@@ -1,0 +1,13 @@
+{
+    "Import Vitest": {
+        "prefix": "!test",
+        "body": [
+            "import { describe, test , expect } from 'vitest';\n",
+            "describe('${1:Test Suite}', () => {",
+            "    test('${2:Test Case}', () => {",
+            "        ${3:// TODO: Implement test}",
+            "    });",
+            "});",
+        ],
+    },
+}

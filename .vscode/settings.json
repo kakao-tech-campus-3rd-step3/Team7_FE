@@ -1,0 +1,13 @@
+{
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "javascript.preferences.importModuleSpecifier": "non-relative",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+    "explorer.sortOrder": "default",
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "index.ts": "*",
+        "index.tsx": "*"
+    }
+}
