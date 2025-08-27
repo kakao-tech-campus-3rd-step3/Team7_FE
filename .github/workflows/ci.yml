@@ -1,0 +1,59 @@
+name: "Continuous Integration"
+
+on:
+    pull_request:
+        branches:
+            - develop
+
+jobs:
+    danger-js:
+        name: "Run DangerJS"
+        runs-on: ubuntu-latest
+        permissions:
+            issues: write
+            pull-requests: write
+            statuses: write
+            checks: write
+
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node.js (with Yarn cache)
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  cache: "yarn"
+
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache Dependencies
+              uses: actions/cache@v4
+              id: yarn-cache
+              with:
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Cache node_modules
+              uses: actions/cache@v4
+              id: node-modules-cache
+              with:
+                  path: |
+                      node_modules
+                      mosu-app/node_modules
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
+
+            - name: Install dependencies
+              if: steps.node-modules-cache.outputs.cache-hit != 'true'
+              run: yarn install --frozen-lockfile --prefer-offline
+
+            - name: "Run DangerJS"
+              run: npx danger ci
