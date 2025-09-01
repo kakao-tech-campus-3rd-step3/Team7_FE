@@ -26,3 +26,5 @@ coverage
 
 # Environment Variables
 .env*
+*storybook.log
+storybook-static
