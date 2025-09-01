@@ -55,6 +55,8 @@ jobs:
 
             - name: "Run DangerJS"
               run: npx danger ci
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     storybook:
         name: Build & Publish Storybook
