@@ -44,9 +44,7 @@ jobs:
               uses: actions/cache@v4
               id: node-modules-cache
               with:
-                  path: |
-                      node_modules
-                      mosu-app/node_modules
+                  path: node_modules
                   key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-node-modules-
@@ -57,3 +55,117 @@ jobs:
 
             - name: "Run DangerJS"
               run: npx danger ci
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    storybook:
+        name: Build & Publish Storybook
+        needs: danger-js
+        runs-on: ubuntu-latest
+        outputs:
+            chromatic_url: ${{ steps.chromatic.outputs.url }}
+            chromatic_build_url: ${{ steps.chromatic.outputs.buildUrl }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node.js (with Yarn cache)
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  cache: "yarn"
+
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache yarn cache
+              uses: actions/cache@v4
+              id: yarn-cache
+              with:
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Cache node_modules
+              uses: actions/cache@v4
+              id: node-modules-cache
+              with:
+                  path: node_modules
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
+
+            - name: Install dependencies
+              if: steps.node-modules-cache.outputs.cache-hit != 'true'
+              run: yarn install --frozen-lockfile --prefer-offline
+
+            - name: Cache Storybook build
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      storybook-static
+                      .storybook
+                  key: ${{ runner.os }}-storybook-${{ hashFiles('**/*.stories.*', '.storybook/**/*') }}
+                  restore-keys: ${{ runner.os }}-storybook-
+
+            - name: Build Storybook
+              run: yarn build-storybook
+
+            - name: Publish to Chromatic
+              id: chromatic
+              uses: chromaui/action@latest
+              with:
+                  projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+                  onlyChanged: true
+                  autoAcceptChanges: false
+                  exitZeroOnChanges: true
+
+    storybook-comment:
+        name: Comment PR with Chromatic URL
+        needs: storybook
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request'
+        permissions:
+            issues: write
+            pull-requests: write
+        steps:
+            - name: Comment URLs on PR
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const pr = context.payload.pull_request;
+                      const storybookURL = '${{ needs.storybook.outputs.chromatic_url }}';
+                      const chromaticURL = '${{ needs.storybook.outputs.chromatic_build_url }}';
+
+                      let body = '### 📚 Storybook이 Chromatic에 배포되었습니다!\n';
+                      if (storybookURL) body += `- 🔗 Storybook Preview: ${storybookURL}\n`;
+                      if (chromaticURL) body += `- 🚀 Chromatic Build: ${chromaticURL}\n`;
+
+                      const { data: comments } = await github.rest.issues.listComments({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pr.number,
+                      });
+
+                      const existingComment = comments.find(comment => comment.user.login === 'github-actions[bot]' && comment.body.includes('Storybook'));
+
+                      if (existingComment) {
+                        await github.rest.issues.updateComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: existingComment.id,
+                          body,
+                        });
+                      } else {
+                        await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: pr.number,
+                          body,
+                        });
+                      }
