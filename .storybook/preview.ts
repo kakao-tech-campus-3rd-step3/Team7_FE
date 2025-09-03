@@ -1,3 +1,4 @@
+import "../src/app/lib/pdf";
 import "../src/app/styles/main.css";
 import type { Preview } from "@storybook/react-vite";
 
