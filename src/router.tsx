@@ -37,7 +37,7 @@ const routes = createRoutesFromElements(
                 </Route>
                 <Route path="applications/:applicationId">
                     <Route index></Route>
-                    <Route path= "resume" element={<ApplicationDetailPage />} />
+                    <Route path="resumes" element={<ApplicationDetailPage />} />
                     <Route path="diff" element={<DocumentDiffPage />} />
                 </Route>
             </Route>
