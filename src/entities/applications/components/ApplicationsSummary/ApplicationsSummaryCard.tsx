@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
@@ -22,7 +22,7 @@ interface CardHeaderProps {
     location: string;
     jobType: string;
     field: string;
-    actions?: React.ReactNode;
+    actions?: ReactNode;
 }
 const CardHeader = ({
   companyLogo,
