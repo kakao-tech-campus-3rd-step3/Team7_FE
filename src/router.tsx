@@ -12,6 +12,7 @@ import MenteeDashboardPage from "@/pages/mentee/MenteeDashboardPage";
 import MenteeSearchMentorPage from "@/pages/mentee/MenteeSearchMentorPage";
 import MenteeSettingsPage from "@/pages/mentee/MenteeSettingsPage";
 import DocumentDiffPage from "@/pages/mentee/applications/DocumentDiffPage";
+import ApplicationDetailPage from "@/pages/mentee/applications/ApplicationDetailPage";
 
 const routes = createRoutesFromElements(
     <Fragment>
@@ -31,8 +32,12 @@ const routes = createRoutesFromElements(
                 <Route path="search" element={<MenteeSearchMentorPage />} />
                 <Route path="settings" element={<MenteeSettingsPage />} />
 
+                <Route path="applications">
+
+                </Route>
                 <Route path="applications/:applicationId">
                     <Route index></Route>
+                    <Route path= "resume" element={<ApplicationDetailPage />} />
                     <Route path="diff" element={<DocumentDiffPage />} />
                 </Route>
             </Route>
