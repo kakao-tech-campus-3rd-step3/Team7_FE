@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
+// File: src/entities/document/components/DocumentList.stories.tsx
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { DocumentList } from "./DocumentList";
 
 const meta: Meta<typeof DocumentList> = {
