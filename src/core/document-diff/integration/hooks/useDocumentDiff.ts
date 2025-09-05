@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { FileTypes } from "@/core/@types/FileType";
 import type { InferDiffResultType } from "@/core/document-diff/base/DiffResult";
@@ -19,7 +19,10 @@ export const useDocumentDiff = <T extends FileTypes>(
     const [diffResult, setDiffResult] = useState<InferDiffResultType<T> | null>(null);
     const [error, setError] = useState<Error | null>(null);
 
-    const diffStrategy = DiffStrategyFactory.create(options.fileType);
+    const diffStrategy = useMemo(
+        () => DiffStrategyFactory.create(options.fileType),
+        [options.fileType],
+    );
 
     const processDiff = useCallback(async () => {
         try {
