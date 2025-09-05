@@ -92,7 +92,7 @@ export default function MyPage() {}
 - 접미사(postfix)에 `ResponseBody` 또는 `RequestBody` 를 붙여 명확하게 구분합니다
 
 ```ts
-export interface GetProfileByIdResponseBody {
+export interface GetProfileByProfileIdResponseBody {
     name: string;
     email: string;
 }
@@ -133,7 +133,7 @@ export async function getProfileById(id: number) {
 export interface CreateProfileByIdRequestBody {}
 export interface CreateProfileByIdResponseBody {}
 
-export async function createProfileById() {}
+export async function createProfileById(id: number) {}
 
 export const useCreateProfile = (id: number) => {
     return useMutation({
@@ -160,7 +160,7 @@ export const useCreateProfile = (id: number) => {
 
 ```ts
 export const UserQueryKeys = {
-    GET_USERNAME: () => ["USER", "GET_USERNAME", id],
+    GET_USERNAME: () => ["USER", "GET_USERNAME"],
     GET_PROFILE_BY_ID: (id: number) => ["USER", "GET_PROFILE_BY_ID", id],
 } as const;
 ```
