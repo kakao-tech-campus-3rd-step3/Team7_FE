@@ -11,28 +11,27 @@ export const useDebouncedResizeObserver = (delay: number = 300) => {
 
     useEffect(() => {
         const element = ref.current;
-        if (!element) return;
+        if (!element || typeof ResizeObserver === "undefined") return;
+        setSize({ width: element.clientWidth, height: element.clientHeight });
 
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-        const observer = new ResizeObserver(() => {
-            if (timeoutId) clearTimeout(timeoutId);
+        const resizeObserver = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            const { width, height } = entry.contentRect;
 
-            timeoutId = setTimeout(() => {
-                setSize({
-                    width: element.offsetWidth,
-                    height: element.offsetHeight,
-                });
-            }, delay);
+            if (timeoutId) clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => setSize({ width, height }), delay);
         });
 
-        observer.observe(element);
+        resizeObserver.observe(element);
 
         return () => {
             if (timeoutId) clearTimeout(timeoutId);
-            observer.disconnect();
+            resizeObserver.unobserve(element);
+            resizeObserver.disconnect();
         };
-    }, [ref, delay]);
+    }, [delay]);
 
     return {
         ref,
