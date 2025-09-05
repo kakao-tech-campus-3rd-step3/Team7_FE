@@ -11,7 +11,13 @@ export interface DiffViewerProps {
     afterSrc: string;
 }
 
-export const DiffViewer = ({ pendingFallback, fileType, beforeSrc, afterSrc }: DiffViewerProps) => {
+export const DiffViewer = ({
+    pendingFallback,
+    errorFallback,
+    fileType,
+    beforeSrc,
+    afterSrc,
+}: DiffViewerProps) => {
     const { isProcessing, diffResult, isError, error } = useDocumentDiff({
         fileType: fileType,
         before: beforeSrc,
@@ -19,13 +25,12 @@ export const DiffViewer = ({ pendingFallback, fileType, beforeSrc, afterSrc }: D
     });
 
     if (isProcessing) return pendingFallback;
-    if (isError || !diffResult) throw error;
+    if (isError) return errorFallback ?? error;
+    if (!diffResult) return pendingFallback;
 
     switch (fileType) {
         case FileType.PDF:
-            return (
-                <PdfDiffViewer renderer="pdf" before={diffResult.before} after={diffResult.after} />
-            );
+            return <PdfDiffViewer before={diffResult.before} after={diffResult.after} />;
 
         // TODO : PlainTextDiffViewer, MarkdownDiffViewer 구현 후 추가
         case FileType.TEXT:
