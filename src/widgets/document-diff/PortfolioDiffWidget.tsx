@@ -6,6 +6,8 @@ import {
     VersionNavMagnifyController,
 } from "@/features/document-diff/components/VersionNav";
 
+import { PdfDiffViewer } from "@/core/document-diff/integration/components/DiffViewer/PdfDiffViewer";
+
 export const PortfolioDiffWidget = () => {
     return (
         <Fragment>
@@ -21,7 +23,8 @@ export const PortfolioDiffWidget = () => {
                     controller={<VersionNavMagnifyController />}
                 />
             </VersionNav>
-            포트폴리오 비교!
+
+            <PdfDiffViewer before="/mocks/v1-sample.pdf" after="/mocks/v2-sample.pdf" />
         </Fragment>
     );
 };
