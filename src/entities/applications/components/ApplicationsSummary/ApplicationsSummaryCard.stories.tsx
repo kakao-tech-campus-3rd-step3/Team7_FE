@@ -36,7 +36,7 @@ export default meta;
 type Story = StoryObj<typeof ApplicationsSummaryCard>;
 
 const baseArgs = {
-  companyLogo: "/assets/samsung.png",
+  companyLogo: 'https://placehold.co/80x80?text=Logo',
   companyName: "삼성전자",
   applyPosition: "DX 부문 소프트웨어 개발",
   appliedDate: "2024-01-15",
