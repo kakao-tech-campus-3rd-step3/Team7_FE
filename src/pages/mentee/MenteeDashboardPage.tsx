@@ -1,9 +1,17 @@
 import { Folder, UserRoundPen, Clock3, UserRound } from "lucide-react";
 
 import {
+    DashboardApplyCard,
+    DashboardApplyWrapper,
+    DashboardApplyContainer,
+} from "@/features/dashboard/components/DashboardApply";
+import {
     DashboardHeaderContainer,
     DashboardHeaderCard,
 } from "@/features/dashboard/components/DashboardHeader";
+
+//TODO : 기업 이미지 불러오기
+const PlaceholderLogo: React.ReactNode = <div className="h-5 w-5 rounded-sm bg-zinc-200/80" />;
 
 export default function MenteeDashboardPage() {
     return (
@@ -43,6 +51,50 @@ export default function MenteeDashboardPage() {
                     iconBg="bg-violet-50"
                 />
             </DashboardHeaderContainer>
+
+            <h3 className="mt-8 mb-3 text-lg leading-7 font-semibold text-slate-900">지원 현황</h3>
+
+            <DashboardApplyContainer>
+                <DashboardApplyWrapper title="지원 예정" value={1} wrapperClassName="bg-zinc-50">
+                    <DashboardApplyCard
+                        icon={PlaceholderLogo}
+                        company="LG CNS"
+                        position="클라우드 엔지니어"
+                        dday="D-14"
+                    />
+                </DashboardApplyWrapper>
+
+                <DashboardApplyWrapper
+                    title="서류 작성 중"
+                    value={1}
+                    wrapperClassName="bg-yellow-50"
+                >
+                    <DashboardApplyCard
+                        icon={PlaceholderLogo}
+                        company="삼성전자"
+                        position="DX부문 소프트웨어 개발"
+                        dday="D-7"
+                    />
+                </DashboardApplyWrapper>
+
+                <DashboardApplyWrapper title="제출 완료" value={1} wrapperClassName="bg-sky-50">
+                    <DashboardApplyCard
+                        icon={PlaceholderLogo}
+                        company="네이버"
+                        position="백엔드 개발자"
+                        dday="D-3"
+                    />
+                </DashboardApplyWrapper>
+
+                <DashboardApplyWrapper title="면접 진행" value={1} wrapperClassName="bg-green-50">
+                    <DashboardApplyCard
+                        icon={PlaceholderLogo}
+                        company="카카오"
+                        position="프론트엔드 개발자"
+                        dday="D-21"
+                    />
+                </DashboardApplyWrapper>
+            </DashboardApplyContainer>
         </div>
     );
 }
