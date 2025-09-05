@@ -1,3 +1,5 @@
+import { Folder } from "lucide-react";
+
 import { DashboardHeaderCard } from "@/features/dashboard/components/DashboardHeader/DashboardHeaderCard";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -10,5 +12,11 @@ export default meta;
 type Story = StoryObj<typeof DashboardHeaderCard>;
 
 export const Default: Story = {
-    args: {},
+    args: {
+        title: "전체 지원 패키지",
+        value: 12,
+        description: "+2 이번 주",
+        icon: <Folder className="h-5 w-5 text-blue-600" strokeWidth={2} />,
+        iconBg: "bg-blue-50",
+    },
 };
