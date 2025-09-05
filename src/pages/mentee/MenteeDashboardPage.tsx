@@ -9,7 +9,7 @@ export default function MenteeDashboardPage() {
     return (
         <div className="px-6 py-6">
             <h1 className="text-xl font-semibold text-foreground">취업 트래커 대시보드</h1>
-            <h2 className="mt-1 text-[14.68px] leading-[22px] text-[#485563] font-normal">
+            <h2 className="mt-1 text-sm leading-[22px] text-[#485563] font-normal">
                 모든 취업 활동을 한눈에 관리하세요
             </h2>
 

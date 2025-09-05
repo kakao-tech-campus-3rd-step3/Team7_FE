@@ -28,10 +28,10 @@ export const DashboardHeaderCard = ({
         >
             <div className="flex items-start justify-between gap-4 px-6">
                 <div className="min-w-0">
-                    <CardTitle className="text-[12.84px] leading-[18.3px] text-[#485563] font-normal">
+                    <CardTitle className="text-xs leading-[18px] text-[#485563] font-normal">
                         {title}
                     </CardTitle>
-                    <div className="text-[22.02px] font-semibold leading-tight">{value}</div>
+                    <div className="text-2xl font-semibold leading-tight">{value}</div>
                     <CardDescription className="mt-1 text-sm text-emerald-600">
                         {description}
                     </CardDescription>
