@@ -24,11 +24,7 @@ export const PortfolioDiffWidget = () => {
                 />
             </VersionNav>
 
-            <PdfDiffViewer
-                renderer="pdf"
-                before="/mocks/v1-sample.pdf"
-                after="/mocks/v2-sample.pdf"
-            />
+            <PdfDiffViewer before="/mocks/v1-sample.pdf" after="/mocks/v2-sample.pdf" />
         </Fragment>
     );
 };
