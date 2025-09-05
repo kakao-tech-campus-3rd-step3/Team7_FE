@@ -13,8 +13,8 @@ export const Default: Story = {
     render: () => {
         return (
             <DiffLayout width="100%" height="500px">
-                <article className="w-full grid place-items-center bg-green-400/40">Before</article>
-                <article className="w-full grid place-items-center bg-blue-400/40">After</article>
+                <article className="w-full grid place-items-center bg-red-400/40">Before</article>
+                <article className="w-full grid place-items-center bg-green-400/40">After</article>
             </DiffLayout>
         );
     },
