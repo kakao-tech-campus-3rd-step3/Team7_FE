@@ -4,7 +4,7 @@ import type { PdfDiffResult } from "@/core/document-diff/PdfDiffStrategy";
 import { DiffLayout } from "@/core/document-diff/integration/components/DiffLayout";
 import { PdfViewer } from "@/core/document-viewer/components/DocumentViewer";
 
-export interface PdfDiffViewerProps extends PdfDiffResult {}
+export interface PdfDiffViewerProps extends Omit<PdfDiffResult, "renderer"> {}
 
 export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
     return (
@@ -15,6 +15,9 @@ export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
                         scale={1}
                         file={before}
                         onLoadSuccess={({ numPages }) => initializePages?.(numPages)}
+                        onLoadError={(error) =>
+                            console.error("Failed to load PDF document:", error)
+                        }
                     >
                         <Page pageNumber={currentPage} width={width} />
                     </Document>
@@ -26,6 +29,9 @@ export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
                         scale={1}
                         file={after}
                         onLoadSuccess={({ numPages }) => initializePages?.(numPages)}
+                        onLoadError={(error) =>
+                            console.error("Failed to load PDF document:", error)
+                        }
                     >
                         <Page pageNumber={currentPage} width={width} />
                     </Document>
