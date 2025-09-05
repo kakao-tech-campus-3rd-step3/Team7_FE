@@ -1,7 +1,6 @@
 import { Folder } from "lucide-react";
 
-import { DashboardHeaderCard } from "@/features/dashboard/components/DashboardHeader/DashboardHeaderCard";
-
+import { DashboardHeaderCard } from "./DashboardHeaderCard";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta<typeof DashboardHeaderCard> = {
