@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 
 import { Eye, Trash, Folder, FileText } from "lucide-react";
 
@@ -13,7 +13,7 @@ export interface DocumentVersion {
     date: string;
 }
 
-export interface DocumentListProps extends HTMLAttributes<HTMLDivElement> {
+export interface DocumentListProps extends ComponentPropsWithoutRef<"div"> {
     title: string;
     versions: DocumentVersion[];
     onCreateVersion?: () => void;
