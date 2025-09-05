@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "format": "prettier --write --config .prettierrc src/**/*.{js,ts,tsx,json,css,md}",
     "postinstall": "node ./scripts/pdf.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
