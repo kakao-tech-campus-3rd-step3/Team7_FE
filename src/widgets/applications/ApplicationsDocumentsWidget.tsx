@@ -1,3 +1,5 @@
+import { NavLink, useLocation, useParams, generatePath } from "react-router-dom";
+
 import { FileText, BookText, FolderClosed } from "lucide-react";
 
 import { DocumentList } from "@/entities/document/components/DocumentList";
@@ -7,18 +9,38 @@ import { TabItem } from "@/shared/components/Tab/TabItem";
 import { TabNavBar } from "@/shared/components/Tab/TabNavBar";
 import { TabNavItem } from "@/shared/components/Tab/TabNavItem";
 
+const TABS = [
+    { label: "이력서", icon: <FileText size={16} />, slug: "resumes" },
+    { label: "자기소개서", icon: <BookText size={16} />, slug: "coverletters" },
+    { label: "포트폴리오", icon: <FolderClosed size={16} />, slug: "portfolios" },
+];
+
+const getActiveMenuByPath = (pathname: string) => {
+    if (pathname.includes("/coverletters")) return "자기소개서";
+    if (pathname.includes("/portfolios")) return "포트폴리오";
+    return "이력서";
+};
+
 export const ApplicationsDocumentsWidget = () => {
+    const { applicationId } = useParams();
+    const { pathname } = useLocation();
+    const activeMenu = getActiveMenuByPath(pathname);
+
     return (
         <section className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <Tab defaultActiveTab="이력서">
+            <Tab key={activeMenu} defaultActiveTab={activeMenu}>
                 <TabNavBar>
-                    <TabNavItem icon={<FileText size={16} />} label="이력서" indicator={null} />
-                    <TabNavItem icon={<BookText size={16} />} label="자기소개서" indicator={null} />
-                    <TabNavItem
-                        icon={<FolderClosed size={16} />}
-                        label="포트폴리오"
-                        indicator={null}
-                    />
+                    {TABS.map(({ label, icon, slug }) => {
+                        const to = generatePath("/mentee/applications/:applicationId/:slug", {
+                            applicationId: String(applicationId),
+                            slug,
+                        });
+                        return (
+                            <NavLink key={slug} to={to} replace className="inline-flex">
+                                <TabNavItem icon={icon} label={label} indicator={null} />
+                            </NavLink>
+                        );
+                    })}
                 </TabNavBar>
 
                 <div className="p-4">
