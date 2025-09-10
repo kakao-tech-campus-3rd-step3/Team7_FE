@@ -70,6 +70,8 @@ export const DocumentList = ({
                             title={version.title}
                             description={version.description}
                             date={version.date}
+                            onViewVersion={onViewVersion}
+                            onDeleteVersion={onDeleteVersion}
                         />
                     ))}
                 </ul>
