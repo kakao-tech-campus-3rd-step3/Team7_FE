@@ -78,7 +78,7 @@ export const ApplicationsDocumentsWidget = () => {
                             title="이력서"
                             versions={resumeVersions}
                             onCreateVersion={() => alert("이력서 새 버전")}
-                            onViewVersion={(id) => alert(`이력서 보기: ${id}`)}
+                            onViewVersion={() => alert("이력서 보기")}
                             onDeleteVersion={makeDeleteHandler(setResumeVersions)}
                         />
                     </TabItem>
@@ -88,7 +88,7 @@ export const ApplicationsDocumentsWidget = () => {
                             title="자기소개서"
                             versions={coverVersions}
                             onCreateVersion={() => alert("자기소개서 새 버전")}
-                            onViewVersion={(id) => alert(`자기소개서 보기: ${id}`)}
+                            onViewVersion={() => alert(`자기소개서 보기`)}
                             onDeleteVersion={makeDeleteHandler(setCoverVersions)}
                         />
                     </TabItem>
@@ -98,7 +98,7 @@ export const ApplicationsDocumentsWidget = () => {
                             title="포트폴리오"
                             versions={portfolioVersions}
                             onCreateVersion={() => alert("포트폴리오 새 버전")}
-                            onViewVersion={(id) => alert(`포트폴리오 보기: ${id}`)}
+                            onViewVersion={() => alert(`포트폴리오 보기`)}
                             onDeleteVersion={makeDeleteHandler(setPortfolioVersions)}
                         />
                     </TabItem>

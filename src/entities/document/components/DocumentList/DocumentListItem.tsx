@@ -44,7 +44,7 @@ export const DocumentListItem = ({
                     variant="ghost"
                     aria-label="보기"
                     title="보기"
-                    onClick={() => {}}
+                    onClick={() => onViewVersion?.(id)}
                     disabled={!onViewVersion}
                 >
                     <Eye size={16} />
