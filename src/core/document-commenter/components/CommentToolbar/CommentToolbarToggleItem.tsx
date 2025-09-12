@@ -10,7 +10,7 @@ export interface CommentToolbarItemProps {
 
 export const CommentToolbarToggleItem = ({ icon, tooltip, onToggle }: CommentToolbarItemProps) => {
     return (
-        <li className="list-none">
+        <li className="list-none h-full flex items-center">
             <Tooltip delayDuration={1000}>
                 <TooltipTrigger asChild aria-label={tooltip}>
                     <Toggle
