@@ -3,16 +3,18 @@ export interface DisableSelectionProps extends React.ComponentPropsWithoutRef<"d
 }
 
 export const DisableSelection = ({ children, ...props }: DisableSelectionProps) => {
+    const { style, ...rest } = props;
+
     return (
         <div
+            {...rest}
             style={{
                 userSelect: "none",
                 WebkitUserSelect: "none",
                 MozUserSelect: "none",
                 msUserSelect: "none",
-                ...props.style,
+                ...style,
             }}
-            {...props}
         >
             {children}
         </div>
