@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 
 export interface AreaSelectionBoxStyle {
     top: CSSProperties["top"];
@@ -17,7 +17,7 @@ export const useAreaSelect = () => {
     const [areaSelectionBoxStyle, setAreaSelectionBoxStyle] =
         useState<AreaSelectionBoxStyle | null>(null);
 
-    const handleMouseDown = useCallback((event: React.MouseEvent) => {
+    const handleMouseDown = useCallback((event: MouseEvent) => {
         if (!rootElementRef.current) return;
 
         event.preventDefault();
@@ -32,7 +32,7 @@ export const useAreaSelect = () => {
     }, []);
 
     const handleMouseMove = useCallback(
-        (event: React.MouseEvent) => {
+        (event: MouseEvent) => {
             if (!isDragging || !rootElementRef.current) return;
 
             event.preventDefault();
