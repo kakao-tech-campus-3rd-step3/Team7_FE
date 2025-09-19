@@ -9,6 +9,7 @@ import { RootLayout } from "@/app/layouts/RootLayout";
 
 import HomePage from "@/pages/HomePage";
 import MenteeDashboardPage from "@/pages/mentee/MenteeDashboardPage";
+import MenteeFeedbackPage from "@/pages/mentee/MenteeFeedbackPage";
 import MenteeSearchMentorPage from "@/pages/mentee/MenteeSearchMentorPage";
 import MenteeSettingsPage from "@/pages/mentee/MenteeSettingsPage";
 import ApplicationDetailPage from "@/pages/mentee/applications/ApplicationDetailPage";
@@ -41,6 +42,8 @@ const routes = createRoutesFromElements(
 
                     <Route path="diff" element={<DocumentDiffPage />} />
                 </Route>
+
+                <Route path="feedback/:id" element={<MenteeFeedbackPage />} />
             </Route>
         </Route>
     </Fragment>,

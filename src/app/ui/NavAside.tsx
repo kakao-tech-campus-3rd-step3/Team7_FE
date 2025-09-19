@@ -8,7 +8,7 @@ export interface NavAsideProps {
 
 export const NavAside = ({ navAsideMenus }: NavAsideProps) => {
     return (
-        <aside className="w-[210px] shadow-xs h-full flex-shrink-0 p-4">
+        <aside className="w-[210px] shadow-xs h-full flex-shrink-0 p-4 border-r border-gray-200">
             <nav className="w-full flex flex-col gap-3">
                 {navAsideMenus.map((menu) => {
                     return <NavAsideItem key={menu.to} {...menu} />;

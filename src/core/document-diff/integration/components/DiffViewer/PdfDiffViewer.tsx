@@ -10,6 +10,7 @@ export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
     return (
         <DiffLayout>
             <PdfViewer
+                viewerWidth="50%"
                 render={({ width, currentPage, initializePages }) => (
                     <Document
                         scale={1}
@@ -24,6 +25,7 @@ export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
                 )}
             />
             <PdfViewer
+                viewerWidth="50%"
                 render={({ width, currentPage, initializePages }) => (
                     <Document
                         scale={1}
