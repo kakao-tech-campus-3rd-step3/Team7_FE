@@ -17,6 +17,7 @@ export interface DocumentListProps extends ComponentPropsWithoutRef<"div"> {
     onCreateVersion?: () => void;
     onViewVersion?: (id: string) => void;
     onDeleteVersion?: (id: string) => void;
+    hideCreateButton?: boolean;
 }
 
 export const DocumentList = ({
@@ -26,6 +27,7 @@ export const DocumentList = ({
     onViewVersion,
     onDeleteVersion,
     className,
+    hideCreateButton,
     ...rest
 }: DocumentListProps) => (
     <Card className={cn("border border-gray-200", className)} {...rest}>
@@ -38,13 +40,15 @@ export const DocumentList = ({
                     <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
                 </div>
 
-                <Button
-                    type="button"
-                    onClick={onCreateVersion}
-                    className="text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                    + 새 버전 만들기
-                </Button>
+                {!hideCreateButton && (
+                    <Button
+                        type="button"
+                        onClick={onCreateVersion}
+                        className="text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                        + 새 버전 만들기
+                    </Button>
+                )}
             </div>
 
             {versions.length === 0 ? (
@@ -54,18 +58,21 @@ export const DocumentList = ({
                     aria-live="polite"
                 >
                     <p className="mb-2 text-sm text-gray-600">아직 생성된 버전이 없습니다.</p>
-                    <Button
-                        type="button"
-                        onClick={onCreateVersion}
-                        className="text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                        새 버전 만들기
-                    </Button>
+                    {!hideCreateButton && (
+                        <Button
+                            type="button"
+                            onClick={onCreateVersion}
+                            className="text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                            새 버전 만들기
+                        </Button>
+                    )}
                 </div>
             ) : (
                 <ul className="space-y-2" role="list">
                     {versions.map((version) => (
                         <DocumentListItem
+                            key={version.id} // ✅ 추가
                             id={version.id}
                             title={version.title}
                             description={version.description}
