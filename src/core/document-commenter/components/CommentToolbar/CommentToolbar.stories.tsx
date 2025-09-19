@@ -1,3 +1,5 @@
+import { Fragment } from "react/jsx-runtime";
+
 import { MessageSquarePlus, ZoomIn, ZoomOut } from "lucide-react";
 
 import { CommentToolbar } from "@/core/document-commenter/components/CommentToolbar/CommentToolbar";
@@ -28,7 +30,7 @@ export const Default: Story = {
             />,
         ],
         rightItems: [
-            <div className="flex gap-1 h-full">
+            <Fragment>
                 <CommentToolbarButtonItem
                     className="h-full w-5"
                     icon={<ZoomIn size={16} />}
@@ -41,7 +43,7 @@ export const Default: Story = {
                     tooltip="축소"
                     onClick={fn()}
                 />
-            </div>,
+            </Fragment>,
         ],
     },
 };
