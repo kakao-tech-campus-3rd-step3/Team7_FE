@@ -2,6 +2,8 @@ import { useId, useState } from "react";
 
 import { UploadCloud } from "lucide-react";
 
+import { cn } from "@/shared/lib/utils";
+
 export interface FileDropzoneProps {
     accept?: string;
     onFiles: (files: FileList | null) => void;
@@ -25,11 +27,11 @@ export const FileDropzone = ({ accept, onFiles, hintId }: FileDropzoneProps) => 
                 setDragOver(false);
                 onFiles(e.dataTransfer.files);
             }}
-            className={[
+            className={cn(
                 "w-full rounded-lg border border-dashed px-4 text-center",
                 "min-h-44 md:min-h-56 flex items-center justify-center",
                 dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-white",
-            ].join(" ")}
+            )}
         >
             <input
                 id={fileInputId}
