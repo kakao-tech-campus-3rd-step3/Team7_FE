@@ -13,6 +13,9 @@ import MenteeSearchMentorPage from "@/pages/mentee/MenteeSearchMentorPage";
 import MenteeSettingsPage from "@/pages/mentee/MenteeSettingsPage";
 import ApplicationDetailPage from "@/pages/mentee/applications/ApplicationDetailPage";
 import DocumentDiffPage from "@/pages/mentee/applications/DocumentDiffPage";
+import NewCoverLetterPage from "@/pages/mentee/applications/NewCoverLetterPage";
+import NewPortfolioPage from "@/pages/mentee/applications/NewPortfolioPage";
+import NewResumePage from "@/pages/mentee/applications/NewResumePage";
 
 const routes = createRoutesFromElements(
     <Fragment>
@@ -33,6 +36,10 @@ const routes = createRoutesFromElements(
                 <Route path="settings" element={<MenteeSettingsPage />} />
 
                 <Route path="applications"></Route>
+                <Route path="resumes/new" element={<NewResumePage />} />
+                <Route path="coverletters/new" element={<NewCoverLetterPage />} />
+                <Route path="portfolios/new" element={<NewPortfolioPage />} />
+
                 <Route path="applications/:applicationId">
                     <Route index></Route>
                     <Route path="resumes" element={<ApplicationDetailPage />} />
