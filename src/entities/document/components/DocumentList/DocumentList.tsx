@@ -72,7 +72,7 @@ export const DocumentList = ({
                 <ul className="space-y-2" role="list">
                     {versions.map((version) => (
                         <DocumentListItem
-                            key={version.id} // ✅ 추가
+                            key={version.id}
                             id={version.id}
                             title={version.title}
                             description={version.description}

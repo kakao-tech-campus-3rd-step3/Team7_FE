@@ -35,6 +35,7 @@ export const DocumentNewForm = ({
     titlePlaceholder = "예: 2차 피드백 반영, 최종 양식본 등",
     accept = ".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg",
     submitText = "새 버전 저장",
+    onSubmit,
 }: DocumentNewFormProps) => {
     const [title, setTitle] = useState("");
     const [files, setFiles] = useState<File[]>([]);
@@ -69,8 +70,24 @@ export const DocumentNewForm = ({
     }));
 
     return (
-        <section className="w-full">
-            <div
+        <form
+            className="w-full"
+            onSubmit={(e) => {
+                e.preventDefault();
+                if (!title.trim()) {
+                    alert("제목을 입력하세요.");
+                    return;
+                }
+                if (files.length === 0) {
+                    alert("업로드할 파일을 추가하세요.");
+                    return;
+                }
+                if (disabled) return;
+                onSubmit?.({ title: title.trim(), files });
+            }}
+            aria-labelledby={titleInputId}
+        >
+            <section
                 className={[
                     "mx-auto w-full",
                     "sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-8xl",
@@ -129,7 +146,7 @@ export const DocumentNewForm = ({
                         alert("임시 저장되었습니다.");
                     }}
                 />
-            </div>
-        </section>
+            </section>
+        </form>
     );
 };
