@@ -35,6 +35,128 @@ const makeNewQuestion = (): CoverLetterQuestionItem => ({
     isOpen: true,
 });
 
+interface CoverLetterQuestionProps {
+    item: CoverLetterQuestionItem;
+    index: number;
+    onPatch: (id: string, patch: Partial<CoverLetterQuestionItem>) => void;
+    onToggle: (id: string) => void;
+    onDelete: (id: string) => void;
+}
+const CoverLetterQuestion = ({
+    item,
+    index,
+    onPatch,
+    onToggle,
+    onDelete,
+}: CoverLetterQuestionProps) => {
+    const isOpen = item.isOpen === true;
+    const contentId = `q-content-${item.id}`;
+    const labelInputId = `q-label-${item.id}`;
+    const maxInputId = `q-max-${item.id}`;
+    const count = item.value.length;
+    const over = count > item.maxLength;
+
+    return (
+        <li className="rounded-lg border border-gray-200 bg-white p-4">
+            <div className="mb-2 flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2">
+                    {isOpen ? (
+                        <button
+                            type="button"
+                            onClick={() => onToggle(item.id)}
+                            aria-label="문항 접기"
+                            aria-expanded="true"
+                            aria-controls={contentId}
+                            className="grid size-6 place-items-center rounded hover:bg-gray-100"
+                        >
+                            <ChevronDown size={16} />
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => onToggle(item.id)}
+                            aria-label="문항 펼치기"
+                            aria-expanded="false"
+                            aria-controls={contentId}
+                            className="grid size-6 place-items-center rounded hover:bg-gray-100"
+                        >
+                            <ChevronRight size={16} />
+                        </button>
+                    )}
+
+                    <div className="grid size-6 place-items-center rounded-full bg-green-100 text-green-600">
+                        <span className="text-xs font-semibold">{index + 1}</span>
+                    </div>
+
+                    <label htmlFor={labelInputId} className="sr-only">
+                        문항 제목
+                    </label>
+                    <input
+                        id={labelInputId}
+                        value={item.label}
+                        onChange={(e) => onPatch(item.id, { label: e.target.value })}
+                        placeholder="문항 제목을 입력하세요"
+                        aria-label="문항 제목"
+                        className="min-w-0 flex-1 truncate rounded border border-transparent px-1 py-0.5 text-sm focus:border-gray-300"
+                    />
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <div
+                        className={`text-xs ${over ? "text-red-600" : "text-gray-500"}`}
+                        aria-live="polite"
+                    >
+                        {count} / {item.maxLength}자
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => onDelete(item.id)}
+                        className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                        aria-label="문항 삭제"
+                    >
+                        <Trash size={14} />
+                        삭제
+                    </button>
+                </div>
+            </div>
+
+            {isOpen && (
+                <div id={contentId}>
+                    <textarea
+                        value={item.value}
+                        onChange={(e) => onPatch(item.id, { value: e.target.value })}
+                        maxLength={item.maxLength}
+                        rows={10}
+                        className="w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-400 min-h-40 md:min-h-56 lg:min-h-72"
+                        placeholder="문항에 대한 내용을 입력하세요."
+                        aria-label={`${index + 1}번 문항 내용`}
+                    />
+                    <div className="mt-2 flex items-center gap-2">
+                        <label htmlFor={maxInputId} className="text-xs text-gray-600">
+                            최대 글자수
+                        </label>
+                        <input
+                            id={maxInputId}
+                            type="number"
+                            min={1}
+                            value={item.maxLength}
+                            onChange={(e) =>
+                                onPatch(item.id, { maxLength: Number(e.target.value || 1) })
+                            }
+                            aria-label="최대 글자수"
+                            className="w-24 rounded-md border px-2 py-1 text-sm text-right"
+                        />
+                    </div>
+                </div>
+            )}
+
+            {!isOpen && item.value && (
+                <p className="truncate text-xs text-gray-500">{item.value.replace(/\s+/g, " ")}</p>
+            )}
+        </li>
+    );
+};
+
 export const CoverLetterNewForm = ({
     titleLabel,
     titlePlaceholder = "예: 2차 피드백 반영, 최종 완성본 등",
@@ -94,24 +216,6 @@ export const CoverLetterNewForm = ({
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
         setQuestions((prev) => prev.filter((q) => q.id !== id));
     };
-    const expandAll = () => setQuestions((prev) => prev.map((q) => ({ ...q, isOpen: true })));
-    const collapseAll = () => setQuestions((prev) => prev.map((q) => ({ ...q, isOpen: false })));
-
-    const handlePickVersion = (id: string | undefined) => {
-        setBaseVersionId(id);
-        if (id === undefined) {
-            const onlyOne = [makeNewQuestion()];
-            setQuestions(onlyOne);
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify({
-                    title: title.trim(),
-                    baseVersionId: undefined,
-                    questions: onlyOne,
-                }),
-            );
-        }
-    };
 
     return (
         <form
@@ -156,7 +260,21 @@ export const CoverLetterNewForm = ({
                         title=""
                         items={versionItems}
                         value={baseVersionId}
-                        onChange={handlePickVersion}
+                        onChange={(id) => {
+                            setBaseVersionId(id);
+                            if (id === undefined) {
+                                const onlyOne = [makeNewQuestion()];
+                                setQuestions(onlyOne);
+                                localStorage.setItem(
+                                    STORAGE_KEY,
+                                    JSON.stringify({
+                                        title: title.trim(),
+                                        baseVersionId: undefined,
+                                        questions: onlyOne,
+                                    }),
+                                );
+                            }
+                        }}
                     />
                 </div>
 
@@ -181,152 +299,22 @@ export const CoverLetterNewForm = ({
 
                     <div className="mb-2 flex items-center justify-between">
                         <p className="text-sm font-semibold text-gray-900">자기소개서 문항</p>
-                        <div className="flex items-center gap-3">
-                            <p className="text-xs text-gray-500" aria-live="polite">
-                                전체 {totalWritten}자 / {totalMax}자
-                            </p>
-                            <button
-                                type="button"
-                                onClick={expandAll}
-                                className="text-xs text-gray-600 underline-offset-2 hover:underline"
-                            >
-                                전체 펼치기
-                            </button>
-                            <button
-                                type="button"
-                                onClick={collapseAll}
-                                className="text-xs text-gray-600 underline-offset-2 hover:underline"
-                            >
-                                전체 접기
-                            </button>
-                        </div>
+                        <p className="text-xs text-gray-500" aria-live="polite">
+                            전체 {totalWritten}자 / {totalMax}자
+                        </p>
                     </div>
 
                     <ul className="space-y-3">
-                        {questions.map((q, idx) => {
-                            const isOpen = q.isOpen === true;
-                            const contentId = `q-content-${q.id}`;
-                            const labelInputId = `q-label-${q.id}`;
-                            const maxInputId = `q-max-${q.id}`;
-                            const count = q.value.length;
-                            const over = count > q.maxLength;
-
-                            return (
-                                <li
-                                    key={q.id}
-                                    className="rounded-lg border border-gray-200 bg-white p-4"
-                                >
-                                    <div className="mb-2 flex items-center justify-between gap-3">
-                                        <div className="flex min-w-0 items-center gap-2">
-                                            {isOpen ? (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleQuestion(q.id)}
-                                                    aria-label="문항 접기"
-                                                    aria-expanded="true"
-                                                    aria-controls={contentId}
-                                                    className="grid size-6 place-items-center rounded hover:bg-gray-100"
-                                                >
-                                                    <ChevronDown size={16} />
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleQuestion(q.id)}
-                                                    aria-label="문항 펼치기"
-                                                    aria-expanded="false"
-                                                    aria-controls={contentId}
-                                                    className="grid size-6 place-items-center rounded hover:bg-gray-100"
-                                                >
-                                                    <ChevronRight size={16} />
-                                                </button>
-                                            )}
-
-                                            <div className="grid size-6 place-items-center rounded-full bg-green-100 text-green-600">
-                                                <span className="text-xs font-semibold">
-                                                    {idx + 1}
-                                                </span>
-                                            </div>
-
-                                            <label htmlFor={labelInputId} className="sr-only">
-                                                문항 제목
-                                            </label>
-                                            <input
-                                                id={labelInputId}
-                                                value={q.label}
-                                                onChange={(e) =>
-                                                    patchQuestion(q.id, { label: e.target.value })
-                                                }
-                                                placeholder="문항 제목을 입력하세요"
-                                                aria-label="문항 제목"
-                                                className="min-w-0 flex-1 truncate rounded border border-transparent px-1 py-0.5 text-sm focus:border-gray-300"
-                                            />
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <div
-                                                className={`text-xs ${over ? "text-red-600" : "text-gray-500"}`}
-                                                aria-live="polite"
-                                            >
-                                                {count} / {q.maxLength}자
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => deleteQuestion(q.id)}
-                                                className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
-                                                aria-label="문항 삭제"
-                                            >
-                                                <Trash size={14} />
-                                                삭제
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {isOpen && (
-                                        <div id={contentId}>
-                                            <textarea
-                                                value={q.value}
-                                                onChange={(e) =>
-                                                    patchQuestion(q.id, { value: e.target.value })
-                                                }
-                                                maxLength={q.maxLength}
-                                                rows={10}
-                                                className="w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-400 min-h-40 md:min-h-56 lg:min-h-72"
-                                                placeholder="문항에 대한 내용을 입력하세요."
-                                                aria-label={`${idx + 1}번 문항 내용`}
-                                            />
-                                            <div className="mt-2 flex items-center gap-2">
-                                                <label
-                                                    htmlFor={maxInputId}
-                                                    className="text-xs text-gray-600"
-                                                >
-                                                    최대 글자수
-                                                </label>
-                                                <input
-                                                    id={maxInputId}
-                                                    type="number"
-                                                    min={1}
-                                                    value={q.maxLength}
-                                                    onChange={(e) =>
-                                                        patchQuestion(q.id, {
-                                                            maxLength: Number(e.target.value || 1),
-                                                        })
-                                                    }
-                                                    aria-label="최대 글자수"
-                                                    className="w-24 rounded-md border px-2 py-1 text-sm text-right"
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {!isOpen && q.value && (
-                                        <p className="truncate text-xs text-gray-500">
-                                            {q.value.replace(/\s+/g, " ")}
-                                        </p>
-                                    )}
-                                </li>
-                            );
-                        })}
+                        {questions.map((q, idx) => (
+                            <CoverLetterQuestion
+                                key={q.id}
+                                item={q}
+                                index={idx}
+                                onPatch={patchQuestion}
+                                onToggle={toggleQuestion}
+                                onDelete={deleteQuestion}
+                            />
+                        ))}
                     </ul>
 
                     <div className="mt-3 flex items-center justify-between">
@@ -337,7 +325,6 @@ export const CoverLetterNewForm = ({
                         >
                             <Plus size={16} /> 문항 추가하기
                         </button>
-                        <span />
                     </div>
                 </div>
 
