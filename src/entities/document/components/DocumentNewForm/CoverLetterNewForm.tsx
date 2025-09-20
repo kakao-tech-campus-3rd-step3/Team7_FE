@@ -73,9 +73,7 @@ export const CoverLetterNewForm = ({
             if (parsed.questions?.length) {
                 setQuestions(parsed.questions.map((q) => ({ ...q, isOpen: q.isOpen ?? true })));
             }
-        } catch {
-            // ignore
-        }
+        } catch {}
     }, []);
 
     useEffect(() => {
@@ -120,6 +118,10 @@ export const CoverLetterNewForm = ({
             className="w-full"
             onSubmit={(e) => {
                 e.preventDefault();
+                if (!title.trim()) {
+                    alert("제목을 입력하세요.");
+                    return;
+                }
                 if (!window.confirm("새 버전을 저장하시겠습니까?")) return;
                 onSubmit?.({ title: title.trim(), baseVersionId, questions });
                 localStorage.removeItem(STORAGE_KEY);
