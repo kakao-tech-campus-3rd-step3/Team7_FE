@@ -8,8 +8,9 @@ import {
 } from "@/entities/document/components/DocumentList";
 
 import { cn } from "@/shared/lib/utils";
-import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
+
+import { CreateVersionButton } from "./CreateVersionButton";
 
 export interface DocumentListProps extends ComponentPropsWithoutRef<"div"> {
     title: string;
@@ -40,15 +41,7 @@ export const DocumentList = ({
                     <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
                 </div>
 
-                {!hideCreateButton && (
-                    <Button
-                        type="button"
-                        onClick={onCreateVersion}
-                        className="text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                        + 새 버전 만들기
-                    </Button>
-                )}
+                {!hideCreateButton && <CreateVersionButton onClick={onCreateVersion} />}
             </div>
 
             {versions.length === 0 ? (
@@ -58,15 +51,7 @@ export const DocumentList = ({
                     aria-live="polite"
                 >
                     <p className="mb-2 text-sm text-gray-600">아직 생성된 버전이 없습니다.</p>
-                    {!hideCreateButton && (
-                        <Button
-                            type="button"
-                            onClick={onCreateVersion}
-                            className="text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                            새 버전 만들기
-                        </Button>
-                    )}
+                    {!hideCreateButton && <CreateVersionButton onClick={onCreateVersion} />}
                 </div>
             ) : (
                 <ul className="space-y-2" role="list">
