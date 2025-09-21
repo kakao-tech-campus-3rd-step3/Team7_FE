@@ -47,19 +47,21 @@ export const DocumentNewForm = ({
     const addFiles = (list: FileList | null) => {
         if (!list) return;
         const incoming = Array.from(list);
-        setFiles((prev) => {
-            const merged = [...prev];
-            incoming.forEach((nf) => {
-                const dup = merged.some(
-                    (f) =>
-                        f.name === nf.name &&
-                        f.size === nf.size &&
-                        f.lastModified === nf.lastModified,
-                );
-                if (!dup) merged.push(nf);
-            });
-            return merged;
-        });
+
+        setFiles((prev) =>
+            incoming.reduce<File[]>(
+                (acc, nf) => {
+                    const exists = acc.some(
+                        (f) =>
+                            f.name === nf.name &&
+                            f.size === nf.size &&
+                            f.lastModified === nf.lastModified,
+                    );
+                    return exists ? acc : [...acc, nf];
+                },
+                [...prev],
+            ),
+        );
     };
 
     const versions = files.map((f, idx) => ({
