@@ -20,7 +20,16 @@ export function loadCoverLetterDraft(): CoverLetterDraft {
 }
 
 export function saveCoverLetterDraft(draft: CoverLetterDraft): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    if (typeof window === "undefined" || !("localStorage" in window)) return;
+    try {
+        const sanitized =
+            draft?.questions
+                ? { ...draft, questions: draft.questions.map(({ isOpen, ...q }) => q) }
+                : draft;
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+    } catch {
+        // TODO: 필요 시 사용자 알림/로그 수집 연동
+    }
 }
 
 export function clearCoverLetterDraft(): void {
