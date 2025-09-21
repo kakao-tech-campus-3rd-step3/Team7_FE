@@ -5,6 +5,7 @@ import { Plus, Trash, ChevronDown, ChevronRight } from "lucide-react";
 import { FormActions } from "@/shared/components/NewApplication/FormActions";
 
 import { VersionRadioList, type VersionRadioItem } from "./VersionRadioList";
+import { loadCoverLetterDraft, saveCoverLetterDraft, clearCoverLetterDraft } from "./storage";
 
 export interface CoverLetterQuestionItem {
     id: string;
@@ -25,8 +26,6 @@ export interface CoverLetterNewFormProps {
     }) => void;
 }
 
-const STORAGE_KEY = "coverletter:draft";
-
 const makeNewQuestion = (): CoverLetterQuestionItem => ({
     id: crypto.randomUUID(),
     label: "새 문항",
@@ -42,6 +41,7 @@ interface CoverLetterQuestionProps {
     onToggle: (id: string) => void;
     onDelete: (id: string) => void;
 }
+
 const CoverLetterQuestion = ({
     item,
     index,
@@ -182,24 +182,16 @@ export const CoverLetterNewForm = ({
     );
 
     useEffect(() => {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        try {
-            const parsed = JSON.parse(raw) as {
-                title?: string;
-                baseVersionId?: string;
-                questions?: CoverLetterQuestionItem[];
-            };
-            if (parsed.title) setTitle(parsed.title);
-            if (parsed.baseVersionId !== undefined) setBaseVersionId(parsed.baseVersionId);
-            if (parsed.questions?.length) {
-                setQuestions(parsed.questions.map((q) => ({ ...q, isOpen: q.isOpen ?? true })));
-            }
-        } catch {}
+        const draft = loadCoverLetterDraft();
+        if (draft.title) setTitle(draft.title);
+        if (draft.baseVersionId !== undefined) setBaseVersionId(draft.baseVersionId);
+        if (draft.questions?.length) {
+            setQuestions(draft.questions.map((q) => ({ ...q, isOpen: q.isOpen ?? true })));
+        }
     }, []);
 
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ title, baseVersionId, questions }));
+        saveCoverLetterDraft({ title, baseVersionId, questions });
     }, [title, baseVersionId, questions]);
 
     const totalWritten = questions.reduce((a, q) => a + q.value.length, 0);
@@ -217,6 +209,27 @@ export const CoverLetterNewForm = ({
         setQuestions((prev) => prev.filter((q) => q.id !== id));
     };
 
+    const handleBaseVersionChange = (id: string | undefined) => {
+        setBaseVersionId(id);
+
+        if (id === undefined) {
+            const onlyOne = [makeNewQuestion()];
+            setQuestions(onlyOne);
+            saveCoverLetterDraft({
+                title: title.trim(),
+                baseVersionId: undefined,
+                questions: onlyOne,
+            });
+            return;
+        }
+
+        saveCoverLetterDraft({
+            title: title.trim(),
+            baseVersionId: id,
+            questions,
+        });
+    };
+
     return (
         <form
             className="w-full"
@@ -227,8 +240,9 @@ export const CoverLetterNewForm = ({
                     return;
                 }
                 if (!window.confirm("새 버전을 저장하시겠습니까?")) return;
+
                 onSubmit?.({ title: title.trim(), baseVersionId, questions });
-                localStorage.removeItem(STORAGE_KEY);
+                clearCoverLetterDraft();
             }}
         >
             <div className="mx-auto w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-8xl px-6 pt-0 pb-6">
@@ -260,21 +274,7 @@ export const CoverLetterNewForm = ({
                         title=""
                         items={versionItems}
                         value={baseVersionId}
-                        onChange={(id) => {
-                            setBaseVersionId(id);
-                            if (id === undefined) {
-                                const onlyOne = [makeNewQuestion()];
-                                setQuestions(onlyOne);
-                                localStorage.setItem(
-                                    STORAGE_KEY,
-                                    JSON.stringify({
-                                        title: title.trim(),
-                                        baseVersionId: undefined,
-                                        questions: onlyOne,
-                                    }),
-                                );
-                            }
-                        }}
+                        onChange={handleBaseVersionChange}
                     />
                 </div>
 
@@ -332,10 +332,11 @@ export const CoverLetterNewForm = ({
                     disabled={disabled}
                     submitText={submitText}
                     onTempSave={() => {
-                        localStorage.setItem(
-                            STORAGE_KEY,
-                            JSON.stringify({ title: title.trim(), baseVersionId, questions }),
-                        );
+                        saveCoverLetterDraft({
+                            title: title.trim(),
+                            baseVersionId,
+                            questions,
+                        });
                         alert("임시 저장되었습니다.");
                     }}
                 />
