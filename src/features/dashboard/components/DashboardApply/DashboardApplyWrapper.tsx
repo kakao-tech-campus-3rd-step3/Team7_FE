@@ -7,6 +7,9 @@ export interface DashboardApplyWrapperProps extends PropsWithChildren {
     value: number;
     wrapperClassName?: string;
     className?: string;
+    droppableRef?: React.Ref<HTMLDivElement>;
+    isOver?: boolean;
+    canDrop?: boolean;
 }
 
 export const DashboardApplyWrapper = ({
@@ -15,6 +18,9 @@ export const DashboardApplyWrapper = ({
     wrapperClassName = "bg-zinc-50",
     className,
     children,
+    droppableRef,
+    isOver,
+    canDrop,
 }: DashboardApplyWrapperProps) => {
     return (
         <div className={cn("flex flex-col", className)}>
@@ -26,9 +32,12 @@ export const DashboardApplyWrapper = ({
             </div>
 
             <div
+                ref={droppableRef}
                 className={cn(
-                    "rounded-xl px-5 py-6 min-h-[420px] sm:min-h-[480px] lg:min-h-[560px]",
+                    "rounded-xl px-5 py-6 min-h-[420px] sm:min-h-[480px] lg:min-h-[560px] transition outline-offset-0",
                     wrapperClassName,
+                    isOver && canDrop && "outline-2 outline-dashed outline-slate-400/70",
+                    isOver && !canDrop && "opacity-70",
                 )}
             >
                 <div className="flex flex-col gap-4">{children}</div>
