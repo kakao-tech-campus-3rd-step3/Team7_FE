@@ -1,7 +1,9 @@
-import { memo } from "react";
-import { useId } from "react";
+import { memo, useMemo } from "react";
 
 import { CalendarDays, FileText } from "lucide-react";
+
+import { Label } from "@/shared/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/shared/ui/radio-group";
 
 export interface VersionRadioItem {
     id: string | undefined;
@@ -17,39 +19,38 @@ export interface VersionRadioListProps {
     onChange?: (id: string | undefined) => void;
 }
 
-interface VersionRadioListItemProps {
-    item: VersionRadioItem;
-    checked: boolean;
-    onChange?: (id: string | undefined) => void;
-}
+const toRadioValue = (id: string | undefined) => id ?? "";
+const fromRadioValue = (val: string): string | undefined => (val === "" ? undefined : val);
 
 const VersionRadioListItem = memo(function VersionRadioListItem({
     item,
     checked,
     onChange,
-}: VersionRadioListItemProps) {
-    const name = useId();
-    const key = (item.id ?? "blank") + item.title;
+}: {
+    item: VersionRadioItem;
+    checked: boolean;
+    onChange?: (id: string | undefined) => void;
+}) {
+    const radioId = useMemo(() => (item.id ?? "blank") + "-" + item.title, [item.id, item.title]);
 
     return (
         <li
-            key={key}
             className={[
-                "flex items-center justify-between rounded-lg border bg-white px-4 py-3",
+                "flex items-center justify-between rounded-lg border bg-white px-4 py-3 transition",
                 checked ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200",
             ].join(" ")}
         >
-            <label className="flex w-full cursor-pointer items-center gap-3">
-                <input
-                    type="radio"
-                    name={name}
-                    value={item.id ?? ""}
-                    checked={checked}
-                    onChange={() => onChange?.(item.id)}
-                    className="size-4 accent-blue-600"
-                    aria-label={item.title}
+            <div className="flex w-full items-center gap-3">
+                <RadioGroupItem
+                    id={radioId}
+                    value={toRadioValue(item.id)}
+                    className="mt-0.5"
+                    onClick={() => onChange?.(item.id)}
                 />
-                <div className="flex min-w-0 flex-1 items-center gap-3">
+                <Label
+                    htmlFor={radioId}
+                    className="flex min-w-0 flex-1 cursor-pointer items-center gap-3"
+                >
                     <div className="grid size-8 place-items-center rounded-md bg-green-50 text-green-600">
                         <FileText size={16} />
                     </div>
@@ -65,29 +66,38 @@ const VersionRadioListItem = memo(function VersionRadioListItem({
                             <span>{item.date}</span>
                         </div>
                     )}
-                </div>
-            </label>
+                </Label>
+            </div>
         </li>
     );
 });
 
 export const VersionRadioList = ({ title, items, value, onChange }: VersionRadioListProps) => {
+    const radioValue = toRadioValue(value);
+
     return (
         <section className="space-y-3">
             {title ? <h3 className="text-sm font-medium text-gray-800">{title}</h3> : null}
-            <ul className="space-y-2">
-                {items.map((it) => {
-                    const checked = (value ?? "") === (it.id ?? "");
-                    return (
-                        <VersionRadioListItem
-                            key={(it.id ?? "blank") + it.title}
-                            item={it}
-                            checked={checked}
-                            onChange={onChange}
-                        />
-                    );
-                })}
-            </ul>
+
+            <RadioGroup
+                value={radioValue}
+                onValueChange={(val: string) => onChange?.(fromRadioValue(val))}
+                className="space-y-2"
+            >
+                <ul className="space-y-2">
+                    {items.map((it) => {
+                        const isChecked = radioValue === toRadioValue(it.id);
+                        return (
+                            <VersionRadioListItem
+                                key={(it.id ?? "blank") + it.title}
+                                item={it}
+                                checked={isChecked}
+                                onChange={onChange}
+                            />
+                        );
+                    })}
+                </ul>
+            </RadioGroup>
         </section>
     );
 };
