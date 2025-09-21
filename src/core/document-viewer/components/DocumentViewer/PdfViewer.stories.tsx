@@ -15,6 +15,7 @@ export const Default: Story = {
     render: () => {
         return (
             <PdfViewer
+                viewerWidth="600px"
                 render={({ width, currentPage, initializePages }) => (
                     <Document
                         scale={1}
