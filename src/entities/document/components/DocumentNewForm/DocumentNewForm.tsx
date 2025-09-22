@@ -30,6 +30,8 @@ const formatNow = () =>
         minute: "2-digit",
     });
 
+const fileKey = (f: File) => `${f.name}::${f.size}::${f.lastModified}`;
+
 export const DocumentNewForm = ({
     titleLabel,
     titlePlaceholder = "예: 2차 피드백 반영, 최종 양식본 등",
@@ -48,20 +50,11 @@ export const DocumentNewForm = ({
         if (!list) return;
         const incoming = Array.from(list);
 
-        setFiles((prev) =>
-            incoming.reduce<File[]>(
-                (acc, nf) => {
-                    const exists = acc.some(
-                        (f) =>
-                            f.name === nf.name &&
-                            f.size === nf.size &&
-                            f.lastModified === nf.lastModified,
-                    );
-                    return exists ? acc : [...acc, nf];
-                },
-                [...prev],
-            ),
-        );
+        setFiles((prev) => {
+            const existing = new Set(prev.map(fileKey));
+            const toAdd = incoming.filter((nf) => !existing.has(fileKey(nf)));
+            return [...prev, ...toAdd];
+        });
     };
 
     const versions = files.map((f, idx) => ({
