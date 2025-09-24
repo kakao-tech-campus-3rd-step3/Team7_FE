@@ -1,3 +1,5 @@
+import { Fragment } from "react/jsx-runtime";
+
 import { FileUser } from "lucide-react";
 
 import { Tab, TabNavItem } from "@/shared/components/Tab";
@@ -7,11 +9,9 @@ import { TabNavBar } from "@/shared/components/Tab/TabNavBar";
 
 import { PortfolioFeedbackWidget } from "@/widgets/document-feedback/PortfolioFeedbackWidget";
 
-import { DocumentEventBusProvider } from "@/core/document-event/contexts/DocumentEventBusProvider";
-
 export default function MenteeFeedbackPage() {
     return (
-        <DocumentEventBusProvider>
+        <Fragment>
             <Tab defaultActiveTab="이력서">
                 <TabNavBar>
                     <TabNavItem
@@ -41,6 +41,6 @@ export default function MenteeFeedbackPage() {
                     <div>자기소개서 피드백 위젯</div>
                 </TabItem>
             </Tab>
-        </DocumentEventBusProvider>
+        </Fragment>
     );
 }
