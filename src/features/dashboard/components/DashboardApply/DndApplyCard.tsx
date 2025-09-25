@@ -4,7 +4,7 @@ import {
     DashboardApplyCard,
     type DashboardApplyCardProps,
 } from "@/features/dashboard/components/DashboardApply";
-import { DND_ITEM_TYPES, type Section } from "@/features/dashboard/dnd/types";
+import { DND_ITEM_TYPES, type Section } from "@/features/dashboard/models/types";
 
 import { cn } from "@/shared/lib/utils";
 

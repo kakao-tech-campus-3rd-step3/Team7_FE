@@ -1,4 +1,4 @@
-import type { Section } from "@/features/dashboard/dnd/types";
+import type { Section } from "@/features/dashboard/models/types";
 
 export const sectionState: Record<Section, { title: string; wrapperClassName: string }> = {
     planned: { title: "지원 예정", wrapperClassName: "bg-zinc-50" },

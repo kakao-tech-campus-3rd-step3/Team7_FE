@@ -7,7 +7,7 @@ import {
     DND_ITEM_TYPES,
     type Section,
     type DragItem,
-} from "@/features/dashboard/dnd/types";
+} from "@/features/dashboard/models/types";
 
 export interface DndApplySectionProps extends Omit<React.ComponentProps<"div">, "onDrop" | "ref"> {
     title: string;

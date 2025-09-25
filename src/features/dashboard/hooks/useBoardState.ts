@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-import type { Section, ApplyCard, DragItem } from "@/features/dashboard/dnd/types";
+import type { Section, ApplyCard, DragItem } from "@/features/dashboard/models/types";
 
 export const useBoardState = (initialBoard: Record<Section, ApplyCard[]>) => {
     const [board, setBoard] = useState<Record<Section, ApplyCard[]>>(initialBoard);
