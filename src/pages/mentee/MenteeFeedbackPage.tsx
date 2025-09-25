@@ -9,6 +9,9 @@ import { TabNavBar } from "@/shared/components/Tab/TabNavBar";
 
 import { PortfolioFeedbackWidget } from "@/widgets/document-feedback/PortfolioFeedbackWidget";
 
+import { EventBusProvider } from "@/core/document-commenter/contexts/EventBusContext";
+import { SelectionEventController } from "@/core/document-commenter/events/SelectionEventController";
+
 export default function MenteeFeedbackPage() {
     return (
         <Fragment>
@@ -35,7 +38,9 @@ export default function MenteeFeedbackPage() {
                     <div>이력서 피드백 위젯</div>
                 </TabItem>
                 <TabItem menu="포트폴리오">
-                    <PortfolioFeedbackWidget />
+                    <EventBusProvider eventControllers={[new SelectionEventController()]}>
+                        <PortfolioFeedbackWidget />
+                    </EventBusProvider>
                 </TabItem>
                 <TabItem menu="자기소개서">
                     <div>자기소개서 피드백 위젯</div>
