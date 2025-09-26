@@ -1,12 +1,9 @@
 import { useDrag } from "react-dnd";
 
-import {
-    DashboardApplyCard,
-    type DashboardApplyCardProps,
-} from "@/features/dashboard/components/DashboardApply";
-import { DND_ITEM_TYPES, type Section } from "@/features/dashboard/models/types";
-
 import { cn } from "@/shared/lib/utils";
+
+import { DND_ITEM_TYPES, type Section } from "../../models/types";
+import { DashboardApplyCard, type DashboardApplyCardProps } from "./DashboardApplyCard";
 
 export interface DndApplyCardProps extends DashboardApplyCardProps {
     id: string;

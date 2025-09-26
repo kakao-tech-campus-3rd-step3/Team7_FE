@@ -1,13 +1,8 @@
 import { useCallback } from "react";
 import { useDrop } from "react-dnd";
 
-import { DashboardApplyWrapper } from "@/features/dashboard/components/DashboardApply";
-import {
-    SECTION_ORDER,
-    DND_ITEM_TYPES,
-    type Section,
-    type DragItem,
-} from "@/features/dashboard/models/types";
+import { SECTION_ORDER, DND_ITEM_TYPES, type Section, type DragItem } from "../../models/types";
+import { DashboardApplyWrapper } from "./DashboardApplyWrapper";
 
 export interface DndApplySectionProps extends Omit<React.ComponentProps<"div">, "onDrop" | "ref"> {
     title: string;
