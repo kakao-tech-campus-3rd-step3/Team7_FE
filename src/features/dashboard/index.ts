@@ -10,3 +10,5 @@ export { useBoardState } from "./hooks/useBoardState";
 export { sectionState } from "./models/constants";
 export { sectionMock } from "./models/sectionMock";
 export { SECTION_ORDER } from "./models/types";
+export type { Section, ApplyCard } from "./models/types";
+export { calcDday } from "./lib/calcDday";
