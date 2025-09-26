@@ -37,11 +37,16 @@ export const CommentAreaPlaceholder = ({
             const width = event.payload.current.x - startPosition.current.x;
             const height = event.payload.current.y - startPosition.current.y;
 
+            const nextLeft =
+                width < 0 ? `${event.payload.current.x}px` : `${startPosition.current.x}px`;
+            const nextTop =
+                height < 0 ? `${event.payload.current.y}px` : `${startPosition.current.y}px`;
+
             Object.assign(areaPlaceholderRef.current.style, {
                 width: `${Math.abs(width)}px`,
                 height: `${Math.abs(height)}px`,
-                left: width < 0 ? `${event.payload.current.x}px` : undefined,
-                top: height < 0 ? `${event.payload.current.y}px` : undefined,
+                left: nextLeft,
+                top: nextTop,
             });
         };
 
