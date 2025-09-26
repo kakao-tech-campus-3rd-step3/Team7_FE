@@ -2,10 +2,11 @@ import { useEffect, useId, useMemo, useState } from "react";
 
 import { Plus, Trash, ChevronDown, ChevronRight } from "lucide-react";
 
+import { useGetCoverLetterByVersion } from "@/entities/document/service/useGetCoverLetterByVersion";
+
 import { FormActions } from "@/shared/components/NewApplication/FormActions";
 
 import { VersionRadioList, type VersionRadioItem } from "./VersionRadioList";
-import { loadCoverLetterDraft, saveCoverLetterDraft, clearCoverLetterDraft } from "./storage";
 
 export interface CoverLetterQuestionItem {
     id: string;
@@ -19,6 +20,8 @@ export interface CoverLetterNewFormProps {
     titleLabel: string;
     titlePlaceholder?: string;
     submitText?: string;
+    applicationId: string;
+    versionItems?: VersionRadioItem[];
     onSubmit?: (payload: {
         title: string;
         baseVersionId?: string;
@@ -161,6 +164,8 @@ export const CoverLetterNewForm = ({
     titleLabel,
     titlePlaceholder = "예: 2차 피드백 반영, 최종 완성본 등",
     submitText = "새 버전 저장",
+    applicationId,
+    versionItems: externalVersionItems,
     onSubmit,
 }: CoverLetterNewFormProps) => {
     const [title, setTitle] = useState("");
@@ -168,34 +173,34 @@ export const CoverLetterNewForm = ({
     const [questions, setQuestions] = useState<CoverLetterQuestionItem[]>([makeNewQuestion()]);
 
     const versionItems: VersionRadioItem[] = useMemo(
-        () => [
-            {
-                id: undefined,
-                title: "빈 문서에서 시작",
-                description: "처음부터 새로운 자기소개서를 작성합니다",
-            },
-            { id: "v12", title: "v1.2 - 최종본", date: "2024.01.20" },
-            { id: "v11", title: "v1.1 - 1차 피드백 반영", date: "2024.01.18" },
-            { id: "v10", title: "v1.0 - 초안", date: "2024.01.15" },
-        ],
-        [],
+        () =>
+            externalVersionItems ?? [
+                {
+                    id: undefined,
+                    title: "빈 문서에서 시작",
+                    description: "처음부터 새로운 자기소개서를 작성합니다",
+                },
+                { id: "v12", title: "v1.2 - 최종본", date: "2024.01.20" },
+                { id: "v11", title: "v1.1 - 1차 피드백 반영", date: "2024.01.18" },
+                { id: "v10", title: "v1.0 - 초안", date: "2024.01.15" },
+            ],
+        [externalVersionItems],
     );
 
-    useEffect(() => {
-        const draft = loadCoverLetterDraft();
-        if (draft.title) setTitle(draft.title);
-        if (draft.baseVersionId !== undefined) setBaseVersionId(draft.baseVersionId);
-        if (draft.questions?.length) {
-            setQuestions(draft.questions.map((q) => ({ ...q, isOpen: q.isOpen ?? true })));
-        }
-    }, []);
+    const { data, isFetching, isError } = useGetCoverLetterByVersion(applicationId, baseVersionId);
 
     useEffect(() => {
-        saveCoverLetterDraft({ title, baseVersionId, questions });
-    }, [title, baseVersionId, questions]);
+        if (!data) return;
+        const mapped: CoverLetterQuestionItem[] = data.coverLetterItems.map((it) => ({
+            id: crypto.randomUUID(),
+            label: it.question,
+            value: it.answer ?? "",
+            maxLength: it.answerLimit ?? 1000,
+            isOpen: true,
+        }));
+        setQuestions(mapped.length ? mapped : [makeNewQuestion()]);
+    }, [data]);
 
-    const totalWritten = questions.reduce((a, q) => a + q.value.length, 0);
-    const totalMax = questions.reduce((a, q) => a + q.maxLength, 0);
     const disabled = !title.trim();
     const titleInputId = useId();
 
@@ -211,24 +216,11 @@ export const CoverLetterNewForm = ({
 
     const handleBaseVersionChange = (id: string | undefined) => {
         setBaseVersionId(id);
-
-        if (id === undefined) {
-            const onlyOne = [makeNewQuestion()];
-            setQuestions(onlyOne);
-            saveCoverLetterDraft({
-                title: title.trim(),
-                baseVersionId: undefined,
-                questions: onlyOne,
-            });
-            return;
-        }
-
-        saveCoverLetterDraft({
-            title: title.trim(),
-            baseVersionId: id,
-            questions,
-        });
+        if (id === undefined) setQuestions([makeNewQuestion()]);
     };
+
+    const totalWritten = questions.reduce((a, q) => a + q.value.length, 0);
+    const totalMax = questions.reduce((a, q) => a + q.maxLength, 0);
 
     return (
         <form
@@ -242,7 +234,6 @@ export const CoverLetterNewForm = ({
                 if (!window.confirm("새 버전을 저장하시겠습니까?")) return;
 
                 onSubmit?.({ title: title.trim(), baseVersionId, questions });
-                clearCoverLetterDraft();
             }}
         >
             <div className="mx-auto w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-8xl px-6 pt-0 pb-6">
@@ -276,6 +267,16 @@ export const CoverLetterNewForm = ({
                         value={baseVersionId}
                         onChange={handleBaseVersionChange}
                     />
+                    {isFetching && (
+                        <p className="mt-2 text-xs text-gray-500" role="status" aria-live="polite">
+                            이전 버전을 불러오는 중입니다...
+                        </p>
+                    )}
+                    {isError && (
+                        <p className="mt-2 text-xs text-red-600" role="alert">
+                            이전 버전 불러오기에 실패했습니다. 다시 시도해 주세요.
+                        </p>
+                    )}
                 </div>
 
                 <div className="rounded-lg border border-gray-200 bg-white px-6 py-5">
@@ -332,12 +333,7 @@ export const CoverLetterNewForm = ({
                     disabled={disabled}
                     submitText={submitText}
                     onTempSave={() => {
-                        saveCoverLetterDraft({
-                            title: title.trim(),
-                            baseVersionId,
-                            questions,
-                        });
-                        alert("임시 저장되었습니다.");
+                        alert("임시 저장은 API 연동 후 제공될 예정입니다.");
                     }}
                 />
             </div>
