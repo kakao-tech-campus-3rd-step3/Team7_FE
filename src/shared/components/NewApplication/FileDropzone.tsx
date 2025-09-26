@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState, useRef } from "react";
 
 import { UploadCloud } from "lucide-react";
 
@@ -13,6 +13,29 @@ export interface FileDropzoneProps {
 export const FileDropzone = ({ accept, onFiles, hintId }: FileDropzoneProps) => {
     const fileInputId = useId();
     const [dragOver, setDragOver] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const pickWithAccept = (files: FileList | null) => {
+        if (!files) return onFiles(null);
+        const patterns = (accept ?? "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+        if (patterns.length === 0) return onFiles(files);
+
+        const accepted = Array.from(files).filter((f) =>
+            patterns.some((p) => {
+                if (p.startsWith(".")) return f.name.toLowerCase().endsWith(p.toLowerCase());
+                if (p.endsWith("/*")) return f.type.startsWith(p.slice(0, -1));
+                return f.type === p;
+            }),
+        );
+
+        const dt = new DataTransfer();
+        accepted.forEach((f) => dt.items.add(f));
+        onFiles(dt.files);
+    };
 
     return (
         <div className="w-full">
@@ -20,23 +43,42 @@ export const FileDropzone = ({ accept, onFiles, hintId }: FileDropzoneProps) => 
                 htmlFor={fileInputId}
                 aria-describedby={hintId}
                 aria-label="파일 업로드 영역"
-                onDragOver={(e) => {
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        inputRef.current?.click();
+                    }
+                }}
+                onDragEnter={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     setDragOver(true);
                 }}
-                onDragLeave={() => setDragOver(false)}
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setDragOver(true);
+                }}
+                onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setDragOver(false);
+                }}
                 onDrop={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     setDragOver(false);
-                    onFiles(e.dataTransfer.files ?? null);
+                    pickWithAccept(e.dataTransfer.files ?? null);
                 }}
                 onPaste={(e) => {
+                    e.stopPropagation();
                     const files = Array.from(e.clipboardData?.files ?? []);
-                    if (files.length > 0) {
-                        const dt = new DataTransfer();
-                        files.forEach((f) => dt.items.add(f));
-                        onFiles(dt.files);
-                    }
+                    if (files.length === 0) return;
+                    const dt = new DataTransfer();
+                    files.forEach((f) => dt.items.add(f));
+                    pickWithAccept(dt.files);
                 }}
                 className={cn(
                     "block w-full rounded-lg border border-dashed px-4 text-center",
@@ -68,13 +110,14 @@ export const FileDropzone = ({ accept, onFiles, hintId }: FileDropzoneProps) => 
 
             <input
                 id={fileInputId}
+                ref={inputRef}
                 type="file"
                 accept={accept}
                 multiple
                 className="sr-only"
                 aria-label="문서 파일 선택"
                 onChange={(e) => {
-                    onFiles(e.currentTarget.files);
+                    pickWithAccept(e.currentTarget.files);
                     e.currentTarget.value = "";
                 }}
             />
