@@ -8,32 +8,41 @@ export interface FileDropzoneProps {
     accept?: string;
     onFiles: (files: FileList | null) => void;
     hintId?: string;
+    maxSizeMB?: number;
 }
 
-export const FileDropzone = ({ accept, onFiles, hintId }: FileDropzoneProps) => {
+export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDropzoneProps) => {
     const fileInputId = useId();
     const [dragOver, setDragOver] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const pickWithAccept = (files: FileList | null) => {
         if (!files) return onFiles(null);
+
         const patterns = (accept ?? "")
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean);
 
-        if (patterns.length === 0) return onFiles(files);
+        let filtered = Array.from(files);
 
-        const accepted = Array.from(files).filter((f) =>
-            patterns.some((p) => {
-                if (p.startsWith(".")) return f.name.toLowerCase().endsWith(p.toLowerCase());
-                if (p.endsWith("/*")) return f.type.startsWith(p.slice(0, -1));
-                return f.type === p;
-            }),
-        );
+        if (patterns.length > 0) {
+            filtered = filtered.filter((f) =>
+                patterns.some((p) => {
+                    if (p.startsWith(".")) return f.name.toLowerCase().endsWith(p.toLowerCase());
+                    if (p.endsWith("/*")) return f.type.startsWith(p.slice(0, -1));
+                    return f.type === p;
+                }),
+            );
+        }
+
+        if (maxSizeMB > 0) {
+            const limit = maxSizeMB * 1024 * 1024;
+            filtered = filtered.filter((f) => f.size <= limit);
+        }
 
         const dt = new DataTransfer();
-        accepted.forEach((f) => dt.items.add(f));
+        filtered.forEach((f) => dt.items.add(f));
         onFiles(dt.files);
     };
 
@@ -99,7 +108,7 @@ export const FileDropzone = ({ accept, onFiles, hintId }: FileDropzoneProps) => 
                         파일을 드래그하거나 클릭하여 업로드
                     </p>
                     <p className="mt-1 text-xs text-gray-400">
-                        PDF, DOC, PPT, 이미지 파일 지원 (최대 10MB)
+                        PDF, DOC, PPT, 이미지 파일 지원 (최대 {maxSizeMB}MB)
                     </p>
 
                     <span className="mt-3 inline-flex select-none items-center justify-center rounded-md bg-[#2563EB] px-4 py-2 text-sm font-medium text-white hover:bg-[#1E40AF]">
