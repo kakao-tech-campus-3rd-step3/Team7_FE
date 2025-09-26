@@ -1,20 +1,16 @@
 import { useEffect, useId, useMemo, useState } from "react";
 
-import { Plus, Trash, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { useGetCoverLetterByVersion } from "@/entities/document/service/useGetCoverLetterByVersion";
 
 import { FormActions } from "@/shared/components/NewApplication/FormActions";
 
+import {
+    CoverLetterQuestionItem as CoverLetterQuestionItemComp,
+    type CoverLetterQuestionItemModel,
+} from "./CoverLetterQuestionItem";
 import { VersionRadioList, type VersionRadioItem } from "./VersionRadioList";
-
-export interface CoverLetterQuestionItem {
-    id: string;
-    label: string;
-    maxLength: number;
-    value: string;
-    isOpen?: boolean;
-}
 
 export interface CoverLetterNewFormProps {
     titleLabel: string;
@@ -25,140 +21,17 @@ export interface CoverLetterNewFormProps {
     onSubmit?: (payload: {
         title: string;
         baseVersionId?: string;
-        questions: CoverLetterQuestionItem[];
+        questions: CoverLetterQuestionItemModel[];
     }) => void;
 }
 
-const makeNewQuestion = (): CoverLetterQuestionItem => ({
+const makeNewQuestion = (): CoverLetterQuestionItemModel => ({
     id: crypto.randomUUID(),
     label: "새 문항",
     maxLength: 500,
     value: "",
     isOpen: true,
 });
-
-interface CoverLetterQuestionProps {
-    item: CoverLetterQuestionItem;
-    index: number;
-    onPatch: (id: string, patch: Partial<CoverLetterQuestionItem>) => void;
-    onToggle: (id: string) => void;
-    onDelete: (id: string) => void;
-}
-
-const CoverLetterQuestion = ({
-    item,
-    index,
-    onPatch,
-    onToggle,
-    onDelete,
-}: CoverLetterQuestionProps) => {
-    const isOpen = item.isOpen === true;
-    const contentId = `q-content-${item.id}`;
-    const labelInputId = `q-label-${item.id}`;
-    const maxInputId = `q-max-${item.id}`;
-    const count = item.value.length;
-    const over = count > item.maxLength;
-
-    return (
-        <li className="rounded-lg border border-gray-200 bg-white p-4">
-            <div className="mb-2 flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-2">
-                    {isOpen ? (
-                        <button
-                            type="button"
-                            onClick={() => onToggle(item.id)}
-                            aria-label="문항 접기"
-                            aria-expanded="true"
-                            aria-controls={contentId}
-                            className="grid size-6 place-items-center rounded hover:bg-gray-100"
-                        >
-                            <ChevronDown size={16} />
-                        </button>
-                    ) : (
-                        <button
-                            type="button"
-                            onClick={() => onToggle(item.id)}
-                            aria-label="문항 펼치기"
-                            aria-expanded="false"
-                            aria-controls={contentId}
-                            className="grid size-6 place-items-center rounded hover:bg-gray-100"
-                        >
-                            <ChevronRight size={16} />
-                        </button>
-                    )}
-
-                    <div className="grid size-6 place-items-center rounded-full bg-green-100 text-green-600">
-                        <span className="text-xs font-semibold">{index + 1}</span>
-                    </div>
-
-                    <label htmlFor={labelInputId} className="sr-only">
-                        문항 제목
-                    </label>
-                    <input
-                        id={labelInputId}
-                        value={item.label}
-                        onChange={(e) => onPatch(item.id, { label: e.target.value })}
-                        placeholder="문항 제목을 입력하세요"
-                        aria-label="문항 제목"
-                        className="min-w-0 flex-1 truncate rounded border border-transparent px-1 py-0.5 text-sm focus:border-gray-300"
-                    />
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <div
-                        className={`text-xs ${over ? "text-red-600" : "text-gray-500"}`}
-                        aria-live="polite"
-                    >
-                        {count} / {item.maxLength}자
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => onDelete(item.id)}
-                        className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
-                        aria-label="문항 삭제"
-                    >
-                        <Trash size={14} />
-                        삭제
-                    </button>
-                </div>
-            </div>
-
-            {isOpen && (
-                <div id={contentId}>
-                    <textarea
-                        value={item.value}
-                        onChange={(e) => onPatch(item.id, { value: e.target.value })}
-                        maxLength={item.maxLength}
-                        rows={10}
-                        className="w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-400 min-h-40 md:min-h-56 lg:min-h-72"
-                        placeholder="문항에 대한 내용을 입력하세요."
-                        aria-label={`${index + 1}번 문항 내용`}
-                    />
-                    <div className="mt-2 flex items-center gap-2">
-                        <label htmlFor={maxInputId} className="text-xs text-gray-600">
-                            최대 글자수
-                        </label>
-                        <input
-                            id={maxInputId}
-                            type="number"
-                            min={1}
-                            value={item.maxLength}
-                            onChange={(e) =>
-                                onPatch(item.id, { maxLength: Number(e.target.value || 1) })
-                            }
-                            aria-label="최대 글자수"
-                            className="w-24 rounded-md border px-2 py-1 text-sm text-right"
-                        />
-                    </div>
-                </div>
-            )}
-
-            {!isOpen && item.value && (
-                <p className="truncate text-xs text-gray-500">{item.value.replace(/\s+/g, " ")}</p>
-            )}
-        </li>
-    );
-};
 
 export const CoverLetterNewForm = ({
     titleLabel,
@@ -170,7 +43,7 @@ export const CoverLetterNewForm = ({
 }: CoverLetterNewFormProps) => {
     const [title, setTitle] = useState("");
     const [baseVersionId, setBaseVersionId] = useState<string | undefined>(undefined);
-    const [questions, setQuestions] = useState<CoverLetterQuestionItem[]>([makeNewQuestion()]);
+    const [questions, setQuestions] = useState<CoverLetterQuestionItemModel[]>([makeNewQuestion()]);
 
     const versionItems: VersionRadioItem[] = useMemo(
         () =>
@@ -191,7 +64,7 @@ export const CoverLetterNewForm = ({
 
     useEffect(() => {
         if (!data) return;
-        const mapped: CoverLetterQuestionItem[] = data.coverLetterItems.map((it) => ({
+        const mapped: CoverLetterQuestionItemModel[] = data.coverLetterItems.map((it) => ({
             id: crypto.randomUUID(),
             label: it.question,
             value: it.answer ?? "",
@@ -201,11 +74,10 @@ export const CoverLetterNewForm = ({
         setQuestions(mapped.length ? mapped : [makeNewQuestion()]);
     }, [data]);
 
-    const disabled = !title.trim();
     const titleInputId = useId();
 
     const addQuestion = () => setQuestions((prev) => [...prev, makeNewQuestion()]);
-    const patchQuestion = (id: string, patch: Partial<CoverLetterQuestionItem>) =>
+    const patchQuestion = (id: string, patch: Partial<CoverLetterQuestionItemModel>) =>
         setQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, ...patch } : q)));
     const toggleQuestion = (id: string) =>
         setQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, isOpen: !q.isOpen } : q)));
@@ -232,7 +104,6 @@ export const CoverLetterNewForm = ({
                     return;
                 }
                 if (!window.confirm("새 버전을 저장하시겠습니까?")) return;
-
                 onSubmit?.({ title: title.trim(), baseVersionId, questions });
             }}
         >
@@ -307,7 +178,7 @@ export const CoverLetterNewForm = ({
 
                     <ul className="space-y-3">
                         {questions.map((q, idx) => (
-                            <CoverLetterQuestion
+                            <CoverLetterQuestionItemComp
                                 key={q.id}
                                 item={q}
                                 index={idx}
@@ -330,7 +201,7 @@ export const CoverLetterNewForm = ({
                 </div>
 
                 <FormActions
-                    disabled={disabled}
+                    disabled={!title.trim()}
                     submitText={submitText}
                     onTempSave={() => {
                         alert("임시 저장은 API 연동 후 제공될 예정입니다.");
