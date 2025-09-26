@@ -10,6 +10,11 @@ export class SelectionEventController extends EventController {
     public state: SelectionState = "idle";
     public startPosition: Vector2d = { x: 0, y: 0 };
 
+    constructor() {
+        super();
+        this.initialize();
+    }
+
     public override attach(eventBus: EventBus): void {
         this.eventBus = eventBus;
 
@@ -22,6 +27,13 @@ export class SelectionEventController extends EventController {
         this.eventBus?.unsubscribe("document:mousedown", this.handleMouseDown);
         this.eventBus?.unsubscribe("document:mousemove", this.handleMouseMove);
         this.eventBus?.unsubscribe("document:mouseup", this.handleMouseUp);
+        this.initialize();
+    }
+
+    private initialize() {
+        this.state = "idle";
+        this.startPosition = { x: 0, y: 0 };
+        this.eventBus = null;
     }
 
     private handleMouseDown: EventHandlerOf<"document:mousedown"> = (event) => {
