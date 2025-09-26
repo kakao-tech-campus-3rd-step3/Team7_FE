@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { Document, Page } from "react-pdf";
 
 import { DisableSelection } from "@/shared/components/Helper/DisableSelection";
@@ -7,7 +7,8 @@ import { useToggle } from "@/shared/hooks/useToggle";
 import { PortfolioFeedbackCommentToolbarWidget } from "@/widgets/document-feedback/PortfolioFeedbackCommentToolbar";
 
 import { CommentAreaPlaceholder } from "@/core/document-commenter/components/Comment/CommentAreaPlaceholder";
-import { useAreaSelect } from "@/core/document-commenter/hooks/useAreaSelect";
+import { useEventBus } from "@/core/document-commenter/contexts/EventBusContext";
+import { useLocalCoordinates } from "@/core/document-commenter/hooks/useLocalCoordinates";
 import { PdfViewer } from "@/core/document-viewer/components/DocumentViewer";
 
 const PDF_MIN_SCALE = 0.4;
@@ -19,13 +20,35 @@ export const PortfolioFeedbackWidget = () => {
     const [, toggleCommentMode] = useToggle(false);
     // TODO: commentMode 활용하여 주석 기능 활성화/비활성화 구현
 
-    const {
-        rootElementRef,
-        areaSelectionBoxStyle,
-        handleMouseDown,
-        handleMouseMove,
-        handleMouseUp,
-    } = useAreaSelect();
+    const eventBus = useEventBus();
+    const { ref: pageRef, getCoords } = useLocalCoordinates<HTMLCanvasElement>();
+
+    const onMouseDown = useCallback(
+        (event: React.MouseEvent) => {
+            const localCoords = getCoords({ x: event.clientX, y: event.clientY });
+            if (!localCoords) return;
+            eventBus.dispatch({ type: "document:mousedown", payload: localCoords });
+        },
+        [eventBus, getCoords],
+    );
+
+    const onMouseMove = useCallback(
+        (event: React.MouseEvent) => {
+            const localCoords = getCoords({ x: event.clientX, y: event.clientY });
+            if (!localCoords) return;
+            eventBus.dispatch({ type: "document:mousemove", payload: localCoords });
+        },
+        [eventBus, getCoords],
+    );
+
+    const onMouseUp = useCallback(
+        (event: React.MouseEvent) => {
+            const localCoords = getCoords({ x: event.clientX, y: event.clientY });
+            if (!localCoords) return;
+            eventBus.dispatch({ type: "document:mouseup", payload: localCoords });
+        },
+        [eventBus, getCoords],
+    );
 
     return (
         <Fragment>
@@ -46,22 +69,19 @@ export const PortfolioFeedbackWidget = () => {
                         <DisableSelection className="relative">
                             <Page
                                 width={width}
-                                canvasRef={rootElementRef}
+                                canvasRef={pageRef}
                                 pageNumber={currentPage}
-                                onMouseDown={handleMouseDown}
-                                onMouseMove={handleMouseMove}
-                                onMouseUp={handleMouseUp}
+                                onMouseDown={onMouseDown}
+                                onMouseMove={onMouseMove}
+                                onMouseUp={onMouseUp}
                                 renderAnnotationLayer={false}
                                 renderTextLayer={false}
                             />
 
-                            {areaSelectionBoxStyle && (
-                                <CommentAreaPlaceholder
-                                    borderColor="#F6B13B"
-                                    backgroundColor="#F6B13B33"
-                                    style={areaSelectionBoxStyle}
-                                />
-                            )}
+                            <CommentAreaPlaceholder
+                                borderColor="#F6B13B"
+                                backgroundColor="#F6B13B33"
+                            />
                         </DisableSelection>
                     </Document>
                 )}
