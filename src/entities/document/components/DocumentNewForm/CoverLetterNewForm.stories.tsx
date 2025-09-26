@@ -51,9 +51,9 @@ export const ManyQuestions: Story = {
 
         const titleInputs = await canvas.findAllByLabelText("문항 제목");
         const textareas = await canvas.findAllByRole("textbox", { name: /번 문항 내용/ });
-        await waitFor(() => {
-            expect(titleInputs).toHaveLength(5);
-            expect(textareas).toHaveLength(5);
+        await waitFor(async () => {
+            await expect(titleInputs).toHaveLength(5);
+            await expect(textareas).toHaveLength(5);
         });
         for (let i = 0; i < 5; i++) {
             await userEvent.clear(titleInputs[i]);
