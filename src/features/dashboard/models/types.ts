@@ -1,4 +1,4 @@
-import type { DashboardApplyCardProps } from "@/features/dashboard/components/DashboardApply";
+import type { DashboardApplyCardProps } from "../components/DashboardApply/DashboardApplyCard";
 
 export const DND_ITEM_TYPES = {
     APPLY_CARD: "APPLY_CARD",
