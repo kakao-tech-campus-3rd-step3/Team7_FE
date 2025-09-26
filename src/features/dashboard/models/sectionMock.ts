@@ -1,4 +1,4 @@
-import type { Section, ApplyCard } from "@/features/dashboard/models/types";
+import type { Section, ApplyCard } from "./types";
 
 export const sectionMock: Record<Section, ApplyCard[]> = {
     planned: [
