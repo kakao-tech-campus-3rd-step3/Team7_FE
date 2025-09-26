@@ -1,5 +1,5 @@
 export type EventTypes = {
-    [key: string]: unknown;
+    "test:event": { message: string };
 
     "document:mousedown": Vector2d;
     "document:mousemove": Vector2d;
