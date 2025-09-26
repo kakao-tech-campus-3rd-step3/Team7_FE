@@ -18,6 +18,12 @@ export class SelectionEventController extends EventController {
         this.eventBus.subscribe("document:mouseup", this.handleMouseUp);
     }
 
+    public override detach(): void {
+        this.eventBus?.unsubscribe("document:mousedown", this.handleMouseDown);
+        this.eventBus?.unsubscribe("document:mousemove", this.handleMouseMove);
+        this.eventBus?.unsubscribe("document:mouseup", this.handleMouseUp);
+    }
+
     private handleMouseDown: EventHandlerOf<"document:mousedown"> = (event) => {
         if (this.state !== "idle") return;
 

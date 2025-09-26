@@ -49,6 +49,7 @@ describe("EventBus", () => {
 
         const mockEventController = {
             attach: vitest.fn(),
+            detach: vitest.fn(),
         };
 
         eventBus.use(mockEventController);
