@@ -1,5 +1,3 @@
-import { Fragment } from "react/jsx-runtime";
-
 import { MessageSquarePlus, ZoomIn, ZoomOut } from "lucide-react";
 
 import {
@@ -23,26 +21,27 @@ export const PortfolioFeedbackCommentToolbarWidget = ({
         <CommentToolbar
             leftItems={[
                 <CommentToolbarToggleItem
+                    key="comment-mode"
                     tooltip="댓글 추가"
                     icon={<MessageSquarePlus />}
                     onToggle={onCommentModeToggle}
                 />,
             ]}
             rightItems={[
-                <Fragment>
-                    <CommentToolbarButtonItem
-                        tooltip="확대"
-                        className="h-full w-5"
-                        icon={<ZoomIn size={16} />}
-                        onClick={onZoomIn}
-                    />
-                    <CommentToolbarButtonItem
-                        tooltip="축소"
-                        className="h-full w-5"
-                        icon={<ZoomOut size={16} />}
-                        onClick={onZoomOut}
-                    />
-                </Fragment>,
+                <CommentToolbarButtonItem
+                    key="zoom-in"
+                    tooltip="확대"
+                    className="h-full w-5"
+                    icon={<ZoomIn size={16} />}
+                    onClick={onZoomIn}
+                />,
+                <CommentToolbarButtonItem
+                    key="zoom-out"
+                    tooltip="축소"
+                    className="h-full w-5"
+                    icon={<ZoomOut size={16} />}
+                    onClick={onZoomOut}
+                />,
             ]}
         />
     );
