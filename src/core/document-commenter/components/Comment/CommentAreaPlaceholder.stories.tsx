@@ -21,6 +21,7 @@ const CommentableContainer = ({ children }: PropsWithChildren) => {
     const onMouseDown = useCallback(
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
+            if (!localCoords) return;
             eventBus.dispatch({ type: "document:mousedown", payload: localCoords });
         },
         [eventBus, getCoords],
@@ -29,6 +30,7 @@ const CommentableContainer = ({ children }: PropsWithChildren) => {
     const onMouseMove = useCallback(
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
+            if (!localCoords) return;
             eventBus.dispatch({ type: "document:mousemove", payload: localCoords });
         },
         [eventBus, getCoords],
@@ -37,6 +39,7 @@ const CommentableContainer = ({ children }: PropsWithChildren) => {
     const onMouseUp = useCallback(
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
+            if (!localCoords) return;
             eventBus.dispatch({ type: "document:mouseup", payload: localCoords });
         },
         [eventBus, getCoords],
