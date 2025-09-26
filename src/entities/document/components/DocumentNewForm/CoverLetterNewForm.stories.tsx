@@ -1,5 +1,5 @@
 import { CoverLetterNewForm } from "./CoverLetterNewForm";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { within, userEvent, waitFor, expect } from "@storybook/test";
 
 const meta: Meta<typeof CoverLetterNewForm> = {
