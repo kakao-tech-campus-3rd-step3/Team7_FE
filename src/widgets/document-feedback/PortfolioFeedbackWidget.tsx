@@ -41,12 +41,10 @@ export const PortfolioFeedbackWidget = () => {
 
     const onMouseUp = useCallback(
         (event: React.MouseEvent) => {
-            eventBus.dispatch({
-                type: "document:mouseup",
-                payload: { x: event.clientX, y: event.clientY },
-            });
+            const localCoords = getCoords({ x: event.clientX, y: event.clientY });
+            eventBus.dispatch({ type: "document:mouseup", payload: localCoords });
         },
-        [eventBus],
+        [eventBus, getCoords],
     );
 
     return (
