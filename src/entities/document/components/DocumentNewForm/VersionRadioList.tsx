@@ -25,7 +25,6 @@ const fromRadioValue = (val: string): string | undefined => (val === "" ? undefi
 const VersionRadioListItem = memo(function VersionRadioListItem({
     item,
     checked,
-    onChange,
 }: {
     item: VersionRadioItem;
     checked: boolean;
@@ -41,12 +40,7 @@ const VersionRadioListItem = memo(function VersionRadioListItem({
             ].join(" ")}
         >
             <div className="flex w-full items-center gap-3">
-                <RadioGroupItem
-                    id={radioId}
-                    value={toRadioValue(item.id)}
-                    className="mt-0.5"
-                    onClick={() => onChange?.(item.id)}
-                />
+                <RadioGroupItem id={radioId} value={toRadioValue(item.id)} className="mt-0.5" />
                 <Label
                     htmlFor={radioId}
                     className="flex min-w-0 flex-1 cursor-pointer items-center gap-3"
@@ -74,6 +68,7 @@ const VersionRadioListItem = memo(function VersionRadioListItem({
 
 export const VersionRadioList = ({ title, items, value, onChange }: VersionRadioListProps) => {
     const radioValue = toRadioValue(value);
+    const safeItems = Array.isArray(items) ? items : [];
 
     return (
         <section className="space-y-3">
@@ -85,7 +80,7 @@ export const VersionRadioList = ({ title, items, value, onChange }: VersionRadio
                 className="space-y-2"
             >
                 <ul className="space-y-2">
-                    {items.map((it) => {
+                    {safeItems.map((it) => {
                         const isChecked = radioValue === toRadioValue(it.id);
                         return (
                             <VersionRadioListItem
