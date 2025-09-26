@@ -49,12 +49,13 @@ export const ManyQuestions: Story = {
         await userEvent.click(addBtn);
         await userEvent.click(addBtn);
 
-        const titleInputs = await canvas.findAllByLabelText("문항 제목");
-        const textareas = await canvas.findAllByRole("textbox", { name: /번 문항 내용/ });
         await waitFor(async () => {
-            await expect(titleInputs).toHaveLength(5);
-            await expect(textareas).toHaveLength(5);
+            await expect(canvas.getAllByLabelText("문항 제목")).toHaveLength(5);
+            await expect(canvas.getAllByRole("textbox", { name: /번 문항 내용/ })).toHaveLength(5);
         });
+        const titleInputs = canvas.getAllByLabelText("문항 제목");
+        const textareas = canvas.getAllByRole("textbox", { name: /번 문항 내용/ });
+
         for (let i = 0; i < 5; i++) {
             await userEvent.clear(titleInputs[i]);
             await userEvent.type(titleInputs[i], `문항 ${i + 1} 제목`);
