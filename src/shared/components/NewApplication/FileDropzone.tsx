@@ -41,9 +41,18 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
             filtered = filtered.filter((f) => f.size <= limit);
         }
 
-        const dt = new DataTransfer();
-        filtered.forEach((f) => dt.items.add(f));
-        onFiles(dt.files);
+        let next: FileList;
+        try {
+            const dt = new DataTransfer();
+            filtered.forEach((f) => dt.items.add(f));
+            next = dt.files;
+        } catch {
+            next =
+                filtered.length === (files as FileList).length
+                    ? (files as FileList)
+                    : (filtered as unknown as FileList);
+        }
+        onFiles(next);
     };
 
     return (
