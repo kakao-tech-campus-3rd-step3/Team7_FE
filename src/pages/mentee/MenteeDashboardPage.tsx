@@ -4,16 +4,17 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { Folder, UserRoundPen, Clock3, UserRound } from "lucide-react";
 
 import { NewApplicationButton } from "@/features/applications/components/applications-create";
-import { useBoardState, sectionState, sectionMock, SECTION_ORDER } from "@/features/dashboard";
 import {
     DashboardApplyContainer,
     DndApplyCard,
     DndApplySection,
-} from "@/features/dashboard/components/DashboardApply";
-import {
     DashboardHeaderContainer,
     DashboardHeaderCard,
-} from "@/features/dashboard/components/DashboardHeader";
+    useBoardState,
+    sectionState,
+    sectionMock,
+    SECTION_ORDER,
+} from "@/features/dashboard";
 
 //TODO : 기업 이미지 불러오기
 const PlaceholderLogo: React.ReactNode = <div className="h-5 w-5 rounded-sm bg-zinc-200/80" />;
