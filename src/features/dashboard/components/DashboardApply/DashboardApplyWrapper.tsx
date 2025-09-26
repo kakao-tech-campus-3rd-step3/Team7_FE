@@ -23,13 +23,13 @@ export const DashboardApplyWrapper = ({
     canDrop,
 }: DashboardApplyWrapperProps) => {
     return (
-        <div className={cn("flex flex-col", className)}>
-            <div className="mb-2 flex items-center justify-between px-1">
-                <h4 className="text-sm leading-6 font-semibold text-slate-900">{title}</h4>
+        <section className={cn("flex flex-col", className)}>
+            <header className="mb-2 flex items-center justify-between px-1">
+                <h3 className="text-sm leading-6 font-semibold text-slate-900">{title}</h3>
                 <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-zinc-100 px-2 text-xs font-medium text-zinc-700">
                     {value}
                 </span>
-            </div>
+            </header>
 
             <div
                 ref={droppableRef}
@@ -42,6 +42,6 @@ export const DashboardApplyWrapper = ({
             >
                 <div className="flex flex-col gap-4">{children}</div>
             </div>
-        </div>
+        </section>
     );
 };

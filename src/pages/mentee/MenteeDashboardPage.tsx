@@ -30,15 +30,15 @@ export default function MenteeDashboardPage() {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className="px-6 py-6">
-                <div className="flex items-start justify-between">
+            <main className="px-6 py-6">
+                <header className="flex items-start justify-between">
                     <div>
                         <h1 className="text-xl font-semibold text-foreground">
                             취업 트래커 대시보드
                         </h1>
-                        <h2 className="mt-1 text-sm leading-[22px] text-[#485563] font-normal">
+                        <p className="mt-1 text-sm leading-[22px] text-[#485563] font-normal">
                             모든 취업 활동을 한눈에 관리하세요
-                        </h2>
+                        </p>
                     </div>
                     <NewApplicationButton
                         onClick={() => {
@@ -46,7 +46,7 @@ export default function MenteeDashboardPage() {
                             alert("신규 지원 추가 클릭");
                         }}
                     />
-                </div>
+                </header>
 
                 <DashboardHeaderContainer className="mt-4">
                     <DashboardHeaderCard
@@ -79,9 +79,11 @@ export default function MenteeDashboardPage() {
                     />
                 </DashboardHeaderContainer>
 
-                <h3 className="mt-8 mb-3 text-lg leading-7 font-semibold text-slate-900">
-                    지원 현황
-                </h3>
+                <header className="mt-8">
+                    <h2 className="mb-3 text-lg leading-7 font-semibold text-slate-900">
+                        지원 현황
+                    </h2>
+                </header>
 
                 <DashboardApplyContainer>
                     {SECTION_ORDER.map((sectionKey, sectionIndex) => {
@@ -114,7 +116,7 @@ export default function MenteeDashboardPage() {
                         );
                     })}
                 </DashboardApplyContainer>
-            </div>
+            </main>
         </DndProvider>
     );
 }
