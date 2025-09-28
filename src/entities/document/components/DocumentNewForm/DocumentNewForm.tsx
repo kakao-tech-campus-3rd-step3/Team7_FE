@@ -1,10 +1,15 @@
-import { useCallback, useId, useMemo, useState } from "react";
+import { useCallback, useId, useMemo } from "react";
+import { useForm } from "react-hook-form";
 
-import { X } from "lucide-react";
+import { z } from "zod";
+
+import { NewDocumentSchema } from "@/entities/document/models/newDocument";
 
 import { FileDropzone } from "@/shared/components/NewApplication/FileDropzone";
-import { FileIconByMimeType } from "@/shared/components/NewApplication/FileIconByMimeType";
 import { FormActions } from "@/shared/components/NewApplication/FormActions";
+
+import { FileListItem } from "./FileListItem";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export interface DocumentNewFormProps {
     titleLabel: string;
@@ -20,6 +25,9 @@ export interface DocumentNewFormProps {
     onTempSave?: (payload: { title: string; files: File[] }) => void;
 }
 
+type FormIn = z.input<typeof NewDocumentSchema>;
+type FormOut = z.output<typeof NewDocumentSchema>;
+
 export const DocumentNewForm = ({
     titleLabel,
     titlePlaceholder = "예: 이력서 2차 수정본",
@@ -33,29 +41,51 @@ export const DocumentNewForm = ({
     onSubmit,
     onTempSave,
 }: DocumentNewFormProps) => {
-    const [title, setTitle] = useState(initialTitle);
-    const [files, setFiles] = useState<File[]>(initialFiles);
-
     const titleId = useId();
     const dropHintId = useId();
 
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        getValues,
+        formState: { errors, isSubmitting: isFormSubmitting },
+    } = useForm<FormIn, any, FormOut>({
+        resolver: zodResolver(NewDocumentSchema),
+        defaultValues: {
+            title: initialTitle ?? "",
+            files: initialFiles ?? [],
+        },
+        mode: "onBlur",
+    });
+
+    const title = watch("title") ?? "";
+    const files = watch("files") ?? [];
+
     const hasTitle = title.trim().length > 0;
     const hasFiles = files.length > 0;
-    const submitDisabled = isSubmitting || (!hasTitle && !hasFiles);
+    const submitDisabled = isSubmitting || isFormSubmitting || (!hasTitle && !hasFiles);
 
     const handleFiles = useCallback(
         (pickedList: FileList | null) => {
-            if (isSubmitting) return;
+            if (isSubmitting || isFormSubmitting) return;
             const picked = pickedList ? Array.from(pickedList) : [];
             if (picked.length === 0) return;
-            setFiles((prev) => (multiple ? [...prev, ...picked] : [picked[0]]));
+            setValue("files", multiple ? [...files, ...picked] : [picked[0]], {
+                shouldValidate: true,
+            });
         },
-        [isSubmitting, multiple],
+        [files, isSubmitting, isFormSubmitting, multiple, setValue],
     );
 
-    const removeFile = useCallback((name: string, size: number) => {
-        setFiles((prev) => prev.filter((f) => !(f.name === name && f.size === size)));
-    }, []);
+    const removeFile = useCallback(
+        (name: string, size: number) => {
+            const next = files.filter((f) => !(f.name === name && f.size === size));
+            setValue("files", next, { shouldValidate: true });
+        },
+        [files, setValue],
+    );
 
     const totalSize = useMemo(() => files.reduce((acc, f) => acc + f.size, 0), [files]);
 
@@ -73,15 +103,13 @@ export const DocumentNewForm = ({
 
     const humanKB = (bytes: number) => `${(bytes / 1024).toFixed(1)} KB`;
 
+    const onValid = (values: FormOut) => {
+        if (submitDisabled) return;
+        onSubmit?.({ title: values.title.trim(), files: values.files });
+    };
+
     return (
-        <form
-            className="w-full"
-            onSubmit={(e) => {
-                e.preventDefault();
-                if (submitDisabled) return;
-                onSubmit?.({ title: title.trim(), files });
-            }}
-        >
+        <form className="w-full" onSubmit={handleSubmit(onValid)}>
             <div className="mx-auto w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl px-6 pt-0 pb-6 space-y-6">
                 {description ? (
                     <header className="pt-2">
@@ -102,13 +130,17 @@ export const DocumentNewForm = ({
                         type="text"
                         placeholder={titlePlaceholder}
                         aria-label={titleLabel}
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        {...register("title")}
                         className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-gray-400"
                     />
                     <p className="mt-2 text-xs text-gray-500">
                         제목 또는 파일 중 하나는 반드시 입력/첨부되어야 합니다.
                     </p>
+                    {errors.title?.message ? (
+                        <p role="alert" className="mt-1 text-xs text-red-600">
+                            {errors.title.message}
+                        </p>
+                    ) : null}
                 </fieldset>
 
                 {hasFiles && (
@@ -122,33 +154,16 @@ export const DocumentNewForm = ({
 
                         <ul className="divide-y divide-gray-200 rounded-md border border-gray-200 bg-white">
                             {fileList.map((f) => (
-                                <li
+                                <FileListItem
                                     key={f.key}
-                                    className="flex items-center justify-between px-4 py-2"
-                                >
-                                    <div className="flex min-w-0 items-center gap-3">
-                                        <FileIconByMimeType ext={f.ext} mime={f.type} />
-
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-medium text-gray-900">
-                                                {f.name}
-                                            </p>
-                                            <p className="truncate text-xs text-gray-500">
-                                                {humanKB(f.size)}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="button"
-                                        onClick={() => removeFile(f.name, Number(f.size))}
-                                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                                        disabled={isSubmitting}
-                                        aria-label={`${f.name} 제거`}
-                                    >
-                                        <X size={16} aria-hidden />
-                                    </button>
-                                </li>
+                                    name={f.name}
+                                    size={f.size}
+                                    ext={f.ext}
+                                    type={f.type}
+                                    disabled={isSubmitting || isFormSubmitting}
+                                    onRemove={removeFile}
+                                    humanKB={humanKB}
+                                />
                             ))}
                         </ul>
                     </section>
@@ -165,7 +180,10 @@ export const DocumentNewForm = ({
                 <FormActions
                     disabled={submitDisabled}
                     submitText={submitText}
-                    onTempSave={() => onTempSave?.({ title: title.trim(), files })}
+                    onTempSave={() => {
+                        const safe = NewDocumentSchema.parse(getValues());
+                        onTempSave?.({ title: safe.title.trim(), files: safe.files });
+                    }}
                 />
             </div>
         </form>
