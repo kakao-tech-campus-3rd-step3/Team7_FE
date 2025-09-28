@@ -3,11 +3,11 @@ import { useState } from "react";
 import { http, HttpResponse } from "msw";
 
 import { CoverLetterNewForm } from "./CoverLetterNewForm";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { within, userEvent, waitFor, expect } from "@storybook/test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const withReactQuery = (Story: any) => {
+const withReactQuery: Decorator = (Story) => {
     const [client] = useState(
         () =>
             new QueryClient({
