@@ -59,12 +59,13 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
             filtered.forEach((f) => dt.items.add(f));
             onFiles(dt.files);
             return;
-        } catch {}
-
-        if (filtered.length === (files as FileList).length) {
-            onFiles(files);
-        } else {
-            onFiles(filtered as unknown as FileList);
+        } catch {
+            onFiles(
+                filtered.length === (files as FileList).length
+                    ? (files as FileList)
+                    : (filtered as unknown as FileList),
+            );
+            return;
         }
     };
 
