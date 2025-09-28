@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState, useCallback } from "react";
 
 import { Plus } from "lucide-react";
 
@@ -41,9 +41,15 @@ export const CoverLetterNewForm = ({
     versionItems: externalVersionItems,
     onSubmit,
 }: CoverLetterNewFormProps) => {
+    const [editor, setEditor] = useState<{
+        baseVersionId?: string;
+        questions: CoverLetterQuestionItemModel[];
+    }>({
+        baseVersionId: undefined,
+        questions: [makeNewQuestion()],
+    });
+
     const [title, setTitle] = useState("");
-    const [baseVersionId, setBaseVersionId] = useState<string | undefined>(undefined);
-    const [questions, setQuestions] = useState<CoverLetterQuestionItemModel[]>([makeNewQuestion()]);
 
     const versionItems: VersionRadioItem[] = useMemo(
         () =>
@@ -60,7 +66,10 @@ export const CoverLetterNewForm = ({
         [externalVersionItems],
     );
 
-    const { data, isFetching, isError } = useGetCoverLetterByVersion(applicationId, baseVersionId);
+    const { data, isFetching, isError } = useGetCoverLetterByVersion(
+        applicationId,
+        editor.baseVersionId,
+    );
 
     useEffect(() => {
         if (!data) return;
@@ -71,28 +80,66 @@ export const CoverLetterNewForm = ({
             maxLength: it.answerLimit ?? 1000,
             isOpen: true,
         }));
-        setQuestions(mapped.length ? mapped : [makeNewQuestion()]);
+        setEditor((prev) => ({
+            ...prev,
+            questions: mapped.length ? mapped : [makeNewQuestion()],
+        }));
     }, [data]);
 
     const titleInputId = useId();
 
-    const addQuestion = () => setQuestions((prev) => [...prev, makeNewQuestion()]);
-    const patchQuestion = (id: string, patch: Partial<CoverLetterQuestionItemModel>) =>
-        setQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, ...patch } : q)));
-    const toggleQuestion = (id: string) =>
-        setQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, isOpen: !q.isOpen } : q)));
-    const deleteQuestion = (id: string) => {
+    const addQuestion = useCallback(
+        () =>
+            setEditor((prev) => ({
+                ...prev,
+                questions: [...prev.questions, makeNewQuestion()],
+            })),
+        [],
+    );
+
+    const patchQuestion = useCallback(
+        (id: string, patch: Partial<CoverLetterQuestionItemModel>) =>
+            setEditor((prev) => ({
+                ...prev,
+                questions: prev.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)),
+            })),
+        [],
+    );
+
+    const toggleQuestion = useCallback(
+        (id: string) =>
+            setEditor((prev) => ({
+                ...prev,
+                questions: prev.questions.map((q) =>
+                    q.id === id ? { ...q, isOpen: !q.isOpen } : q,
+                ),
+            })),
+        [],
+    );
+
+    const deleteQuestion = useCallback((id: string) => {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
-        setQuestions((prev) => prev.filter((q) => q.id !== id));
-    };
+        setEditor((prev) => ({
+            ...prev,
+            questions: prev.questions.filter((q) => q.id !== id),
+        }));
+    }, []);
 
-    const handleBaseVersionChange = (id: string | undefined) => {
-        setBaseVersionId(id);
-        if (id === undefined) setQuestions([makeNewQuestion()]);
-    };
+    const handleBaseVersionChange = useCallback((id: string | undefined) => {
+        setEditor((prev) => ({
+            baseVersionId: id,
+            questions: id === undefined ? [makeNewQuestion()] : prev.questions,
+        }));
+    }, []);
 
-    const totalWritten = questions.reduce((a, q) => a + q.value.length, 0);
-    const totalMax = questions.reduce((a, q) => a + q.maxLength, 0);
+    const totalWritten = useMemo(
+        () => editor.questions.reduce((a, q) => a + q.value.length, 0),
+        [editor.questions],
+    );
+    const totalMax = useMemo(
+        () => editor.questions.reduce((a, q) => a + q.maxLength, 0),
+        [editor.questions],
+    );
 
     return (
         <form
@@ -104,7 +151,11 @@ export const CoverLetterNewForm = ({
                     return;
                 }
                 if (!window.confirm("새 버전을 저장하시겠습니까?")) return;
-                onSubmit?.({ title: title.trim(), baseVersionId, questions });
+                onSubmit?.({
+                    title: title.trim(),
+                    baseVersionId: editor.baseVersionId,
+                    questions: editor.questions,
+                });
             }}
         >
             <div className="mx-auto w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-8xl px-6 pt-0 pb-6">
@@ -135,7 +186,7 @@ export const CoverLetterNewForm = ({
                     <VersionRadioList
                         title=""
                         items={versionItems}
-                        value={baseVersionId}
+                        value={editor.baseVersionId}
                         onChange={handleBaseVersionChange}
                     />
                     {isFetching && (
@@ -177,7 +228,7 @@ export const CoverLetterNewForm = ({
                     </div>
 
                     <ul className="space-y-3">
-                        {questions.map((q, idx) => (
+                        {editor.questions.map((q, idx) => (
                             <CoverLetterQuestionItemComp
                                 key={q.id}
                                 item={q}
