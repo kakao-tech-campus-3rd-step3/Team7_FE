@@ -6,7 +6,7 @@ import { Label } from "@/shared/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/shared/ui/radio-group";
 
 export interface VersionRadioItem {
-    id: string | undefined;
+    id?: string;
     title: string;
     description?: string;
     date?: string;
