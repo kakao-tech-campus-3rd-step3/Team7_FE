@@ -30,42 +30,30 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
 
         const patterns = (accept ?? "")
             .split(",")
-            .map((s) => s.trim())
+            .map((s) => s.trim().toLowerCase())
             .filter(Boolean);
 
-        let filtered = Array.from(files);
+        const limit = maxSizeMB > 0 ? maxSizeMB * 1024 * 1024 : Infinity;
 
-        if (patterns.length > 0) {
-            filtered = filtered.filter((f) =>
-                patterns.some((p) => {
-                    if (p.startsWith(".")) {
-                        return f.name.toLowerCase().endsWith(p.toLowerCase());
-                    }
-                    if (p.endsWith("/*")) {
-                        return f.type.startsWith(p.slice(0, -1));
-                    }
-                    return f.type === p;
-                }),
-            );
-        }
-
-        if (maxSizeMB > 0) {
-            const limit = maxSizeMB * 1024 * 1024;
-            filtered = filtered.filter((f) => f.size <= limit);
-        }
+        const filtered = Array.from(files)
+            .filter((f) => {
+                if (patterns.length === 0) return true;
+                const name = f.name.toLowerCase();
+                const type = f.type.toLowerCase();
+                return patterns.some((p) => {
+                    if (p.startsWith(".")) return name.endsWith(p);
+                    if (p.endsWith("/*")) return type.startsWith(p.slice(0, -1));
+                    return type === p;
+                });
+            })
+            .filter((f) => f.size <= limit);
 
         try {
             const dt = new DataTransfer();
             filtered.forEach((f) => dt.items.add(f));
             onFiles(dt.files);
-            return;
         } catch {
-            onFiles(
-                filtered.length === (files as FileList).length
-                    ? (files as FileList)
-                    : (filtered as unknown as FileList),
-            );
-            return;
+            onFiles(filtered.length === files.length ? files : (filtered as unknown as FileList));
         }
     };
 
