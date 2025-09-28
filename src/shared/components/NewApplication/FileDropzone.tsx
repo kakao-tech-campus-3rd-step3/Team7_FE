@@ -79,6 +79,7 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
                 accept={accept}
                 multiple
                 aria-describedby={hintId}
+                aria-label="파일 선택"
                 onChange={(e) => {
                     pickWithAccept(e.currentTarget.files);
                     e.currentTarget.value = "";
