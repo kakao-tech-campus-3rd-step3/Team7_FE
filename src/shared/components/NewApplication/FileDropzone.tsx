@@ -1,4 +1,5 @@
 import { useId, useState, useRef } from "react";
+import type { SyntheticEvent } from "react";
 
 import { UploadCloud } from "lucide-react";
 
@@ -10,10 +11,9 @@ export interface FileDropzoneProps {
     hintId?: string;
     maxSizeMB?: number;
 }
-
 type Handler<E> = (event: E) => void;
 export const blockEvent =
-    <E extends React.SyntheticEvent>(handler?: Handler<E>) =>
+    <E extends SyntheticEvent>(handler?: Handler<E>) =>
     (event: E) => {
         event.preventDefault();
         event.stopPropagation();
