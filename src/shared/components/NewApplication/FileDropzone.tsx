@@ -11,6 +11,15 @@ export interface FileDropzoneProps {
     maxSizeMB?: number;
 }
 
+type Handler<E> = (event: E) => void;
+export const blockEvent =
+    <E extends React.SyntheticEvent>(handler?: Handler<E>) =>
+    (event: E) => {
+        event.preventDefault();
+        event.stopPropagation();
+        handler?.(event);
+    };
+
 export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDropzoneProps) => {
     const fileInputId = useId();
     const [dragOver, setDragOver] = useState(false);
@@ -29,8 +38,12 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
         if (patterns.length > 0) {
             filtered = filtered.filter((f) =>
                 patterns.some((p) => {
-                    if (p.startsWith(".")) return f.name.toLowerCase().endsWith(p.toLowerCase());
-                    if (p.endsWith("/*")) return f.type.startsWith(p.slice(0, -1));
+                    if (p.startsWith(".")) {
+                        return f.name.toLowerCase().endsWith(p.toLowerCase());
+                    }
+                    if (p.endsWith("/*")) {
+                        return f.type.startsWith(p.slice(0, -1));
+                    }
                     return f.type === p;
                 }),
             );
@@ -41,104 +54,75 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
             filtered = filtered.filter((f) => f.size <= limit);
         }
 
-        let next: FileList;
         try {
             const dt = new DataTransfer();
             filtered.forEach((f) => dt.items.add(f));
-            next = dt.files;
-        } catch {
-            next =
-                filtered.length === (files as FileList).length
-                    ? (files as FileList)
-                    : (filtered as unknown as FileList);
+            onFiles(dt.files);
+            return;
+        } catch {}
+
+        if (filtered.length === (files as FileList).length) {
+            onFiles(files);
+        } else {
+            onFiles(filtered as unknown as FileList);
         }
-        onFiles(next);
     };
 
     return (
         <div className="w-full">
-            <label
-                htmlFor={fileInputId}
-                aria-describedby={hintId}
-                aria-label="파일 업로드 영역"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        inputRef.current?.click();
-                    }
-                }}
-                onDragEnter={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDragOver(true);
-                }}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDragOver(true);
-                }}
-                onDragLeave={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDragOver(false);
-                }}
-                onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDragOver(false);
-                    pickWithAccept(e.dataTransfer.files ?? null);
-                }}
-                onPaste={(e) => {
-                    e.stopPropagation();
-                    const files = Array.from(e.clipboardData?.files ?? []);
-                    if (files.length === 0) return;
-                    const dt = new DataTransfer();
-                    files.forEach((f) => dt.items.add(f));
-                    pickWithAccept(dt.files);
-                }}
-                className={cn(
-                    "block w-full rounded-lg border border-dashed px-4 text-center",
-                    "min-h-44 md:min-h-56 cursor-pointer",
-                    "flex items-center justify-center",
-                    dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-white",
-                )}
-            >
-                <div className="flex flex-col items-center">
-                    <div
-                        className="mb-3 grid size-10 place-items-center rounded-full bg-gray-100 text-gray-400"
-                        aria-hidden
-                    >
-                        <UploadCloud size={20} />
-                    </div>
-
-                    <p className="text-sm font-semibold text-gray-700">
-                        파일을 드래그하거나 클릭하여 업로드
-                    </p>
-                    <p className="mt-1 text-xs text-gray-400">
-                        PDF, DOC, PPT, 이미지 파일 지원 (최대 {maxSizeMB}MB)
-                    </p>
-
-                    <span className="mt-3 inline-flex select-none items-center justify-center rounded-md bg-[#2563EB] px-4 py-2 text-sm font-medium text-white hover:bg-[#1E40AF]">
-                        파일 선택
-                    </span>
-                </div>
-            </label>
-
             <input
                 id={fileInputId}
                 ref={inputRef}
                 type="file"
+                className="sr-only"
                 accept={accept}
                 multiple
-                className="sr-only"
-                aria-label="문서 파일 선택"
+                aria-describedby={hintId}
                 onChange={(e) => {
                     pickWithAccept(e.currentTarget.files);
                     e.currentTarget.value = "";
                 }}
             />
+
+            <label
+                role="button"
+                htmlFor={fileInputId}
+                aria-describedby={hintId}
+                className={cn(
+                    "grid place-items-center rounded-lg border-2 border-dashed px-6 py-10 text-center transition",
+                    dragOver
+                        ? "border-blue-400 bg-blue-50"
+                        : "border-gray-300 bg-gray-50 hover:bg-gray-100",
+                )}
+                onDragEnter={blockEvent(() => setDragOver(true))}
+                onDragOver={blockEvent(() => setDragOver(true))}
+                onDragLeave={blockEvent(() => setDragOver(false))}
+                onDrop={blockEvent((e) => {
+                    setDragOver(false);
+                    pickWithAccept(e.dataTransfer.files ?? null);
+                })}
+                onPaste={(e) => {
+                    e.stopPropagation();
+                    const files = e.clipboardData?.files ?? null;
+                    if (!files || files.length === 0) return;
+                    pickWithAccept(files);
+                }}
+            >
+                <div className="flex flex-col items-center gap-2">
+                    <div className="grid size-12 place-items-center rounded-full bg-white shadow-sm">
+                        <UploadCloud className="size-6 text-gray-600" aria-hidden />
+                    </div>
+                    <p className="text-sm text-gray-800">
+                        파일을 드래그 앤 드롭하거나{" "}
+                        <span className="font-semibold underline">클릭</span>하여 선택하세요
+                    </p>
+                    <p id={hintId} className="text-xs text-gray-500">
+                        {accept ? `지원 형식: ${accept}` : "PDF, DOC, PPT, 이미지 파일 지원"} · 최대{" "}
+                        {maxSizeMB}
+                        MB
+                    </p>
+                </div>
+            </label>
         </div>
     );
 };
