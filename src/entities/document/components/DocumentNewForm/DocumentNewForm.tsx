@@ -1,19 +1,10 @@
 import { useCallback, useId, useMemo, useState } from "react";
 
-import {
-    FileText,
-    FileImage,
-    FileVideo,
-    FileArchive,
-    FileAudio,
-    FileCode,
-    FileSpreadsheet,
-    X,
-} from "lucide-react";
+import { X } from "lucide-react";
 
 import { FileDropzone } from "@/shared/components/NewApplication/FileDropzone";
+import { FileIconByMimeType } from "@/shared/components/NewApplication/FileIconByMimeType";
 import { FormActions } from "@/shared/components/NewApplication/FormActions";
-import { cn } from "@/shared/lib/utils";
 
 export interface DocumentNewFormProps {
     titleLabel: string;
@@ -82,22 +73,6 @@ export const DocumentNewForm = ({
 
     const humanKB = (bytes: number) => `${(bytes / 1024).toFixed(1)} KB`;
 
-    const FileIcon = (ext: string, mime: string) => {
-        if (mime.startsWith("image/"))
-            return { Comp: FileImage, badge: "bg-green-100 text-green-600" };
-        if (mime.startsWith("video/"))
-            return { Comp: FileVideo, badge: "bg-purple-100 text-purple-600" };
-        if (mime.startsWith("audio/"))
-            return { Comp: FileAudio, badge: "bg-indigo-100 text-indigo-600" };
-        if (mime.includes("zip") || ["zip", "7z", "rar"].includes(ext))
-            return { Comp: FileArchive, badge: "bg-amber-100 text-amber-600" };
-        if (["xls", "xlsx", "csv"].includes(ext))
-            return { Comp: FileSpreadsheet, badge: "bg-emerald-100 text-emerald-600" };
-        if (["js", "ts", "tsx", "json", "html", "css", "java", "py"].includes(ext))
-            return { Comp: FileCode, badge: "bg-sky-100 text-sky-600" };
-        return { Comp: FileText, badge: "bg-rose-100 text-rose-600" };
-    };
-
     return (
         <form
             className="w-full"
@@ -114,7 +89,8 @@ export const DocumentNewForm = ({
                     </header>
                 ) : null}
 
-                <section className="rounded-lg border border-gray-200 bg-white px-6 py-5">
+                <fieldset className="rounded-lg border border-gray-200 bg-white px-6 py-5">
+                    <legend className="sr-only">문서 버전 기본 정보</legend>
                     <label
                         htmlFor={titleId}
                         className="mb-1 block text-sm font-medium text-gray-800"
@@ -133,7 +109,7 @@ export const DocumentNewForm = ({
                     <p className="mt-2 text-xs text-gray-500">
                         제목 또는 파일 중 하나는 반드시 입력/첨부되어야 합니다.
                     </p>
-                </section>
+                </fieldset>
 
                 {hasFiles && (
                     <section className="rounded-lg border border-gray-200 bg-white px-6 py-5 space-y-3">
@@ -145,44 +121,35 @@ export const DocumentNewForm = ({
                         </div>
 
                         <ul className="divide-y divide-gray-200 rounded-md border border-gray-200 bg-white">
-                            {fileList.map((f) => {
-                                const I = FileIcon(f.ext, f.type);
-                                return (
-                                    <li
-                                        key={f.key}
-                                        className="flex items-center justify-between px-4 py-2"
-                                    >
-                                        <div className="flex min-w-0 items-center gap-3">
-                                            <div
-                                                className={cn(
-                                                    "grid size-8 place-items-center rounded",
-                                                    I.badge,
-                                                )}
-                                            >
-                                                <I.Comp size={16} aria-hidden />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <p className="truncate text-sm font-medium text-gray-900">
-                                                    {f.name}
-                                                </p>
-                                                <p className="truncate text-xs text-gray-500">
-                                                    {humanKB(f.size)}
-                                                </p>
-                                            </div>
-                                        </div>
+                            {fileList.map((f) => (
+                                <li
+                                    key={f.key}
+                                    className="flex items-center justify-between px-4 py-2"
+                                >
+                                    <div className="flex min-w-0 items-center gap-3">
+                                        <FileIconByMimeType ext={f.ext} mime={f.type} />
 
-                                        <button
-                                            type="button"
-                                            onClick={() => removeFile(f.name, Number(f.size))}
-                                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                                            disabled={isSubmitting}
-                                            aria-label={`${f.name} 제거`}
-                                        >
-                                            <X size={16} aria-hidden />
-                                        </button>
-                                    </li>
-                                );
-                            })}
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-medium text-gray-900">
+                                                {f.name}
+                                            </p>
+                                            <p className="truncate text-xs text-gray-500">
+                                                {humanKB(f.size)}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => removeFile(f.name, Number(f.size))}
+                                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                                        disabled={isSubmitting}
+                                        aria-label={`${f.name} 제거`}
+                                    >
+                                        <X size={16} aria-hidden />
+                                    </button>
+                                </li>
+                            ))}
                         </ul>
                     </section>
                 )}
