@@ -11,7 +11,7 @@ export interface CoverLetterVersionData {
     coverLetterItems: CoverLetterItem[];
 }
 
-async function fetchCoverLetterByVersion(_applicationId: string, versionId: string) {
+export async function getCoverLetterByVersion(_applicationId: string, versionId: string) {
     await new Promise((r) => setTimeout(r, 400));
     if (versionId === "v12") {
         return {
@@ -35,10 +35,9 @@ async function fetchCoverLetterByVersion(_applicationId: string, versionId: stri
 
 export function useGetCoverLetterByVersion(applicationId?: string, versionId?: string) {
     const enabled = Boolean(applicationId && versionId);
-
     const query = useQuery({
         queryKey: ["COVERLETTER", applicationId, versionId],
-        queryFn: () => fetchCoverLetterByVersion(applicationId!, versionId!),
+        queryFn: () => getCoverLetterByVersion(applicationId!, versionId!),
         enabled,
     });
 
