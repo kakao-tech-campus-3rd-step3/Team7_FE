@@ -1,3 +1,5 @@
+import { cn } from "@/shared/lib/utils";
+
 export interface FormActionsProps {
     disabled?: boolean;
     submitText?: string;
@@ -18,10 +20,10 @@ export const FormActions = ({ disabled, submitText = "저장", onTempSave }: For
             <button
                 type="submit"
                 disabled={!!disabled}
-                className={[
+                className={cn(
                     "rounded-md px-4 py-2 text-sm font-medium text-white",
                     disabled ? "bg-gray-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700",
-                ].join(" ")}
+                )}
             >
                 {submitText}
             </button>
