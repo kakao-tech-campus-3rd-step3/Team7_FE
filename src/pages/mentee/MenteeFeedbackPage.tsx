@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Fragment } from "react/jsx-runtime";
 
 import { FileUser } from "lucide-react";
@@ -8,6 +9,9 @@ import { TabMenuIndicator } from "@/shared/components/Tab/TabMenuIndicator";
 import { TabNavBar } from "@/shared/components/Tab/TabNavBar";
 
 import { PortfolioFeedbackWidget } from "@/widgets/document-feedback/PortfolioFeedbackWidget";
+
+import { EventBusProvider } from "@/core/document-commenter/contexts/EventBusContext";
+import { SelectionEventController } from "@/core/document-commenter/events/SelectionEventController";
 
 export default function MenteeFeedbackPage() {
     return (
@@ -35,7 +39,11 @@ export default function MenteeFeedbackPage() {
                     <div>이력서 피드백 위젯</div>
                 </TabItem>
                 <TabItem menu="포트폴리오">
-                    <PortfolioFeedbackWidget />
+                    <EventBusProvider
+                        eventControllers={useMemo(() => [new SelectionEventController()], [])}
+                    >
+                        <PortfolioFeedbackWidget />
+                    </EventBusProvider>
                 </TabItem>
                 <TabItem menu="자기소개서">
                     <div>자기소개서 피드백 위젯</div>
