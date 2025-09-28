@@ -72,8 +72,7 @@ export const VersionRadioList = ({ title, items, value, onChange }: VersionRadio
 
     return (
         <section className="space-y-3">
-            {title ? <h3 className="text-sm font-medium text-gray-800">{title}</h3> : null}
-
+            {title && <h3 className="text-sm font-medium text-gray-800">{title}</h3>}
             <RadioGroup
                 value={radioValue}
                 onValueChange={(val: string) => onChange?.(fromRadioValue(val))}
