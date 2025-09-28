@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-const FileSchema = z.instanceof(File);
-
+const FileSchema = z.custom<File>((value) => typeof File !== "undefined" && value instanceof File, {
+    message: "유효한 파일만 첨부할 수 있습니다.",
+});
 export const NewDocumentSchema = z
     .object({
         title: z.string().trim().default(""),
