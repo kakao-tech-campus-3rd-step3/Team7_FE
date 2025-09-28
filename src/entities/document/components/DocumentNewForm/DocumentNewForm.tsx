@@ -51,7 +51,7 @@ export const DocumentNewForm = ({
         watch,
         getValues,
         formState: { errors, isSubmitting: isFormSubmitting },
-    } = useForm<FormIn, any, FormOut>({
+    } = useForm<FormIn, unknown, FormOut>({
         resolver: zodResolver(NewDocumentSchema),
         defaultValues: {
             title: initialTitle ?? "",
@@ -181,8 +181,11 @@ export const DocumentNewForm = ({
                     disabled={submitDisabled}
                     submitText={submitText}
                     onTempSave={() => {
-                        const safe = NewDocumentSchema.parse(getValues());
-                        onTempSave?.({ title: safe.title.trim(), files: safe.files });
+                        const result = NewDocumentSchema.safeParse(getValues());
+                        if (!result.success) {
+                            return;
+                        }
+                        onTempSave?.({ title: result.data.title.trim(), files: result.data.files });
                     }}
                 />
             </div>
