@@ -1,5 +1,4 @@
 import { useId, useState, useRef } from "react";
-import type { SyntheticEvent } from "react";
 
 import { UploadCloud } from "lucide-react";
 
@@ -7,13 +6,14 @@ import { cn } from "@/shared/lib/utils";
 
 export interface FileDropzoneProps {
     accept?: string;
-    onFiles: (files: FileList | null) => void;
+    onFiles: (files: FileList | File[] | null) => void; // File[] 허용
     hintId?: string;
     maxSizeMB?: number;
 }
+
 type Handler<E> = (event: E) => void;
 export const blockEvent =
-    <E extends SyntheticEvent>(handler?: Handler<E>) =>
+    <E extends React.SyntheticEvent>(handler?: Handler<E>) =>
     (event: E) => {
         event.preventDefault();
         event.stopPropagation();
@@ -25,8 +25,11 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
     const [dragOver, setDragOver] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const pickWithAccept = (files: FileList | null) => {
+    const pickWithAccept = (files: FileList | File[] | null) => {
         if (!files) return onFiles(null);
+
+        const originalIsArray = Array.isArray(files);
+        const originalLength = (files as any).length ?? 0;
 
         const patterns = (accept ?? "")
             .split(",")
@@ -35,7 +38,9 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
 
         const limit = maxSizeMB > 0 ? maxSizeMB * 1024 * 1024 : Infinity;
 
-        const filtered = Array.from(files)
+        const list = originalIsArray ? (files as File[]) : Array.from(files as FileList);
+
+        const filtered = list
             .filter((f) => {
                 if (patterns.length === 0) return true;
                 const name = f.name.toLowerCase();
@@ -53,7 +58,15 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
             filtered.forEach((f) => dt.items.add(f));
             onFiles(dt.files);
         } catch {
-            onFiles(filtered.length === files.length ? files : (filtered as unknown as FileList));
+            onFiles(
+                originalIsArray
+                    ? filtered.length === originalLength
+                        ? (files as File[])
+                        : filtered
+                    : filtered.length === originalLength
+                      ? (files as FileList)
+                      : filtered,
+            );
         }
     };
 

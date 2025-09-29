@@ -68,10 +68,17 @@ export const DocumentNewForm = ({
     const submitDisabled = isSubmitting || isFormSubmitting || (!hasTitle && !hasFiles);
 
     const handleFiles = useCallback(
-        (pickedList: FileList | null) => {
+        (pickedList: FileList | File[] | null) => {
             if (isSubmitting || isFormSubmitting) return;
-            const picked = pickedList ? Array.from(pickedList) : [];
+
+            const picked = pickedList
+                ? Array.isArray(pickedList)
+                    ? pickedList
+                    : Array.from(pickedList)
+                : [];
+
             if (picked.length === 0) return;
+
             setValue("files", multiple ? [...files, ...picked] : [picked[0]], {
                 shouldValidate: true,
             });
