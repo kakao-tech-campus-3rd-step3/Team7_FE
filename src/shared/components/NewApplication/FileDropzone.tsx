@@ -29,17 +29,15 @@ export const FileDropzone = ({ accept, onFiles, hintId, maxSizeMB = 10 }: FileDr
         if (!files) return onFiles(null);
 
         const originalIsArray = Array.isArray(files);
-        const originalLength = (files as any).length ?? 0;
-
+        const originalLength = originalIsArray
+            ? (files as File[]).length
+            : (files as FileList).length;
         const patterns = (accept ?? "")
             .split(",")
             .map((s) => s.trim().toLowerCase())
             .filter(Boolean);
-
         const limit = maxSizeMB > 0 ? maxSizeMB * 1024 * 1024 : Infinity;
-
         const list = originalIsArray ? (files as File[]) : Array.from(files as FileList);
-
         const filtered = list
             .filter((f) => {
                 if (patterns.length === 0) return true;
