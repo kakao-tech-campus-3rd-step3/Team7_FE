@@ -150,6 +150,11 @@ export const CoverLetterNewForm = ({
                     alert("제목을 입력하세요.");
                     return;
                 }
+                const overLimit = editor.questions.find((q) => q.value.length > q.maxLength);
+                if (overLimit) {
+                    alert("문항 답변이 허용 글자수를 초과했습니다. 확인 후 다시 저장해주세요.");
+                    return;
+                }
                 if (!window.confirm("새 버전을 저장하시겠습니까?")) return;
                 onSubmit?.({
                     title: title.trim(),
