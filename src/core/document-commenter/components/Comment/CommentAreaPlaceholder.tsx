@@ -23,6 +23,7 @@ export const CommentAreaPlaceholder = ({
             if (!areaPlaceholderRef.current) return;
 
             Object.assign(areaPlaceholderRef.current.style, {
+                visibility: "visible",
                 top: `${event.payload.y}px`,
                 left: `${event.payload.x}px`,
                 width: "0px",
@@ -50,12 +51,23 @@ export const CommentAreaPlaceholder = ({
             });
         };
 
+        const handleSelectionEnd: EventHandlerOf<"selection:end"> = () => {
+            if (!areaPlaceholderRef.current) return;
+            if (areaPlaceholderRef.current.style.visibility === "hidden") return;
+
+            Object.assign(areaPlaceholderRef.current.style, {
+                visibility: "hidden",
+            });
+        };
+
         eventBus.subscribe("selection:start", handleSelectionStart);
         eventBus.subscribe("selection:move", handleSelectionMove);
+        eventBus.subscribe("selection:end", handleSelectionEnd);
 
         return () => {
             eventBus.unsubscribe("selection:start", handleSelectionStart);
             eventBus.unsubscribe("selection:move", handleSelectionMove);
+            eventBus.unsubscribe("selection:end", handleSelectionEnd);
         };
     }, [eventBus]);
 
