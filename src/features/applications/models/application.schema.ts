@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const newApplicationSchema = z.object({
+export const NewApplicationSchema = z.object({
     companyName: z.string().min(1, { message: "회사명을 입력해 주세요." }),
 
     applyPosition: z.string().min(1, { message: "지원 직무를 입력해 주세요." }),
@@ -29,8 +29,8 @@ export const newApplicationSchema = z.object({
         .refine((value) => /^https?:\/\/.+/i.test(value), { message: "URL 형식이 아닙니다." }),
 });
 
-export type NewApplicationFormInput = z.input<typeof newApplicationSchema>;
-export type NewApplicationFormOutput = z.output<typeof newApplicationSchema>;
+export type NewApplicationFormInput = z.input<typeof NewApplicationSchema>;
+export type NewApplicationFormOutput = z.output<typeof NewApplicationSchema>;
 
 export const DEFAULT_APPLICATION: NewApplicationFormInput = {
     companyName: "",

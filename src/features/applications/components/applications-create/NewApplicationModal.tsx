@@ -7,7 +7,7 @@ import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
 import {
-    newApplicationSchema,
+    NewApplicationSchema,
     type NewApplicationFormInput,
     type NewApplicationFormOutput,
     DEFAULT_APPLICATION,
@@ -33,14 +33,14 @@ export const NewApplicationModal = ({
         reset,
         formState: { errors, isSubmitting, isValid },
     } = useForm<NewApplicationFormInput>({
-        resolver: zodResolver(newApplicationSchema),
+        resolver: zodResolver(NewApplicationSchema),
         mode: "onChange",
         reValidateMode: "onChange",
         defaultValues: DEFAULT_APPLICATION,
     });
 
     const onSubmit: SubmitHandler<NewApplicationFormInput> = (formValues) => {
-        const data: NewApplicationFormOutput = newApplicationSchema.parse(formValues);
+        const data: NewApplicationFormOutput = NewApplicationSchema.parse(formValues);
         onCreate({ ...data, targetSection: "planned" });
         reset();
         onClose();
