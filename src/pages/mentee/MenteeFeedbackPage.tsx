@@ -11,7 +11,7 @@ import { TabNavBar } from "@/shared/components/Tab/TabNavBar";
 import { PortfolioFeedbackWidget } from "@/widgets/document-feedback/PortfolioFeedbackWidget";
 
 import { EventBusProvider } from "@/core/document-commenter/contexts/EventBusContext";
-import { SelectionEventController } from "@/core/document-commenter/events/SelectionEventController";
+import { SelectionEventPlugin } from "@/core/document-commenter/plugins/SelectionEventPlugin";
 
 export default function MenteeFeedbackPage() {
     return (
@@ -40,7 +40,10 @@ export default function MenteeFeedbackPage() {
                 </TabItem>
                 <TabItem menu="포트폴리오">
                     <EventBusProvider
-                        eventControllers={useMemo(() => [new SelectionEventController()], [])}
+                        eventBusPlugins={useMemo(
+                            () => [new SelectionEventPlugin(), new CommentStoragePlugin()],
+                            [],
+                        )}
                     >
                         <PortfolioFeedbackWidget />
                     </EventBusProvider>

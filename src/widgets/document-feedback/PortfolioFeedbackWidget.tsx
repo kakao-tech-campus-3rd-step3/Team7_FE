@@ -27,7 +27,7 @@ export const PortfolioFeedbackWidget = () => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mousedown", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mousedown", payload: localCoords });
         },
         [eventBus, getCoords],
     );
@@ -36,7 +36,7 @@ export const PortfolioFeedbackWidget = () => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mousemove", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mousemove", payload: localCoords });
         },
         [eventBus, getCoords],
     );
@@ -45,7 +45,7 @@ export const PortfolioFeedbackWidget = () => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mouseup", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mouseup", payload: localCoords });
         },
         [eventBus, getCoords],
     );

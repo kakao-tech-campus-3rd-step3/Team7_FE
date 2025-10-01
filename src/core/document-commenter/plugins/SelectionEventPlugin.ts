@@ -1,10 +1,10 @@
 import { EventBus } from "@/core/document-commenter/events/EventBus";
-import { EventController } from "@/core/document-commenter/events/EventController";
+import { EventBusPlugin } from "@/core/document-commenter/events/EventBusPlugin";
 import type { EventHandlerOf } from "@/core/document-commenter/events/EventTypes";
 
 export type SelectionState = "idle" | "dragging";
 
-export class SelectionEventController extends EventController {
+export class SelectionEventPlugin extends EventBusPlugin {
     private eventBus: Nullable<EventBus> = null;
 
     public state: SelectionState = "idle";
@@ -15,18 +15,18 @@ export class SelectionEventController extends EventController {
         this.initialize();
     }
 
-    public override attach(eventBus: EventBus): void {
+    public override install(eventBus: EventBus): void {
         this.eventBus = eventBus;
 
-        this.eventBus.subscribe("document:mousedown", this.handleMouseDown);
-        this.eventBus.subscribe("document:mousemove", this.handleMouseMove);
-        this.eventBus.subscribe("document:mouseup", this.handleMouseUp);
+        this.eventBus.subscribe("raw:mousedown", this.handleMouseDown);
+        this.eventBus.subscribe("raw:mousemove", this.handleMouseMove);
+        this.eventBus.subscribe("raw:mouseup", this.handleMouseUp);
     }
 
-    public override detach(): void {
-        this.eventBus?.unsubscribe("document:mousedown", this.handleMouseDown);
-        this.eventBus?.unsubscribe("document:mousemove", this.handleMouseMove);
-        this.eventBus?.unsubscribe("document:mouseup", this.handleMouseUp);
+    public override uninstall(): void {
+        this.eventBus?.unsubscribe("raw:mousedown", this.handleMouseDown);
+        this.eventBus?.unsubscribe("raw:mousemove", this.handleMouseMove);
+        this.eventBus?.unsubscribe("raw:mouseup", this.handleMouseUp);
         this.initialize();
     }
 
@@ -36,7 +36,7 @@ export class SelectionEventController extends EventController {
         this.eventBus = null;
     }
 
-    private handleMouseDown: EventHandlerOf<"document:mousedown"> = (event) => {
+    private handleMouseDown: EventHandlerOf<"raw:mousedown"> = (event) => {
         if (this.state !== "idle") return;
 
         this.state = "dragging";
@@ -48,7 +48,7 @@ export class SelectionEventController extends EventController {
         });
     };
 
-    private handleMouseMove: EventHandlerOf<"document:mousemove"> = (event) => {
+    private handleMouseMove: EventHandlerOf<"raw:mousemove"> = (event) => {
         if (this.state !== "dragging") return;
 
         this.eventBus?.dispatch({
@@ -57,7 +57,7 @@ export class SelectionEventController extends EventController {
         });
     };
 
-    private handleMouseUp: EventHandlerOf<"document:mouseup"> = (event) => {
+    private handleMouseUp: EventHandlerOf<"raw:mouseup"> = (event) => {
         if (this.state !== "dragging") return;
 
         this.state = "idle";
