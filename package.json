@@ -6,7 +6,7 @@
   "scripts": {
     "format": "prettier --write --config .prettierrc src/**/*.{js,ts,tsx,json,css,md}",
     "postinstall": "node ./scripts/pdf.mjs",
-    "dev": "vite",
+    "dev": "vite --port 3000",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
