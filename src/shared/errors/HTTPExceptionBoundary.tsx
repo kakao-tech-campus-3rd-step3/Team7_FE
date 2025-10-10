@@ -16,7 +16,7 @@ export class HTTPExceptionBoundary extends React.Component<
     HTTPExceptionBoundaryProps,
     ErrorBoundaryState
 > {
-    constructor(props: Record<string, unknown>) {
+    constructor(props: HTTPExceptionBoundaryProps) {
         super(props);
         this.state = { hasError: false };
     }
