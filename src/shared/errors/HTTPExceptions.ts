@@ -44,7 +44,7 @@ export class InternalServerException extends HTTPException {
     static readonly CODE = 500;
     constructor() {
         super(InternalServerException.CODE);
-        this.name = "InternalServerErrorException";
+        this.name = "InternalServerException";
     }
 }
 
