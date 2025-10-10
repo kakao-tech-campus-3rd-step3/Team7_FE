@@ -40,10 +40,7 @@ export default function MenteeFeedbackPage() {
                 </TabItem>
                 <TabItem menu="포트폴리오">
                     <EventBusProvider
-                        eventBusPlugins={useMemo(
-                            () => [new SelectionEventPlugin(), new CommentStoragePlugin()],
-                            [],
-                        )}
+                        eventBusPlugins={useMemo(() => [new SelectionEventPlugin()], [])}
                     >
                         <PortfolioFeedbackWidget />
                     </EventBusProvider>
