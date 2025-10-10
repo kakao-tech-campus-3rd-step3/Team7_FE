@@ -1,19 +1,31 @@
-import { FileType, type FileTypes } from "@/core/@types/FileType";
-import { MarkdownDiffStrategy } from "@/core/document-diff/MarkdownDiffStrategy";
-import { PdfDiffStrategy } from "@/core/document-diff/PdfDiffStrategy";
-import { PlainTextDiffStrategy } from "@/core/document-diff/PlainTextDiffStrategy";
+// core/document-diff/base/DiffStrategyFactory.ts
+import type { DiffStrategy } from "./DiffStrategy";
+import {
+    resolveDiffStrategy,
+    registerDiffStrategy,
+    unregisterDiffStrategy,
+    isDiffStrategyRegistered,
+    listRegisteredDiffStrategies,
+    type DiffStrategyFactoryFn,
+} from "./DiffStrategyRegistry";
+import type { FileTypes } from "@/core/@types/FileType";
 
-export class DiffStrategyFactory {
-    public static create(fileType: FileTypes) {
-        switch (fileType) {
-            case FileType.PDF:
-                return new PdfDiffStrategy();
-            case FileType.TEXT:
-                return new PlainTextDiffStrategy();
-            case FileType.MARKDOWN:
-                return new MarkdownDiffStrategy();
-            default:
-                throw new Error(`Unsupported file type: ${fileType}`);
-        }
-    }
+export function createDiffStrategy<TResult = unknown>(fileType: FileTypes): DiffStrategy<TResult> {
+    return resolveDiffStrategy<TResult>(fileType);
+}
+
+export {
+    registerDiffStrategy,
+    unregisterDiffStrategy,
+    isDiffStrategyRegistered,
+    listRegisteredDiffStrategies,
+};
+export type { DiffStrategyFactoryFn } from "./DiffStrategyRegistry";
+
+export function registerBuiltinDiffStrategies(
+    creators: Partial<Record<FileTypes, DiffStrategyFactoryFn<any>>>,
+) {
+    Object.entries(creators).forEach(([type, factory]) => {
+        if (factory) registerDiffStrategy(type as FileTypes, factory);
+    });
 }
