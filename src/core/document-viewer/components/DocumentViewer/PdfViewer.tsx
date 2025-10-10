@@ -1,73 +1,63 @@
-import { forwardRef, type CSSProperties } from "react";
+import type { DiffResult } from "@/core/document-diff/domain";
 
-import { useDebouncedResizeObserver } from "@/shared/hooks/useDebouncedResizeObserver";
-import { cn } from "@/shared/lib/utils";
-
-import { PdfPageController } from "@/core/document-viewer/components/DocumentController";
-import {
-    PdfPageContextProvider,
-    usePdfPageContext,
-} from "@/core/document-viewer/contexts/PdfPageContext";
-
-export type PdfViewerRenderProps = Omit<ReturnType<typeof useDebouncedResizeObserver>, "ref"> &
-    ReturnType<typeof usePdfPageContext>;
-
-export interface PdfRendererProps {
-    width: number;
-    height: number;
-    render: (props: PdfViewerRenderProps) => React.ReactNode;
+export interface PdfDiffViewerProps {
+    result?: DiffResult;
+    isLoading?: boolean;
+    error?: unknown;
+    leftLabel?: string; // 기본: "원본"
+    rightLabel?: string; // 기본: "수정본"
 }
 
-export const PdfRenderer = ({ width, height, render }: PdfRendererProps) => {
-    const {
-        currentPage,
-        totalPages,
-        toNextPage,
-        toPrevPage,
-        jumpToPage,
-        initializePages,
-        isInPageRange,
-    } = usePdfPageContext();
-
-    return render({
-        width,
-        height,
-
-        currentPage,
-        totalPages,
-
-        toNextPage,
-        toPrevPage,
-        jumpToPage,
-        initializePages,
-        isInPageRange,
-    });
-};
-
-export interface DocumentViewerProps extends React.ComponentPropsWithoutRef<"article"> {
-    viewerWidth: CSSProperties["width"];
-    debouncedTimeout?: number;
-    render: (props: PdfViewerRenderProps) => React.ReactNode;
-}
-
-export const PdfViewer = forwardRef<HTMLDivElement, DocumentViewerProps>(
-    ({ viewerWidth, debouncedTimeout = 400, render, ...props }: DocumentViewerProps) => {
-        const { ref, width, height } = useDebouncedResizeObserver(debouncedTimeout);
-
+/** PDF 전용 Diff 뷰어 (좌/우 2-pane 레이아웃) */
+export const PdfDiffViewer = ({
+    result,
+    isLoading,
+    error,
+    leftLabel = "원본",
+    rightLabel = "수정본",
+}: PdfDiffViewerProps) => {
+    if (isLoading)
         return (
-            <PdfPageContextProvider>
-                <article
-                    ref={ref}
-                    style={{ width: viewerWidth }}
-                    className={cn("relative", props.className)}
-                    {...props}
-                >
-                    <PdfPageController />
-                    <PdfRenderer render={render} width={width} height={height} />
-                </article>
-            </PdfPageContextProvider>
+            <p role="status" className="p-3 text-sm">
+                Loading PDF diff…
+            </p>
         );
-    },
-);
+    if (error)
+        return (
+            <p role="alert" className="p-3 text-sm">
+                PDF diff error
+            </p>
+        );
+    if (!result) return <p className="p-3 text-sm">No PDF diff</p>;
 
-PdfViewer.displayName = "PdfViewer";
+    return (
+        <section className="grid grid-cols-2 gap-6">
+            {/* LEFT */}
+            <article aria-label="원본 문서" className="rounded-lg border bg-white">
+                <header className="flex items-center gap-2 px-4 py-2 border-b bg-indigo-50">
+                    <span className="inline-block h-2 w-2 rounded-full bg-indigo-500" aria-hidden />
+                    <h3 className="text-sm font-medium">{leftLabel}</h3>
+                </header>
+                <div className="p-4">
+                    {/* TODO: 원본 PDF 페이지 렌더링 */}
+                    <p className="text-xs text-muted-foreground">원본 문서 미리보기</p>
+                </div>
+            </article>
+
+            {/* RIGHT */}
+            <article aria-label="수정본 문서" className="rounded-lg border bg-white">
+                <header className="flex items-center gap-2 px-4 py-2 border-b bg-emerald-50">
+                    <span
+                        className="inline-block h-2 w-2 rounded-full bg-emerald-500"
+                        aria-hidden
+                    />
+                    <h3 className="text-sm font-medium">{rightLabel}</h3>
+                </header>
+                <div className="p-4">
+                    {/* TODO: 수정본 PDF 페이지 렌더링 */}
+                    <p className="text-xs text-muted-foreground">수정본 문서 미리보기</p>
+                </div>
+            </article>
+        </section>
+    );
+};

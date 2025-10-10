@@ -1,10 +1,10 @@
 import React, { Suspense, type ReactNode } from "react";
 
 import { FileType, type FileTypes } from "@/core/@types/FileType";
+import { useDocumentDiff } from "@/core/document-diff/hooks/useDocumentDiff";
 import { MarkdownDiffViewer } from "@/core/document-diff/integration/components/DiffViewer/MarkdownDiffViewer";
 import { PdfDiffViewer } from "@/core/document-diff/integration/components/DiffViewer/PdfDiffViewer";
 import { PlainTextDiffViewer } from "@/core/document-diff/integration/components/DiffViewer/PlainTextDiffViewer";
-import { useDocumentDiff } from "@/core/document-diff/integration/hooks/useDocumentDiff";
 
 class DiffErrorBoundary extends React.Component<
     { fallback: ReactNode; children: ReactNode },
