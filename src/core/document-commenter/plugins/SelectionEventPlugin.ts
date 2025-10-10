@@ -8,7 +8,7 @@ export class SelectionEventPlugin extends EventBusPlugin {
     private eventBus: Nullable<EventBus> = null;
 
     public state: SelectionState = "idle";
-    public startPosition: Vector2d = { x: 0, y: 0 };
+    public startPosition: Vector2d = { x: -1, y: -1 };
 
     constructor() {
         super();
@@ -62,9 +62,69 @@ export class SelectionEventPlugin extends EventBusPlugin {
 
         this.state = "idle";
 
-        this.eventBus?.dispatch({
-            type: "selection:end",
-            payload: { start: this.startPosition, end: event.payload },
-        });
+        if (
+            this.startPosition.x === event.payload.x ||
+            this.startPosition.y === event.payload.y ||
+            this.startPosition.x === -1 ||
+            this.startPosition.y === -1
+        ) {
+            return;
+        } else if (
+            this.startPosition.x > event.payload.x &&
+            this.startPosition.y < event.payload.y
+        ) {
+            this.eventBus?.dispatch({
+                type: "selection:end",
+                payload: {
+                    start: {
+                        x: event.payload.x,
+                        y: this.startPosition.y,
+                    },
+                    end: {
+                        x: this.startPosition.x,
+                        y: event.payload.y,
+                    },
+                },
+            });
+        } else if (
+            this.startPosition.x > event.payload.x &&
+            this.startPosition.y > event.payload.y
+        ) {
+            this.eventBus?.dispatch({
+                type: "selection:end",
+                payload: {
+                    start: event.payload,
+                    end: this.startPosition,
+                },
+            });
+        } else if (
+            this.startPosition.x < event.payload.x &&
+            this.startPosition.y > event.payload.y
+        ) {
+            this.eventBus?.dispatch({
+                type: "selection:end",
+                payload: {
+                    start: {
+                        x: this.startPosition.x,
+                        y: event.payload.y,
+                    },
+                    end: {
+                        x: event.payload.x,
+                        y: this.startPosition.y,
+                    },
+                },
+            });
+        } else if (
+            this.startPosition.x < event.payload.x &&
+            this.startPosition.y < event.payload.y
+        ) {
+            this.eventBus?.dispatch({
+                type: "selection:end",
+                payload: {
+                    start: this.startPosition,
+                    end: event.payload,
+                },
+            });
+        }
     };
 }
