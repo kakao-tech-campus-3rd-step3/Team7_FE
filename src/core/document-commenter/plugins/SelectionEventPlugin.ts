@@ -32,7 +32,7 @@ export class SelectionEventPlugin extends EventBusPlugin {
 
     private initialize() {
         this.state = "idle";
-        this.startPosition = { x: 0, y: 0 };
+        this.startPosition = { x: -1, y: -1 };
         this.eventBus = null;
     }
 
