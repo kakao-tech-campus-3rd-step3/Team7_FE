@@ -13,6 +13,7 @@ export const FeedbackCommentAreas = () => {
             {data.content.map((comment) => {
                 return (
                     <CommentArea
+                        key={comment.id}
                         borderColor="#F6B13B"
                         backgroundColor="#F6B13B33"
                         style={{}}
