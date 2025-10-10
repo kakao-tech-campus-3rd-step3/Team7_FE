@@ -35,7 +35,7 @@ export const Pending: Story = {
     },
 };
 
-export const Error: Story = {
+export const _Error: Story = {
     args: {
         id: 3,
         startX: 50,
