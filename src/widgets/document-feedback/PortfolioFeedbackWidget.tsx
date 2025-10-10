@@ -1,7 +1,11 @@
 import { Fragment, useCallback, useState } from "react";
 import { Document, Page } from "react-pdf";
 
+import { FeedbackCommentAreas } from "@/features/document-feedback/containers/FeedbackComment/FeedbackCommentAreas";
+import { NewFeedbackComment } from "@/features/document-feedback/containers/FeedbackComment/NewFeedbackComment";
+
 import { DisableSelection } from "@/shared/components/Helper/DisableSelection";
+import { HTTPExceptionBoundary } from "@/shared/errors/HTTPExceptionBoundary";
 import { useToggle } from "@/shared/hooks/useToggle";
 
 import { PortfolioFeedbackCommentToolbarWidget } from "@/widgets/document-feedback/PortfolioFeedbackCommentToolbar";
@@ -27,7 +31,7 @@ export const PortfolioFeedbackWidget = () => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mousedown", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mousedown", payload: localCoords });
         },
         [eventBus, getCoords],
     );
@@ -36,7 +40,7 @@ export const PortfolioFeedbackWidget = () => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mousemove", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mousemove", payload: localCoords });
         },
         [eventBus, getCoords],
     );
@@ -45,7 +49,7 @@ export const PortfolioFeedbackWidget = () => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mouseup", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mouseup", payload: localCoords });
         },
         [eventBus, getCoords],
     );
@@ -82,6 +86,18 @@ export const PortfolioFeedbackWidget = () => {
                                 borderColor="#F6B13B"
                                 backgroundColor="#F6B13B33"
                             />
+
+                            <HTTPExceptionBoundary
+                                onError={(code) => {
+                                    switch (code) {
+                                        default:
+                                            return <p>Unknown Error</p>;
+                                    }
+                                }}
+                            >
+                                <FeedbackCommentAreas />
+                                <NewFeedbackComment />
+                            </HTTPExceptionBoundary>
                         </DisableSelection>
                     </Document>
                 )}

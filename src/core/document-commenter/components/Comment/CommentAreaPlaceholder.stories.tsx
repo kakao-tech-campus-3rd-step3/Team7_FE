@@ -2,8 +2,8 @@ import { useCallback, type PropsWithChildren } from "react";
 
 import { CommentAreaPlaceholder } from "@/core/document-commenter/components/Comment/CommentAreaPlaceholder";
 import { EventBusProvider, useEventBus } from "@/core/document-commenter/contexts/EventBusContext";
-import { SelectionEventController } from "@/core/document-commenter/events/SelectionEventController";
 import { useLocalCoordinates } from "@/core/document-commenter/hooks/useLocalCoordinates";
+import { SelectionEventPlugin } from "@/core/document-commenter/plugins/SelectionEventPlugin";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta<typeof CommentAreaPlaceholder> = {
@@ -22,7 +22,7 @@ const CommentableContainer = ({ children }: PropsWithChildren) => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mousedown", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mousedown", payload: localCoords });
         },
         [eventBus, getCoords],
     );
@@ -31,7 +31,7 @@ const CommentableContainer = ({ children }: PropsWithChildren) => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mousemove", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mousemove", payload: localCoords });
         },
         [eventBus, getCoords],
     );
@@ -40,7 +40,7 @@ const CommentableContainer = ({ children }: PropsWithChildren) => {
         (event: React.MouseEvent) => {
             const localCoords = getCoords({ x: event.clientX, y: event.clientY });
             if (!localCoords) return;
-            eventBus.dispatch({ type: "document:mouseup", payload: localCoords });
+            eventBus.dispatch({ type: "raw:mouseup", payload: localCoords });
         },
         [eventBus, getCoords],
     );
@@ -70,7 +70,7 @@ export const Default: Story = {
     },
     render: (args) => {
         return (
-            <EventBusProvider eventControllers={[new SelectionEventController()]}>
+            <EventBusProvider eventBusPlugins={[new SelectionEventPlugin()]}>
                 <CommentableContainer>
                     <CommentAreaPlaceholder {...args} />
                 </CommentableContainer>

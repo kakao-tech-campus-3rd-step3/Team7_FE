@@ -6,7 +6,7 @@
   "scripts": {
     "format": "prettier --write --config .prettierrc src/**/*.{js,ts,tsx,json,css,md}",
     "postinstall": "node ./scripts/pdf.mjs",
-    "dev": "vite",
+    "dev": "vite --port 3000",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -29,6 +29,7 @@
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "immer": "^10.1.3",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.542.0",
     "react": "^19.1.1",

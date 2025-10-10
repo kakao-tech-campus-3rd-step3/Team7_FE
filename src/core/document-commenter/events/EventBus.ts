@@ -1,4 +1,4 @@
-import type { EventController } from "@/core/document-commenter/events/EventController";
+import type { EventBusPlugin } from "@/core/document-commenter/events/EventBusPlugin";
 import type {
     EventHandlerOf,
     EventTypeOf,
@@ -32,8 +32,8 @@ export class EventBus {
         }
     }
 
-    public use(eventController: EventController) {
-        eventController.attach(this);
+    public use(eventController: EventBusPlugin) {
+        eventController.install(this);
         return this;
     }
 }
