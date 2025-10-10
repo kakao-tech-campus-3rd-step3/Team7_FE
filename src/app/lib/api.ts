@@ -5,6 +5,12 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+    config.params = {
+        ...config.params,
+
+        // TODO: 추후 memberId 대신 JWT 토큰 사용
+        memberId: 1,
+    };
     return config;
 });
 
