@@ -1,3 +1,3 @@
-export abstract class DiffStrategy<T> {
-    abstract process(before: string, after: string): Promise<T>;
-}
+export type DiffStrategy<T> = {
+    process: (before: string, after: string) => Promise<T>;
+};

@@ -1,14 +1,15 @@
-import type { FileType } from "@/core/@types/FileType";
-import type { DiffResult } from "@/core/document-diff/base/DiffResult";
-import { DiffStrategy } from "@/core/document-diff/base/DiffStrategy";
+import type { DiffStrategy } from "@/core/document-diff/base/DiffStrategy";
 
-export interface PlainTextDiffResult extends DiffResult<string> {
-    renderer: typeof FileType.TEXT;
+export interface PlainTextDiffResult {
+    before: string;
+    after: string;
 }
 
-export class PlainTextDiffStrategy extends DiffStrategy<PlainTextDiffResult> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public override async process(_before: string, _after: string): Promise<PlainTextDiffResult> {
-        throw new Error("Method not implemented.");
-    }
+export function createPlainTextDiffStrategy(): DiffStrategy<PlainTextDiffResult> {
+    return {
+        async process(before: string, after: string) {
+            // TODO: 라인/문자 단위 diff 계산 결과를 함께 반환하도록 확장
+            return { before, after };
+        },
+    };
 }
