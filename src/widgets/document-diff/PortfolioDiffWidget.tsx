@@ -13,10 +13,14 @@ export const PortfolioDiffWidget = () => {
         after: "/mocks/v2-sample.pdf",
     });
 
-    const [numPages, setNumPages] = useState<number>(0);
+    const [beforeNumPages, setBeforeNumPages] = useState<number>(0);
+    const [afterNumPages, setAfterNumPages] = useState<number>(0);
+    const handleBeforeLoadSuccess = ({ numPages }: { numPages: number }) => {
+        setBeforeNumPages(numPages);
+    };
 
-    const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-        setNumPages(numPages);
+    const handleAfterLoadSuccess = ({ numPages }: { numPages: number }) => {
+        setAfterNumPages(numPages);
     };
 
     return (
@@ -53,10 +57,10 @@ export const PortfolioDiffWidget = () => {
                         <div className="w-full max-w-[850px]">
                             <Document
                                 file={diffResult.before}
-                                onLoadSuccess={onDocumentLoadSuccess}
+                                onLoadSuccess={handleBeforeLoadSuccess}
                             >
-                                {numPages > 0 &&
-                                    Array.from({ length: numPages }, (_, i) => (
+                                {beforeNumPages > 0 &&
+                                    Array.from({ length: beforeNumPages }, (_, i) => (
                                         <Page
                                             key={`before_page_${i + 1}`}
                                             pageNumber={i + 1}
@@ -72,9 +76,12 @@ export const PortfolioDiffWidget = () => {
                         className="rounded-lg border bg-white grid place-items-center p-3"
                     >
                         <div className="w-full max-w-[850px]">
-                            <Document file={diffResult.after} onLoadSuccess={onDocumentLoadSuccess}>
-                                {numPages > 0 &&
-                                    Array.from({ length: numPages }, (_, i) => (
+                            <Document
+                                file={diffResult.after}
+                                onLoadSuccess={handleAfterLoadSuccess}
+                            >
+                                {afterNumPages > 0 &&
+                                    Array.from({ length: afterNumPages }, (_, i) => (
                                         <Page
                                             key={`after_page_${i + 1}`}
                                             pageNumber={i + 1}
