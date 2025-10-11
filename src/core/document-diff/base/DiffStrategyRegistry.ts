@@ -3,13 +3,12 @@ import { FileType, type FileTypes } from "@/core/@types/FileType";
 
 export type DiffStrategyFactoryFn<TResult = unknown> = () => DiffStrategy<TResult>;
 
-const registry = new Map<FileTypes, DiffStrategyFactoryFn<any>>();
-
+const registry = new Map<FileTypes, DiffStrategyFactoryFn<unknown>>();
 export function registerDiffStrategy<TResult = unknown>(
     type: FileTypes,
     factory: DiffStrategyFactoryFn<TResult>,
 ): void {
-    registry.set(type, factory as DiffStrategyFactoryFn<any>);
+    registry.set(type, factory as DiffStrategyFactoryFn<unknown>);
 }
 
 export function unregisterDiffStrategy(type: FileTypes): void {
