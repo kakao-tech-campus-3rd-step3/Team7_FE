@@ -1,4 +1,3 @@
-// core/document-diff/base/DiffStrategyFactory.ts
 import type { DiffStrategy } from "./DiffStrategy";
 import {
     resolveDiffStrategy,
@@ -23,7 +22,7 @@ export {
 export type { DiffStrategyFactoryFn } from "./DiffStrategyRegistry";
 
 export function registerBuiltinDiffStrategies(
-    creators: Partial<Record<FileTypes, DiffStrategyFactoryFn<any>>>,
+    creators: Partial<Record<FileTypes, DiffStrategyFactoryFn<unknown>>>,
 ) {
     Object.entries(creators).forEach(([type, factory]) => {
         if (factory) registerDiffStrategy(type as FileTypes, factory);
