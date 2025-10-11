@@ -7,38 +7,37 @@ import { DiffLayout } from "@/core/document-diff/integration/components/DiffLayo
 export interface PdfDiffViewerProps extends Omit<PdfDiffResult, "renderer"> {}
 
 export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
-    const [numPages, setNumPages] = useState<number>(0);
+    const [beforeNumPages, setBeforeNumPages] = useState<number>(0);
+    const [afterNumPages, setAfterNumPages] = useState<number>(0);
+    const totalPages = Math.max(beforeNumPages, afterNumPages);
     const [currentPage, setCurrentPage] = useState<number>(1);
-
-    const handleLoadSuccess = useCallback((info: { numPages: number }) => {
-        setNumPages(info.numPages);
-        setCurrentPage((prev) => (prev > info.numPages ? info.numPages : prev));
+    const handleBeforeLoadSuccess = useCallback((info: { numPages: number }) => {
+        setBeforeNumPages(info.numPages);
     }, []);
-
+    const handleAfterLoadSuccess = useCallback((info: { numPages: number }) => {
+        setAfterNumPages(info.numPages);
+    }, []);
     const goPrev = useCallback(() => {
         setCurrentPage((p) => Math.max(1, p - 1));
     }, []);
-
     const goNext = useCallback(() => {
-        setCurrentPage((p) => (numPages > 0 ? Math.min(numPages, p + 1) : p + 1));
-    }, [numPages]);
-
+        setCurrentPage((p) => (totalPages > 0 ? Math.min(totalPages, p + 1) : p + 1));
+    }, [totalPages]);
     const goTo = useCallback(
         (page: number) => {
-            if (numPages === 0) return;
-            const next = Math.min(Math.max(1, page), numPages);
+            if (totalPages === 0) return;
+            const next = Math.min(Math.max(1, page), totalPages);
             setCurrentPage(next);
         },
-        [numPages],
+        [totalPages],
     );
-
     return (
         <div className="flex flex-col gap-3 w-full h-full">
             <div className="flex items-center justify-between">
                 <div className="text-sm text-neutral-600">
-                    {numPages > 0 ? (
+                    {totalPages > 0 ? (
                         <span>
-                            Page <strong>{currentPage}</strong> / {numPages}
+                            Page <strong>{currentPage}</strong> / {totalPages}
                         </span>
                     ) : (
                         <span>Loading PDF…</span>
@@ -57,7 +56,7 @@ export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
                     <input
                         type="number"
                         min={1}
-                        max={numPages || undefined}
+                        max={totalPages || undefined}
                         value={currentPage}
                         onChange={(e) => goTo(Number(e.target.value))}
                         className="w-16 px-2 py-1 rounded-md border text-sm text-center"
@@ -66,7 +65,7 @@ export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
                     <button
                         type="button"
                         onClick={goNext}
-                        disabled={numPages > 0 ? currentPage >= numPages : true}
+                        disabled={totalPages > 0 ? currentPage >= totalPages : true}
                         className="px-3 py-1 rounded-md border text-sm disabled:opacity-50"
                         aria-label="다음 페이지"
                     >
@@ -74,7 +73,6 @@ export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
                     </button>
                 </div>
             </div>
-
             <DiffLayout
                 className="w-full h-full"
                 gapXClass="gap-x-6"
@@ -84,17 +82,24 @@ export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => {
                 rightAccentClass="border-l-4 border-emerald-500"
             >
                 <div className="w-full max-w-[820px]">
-                    <Document file={before} onLoadSuccess={handleLoadSuccess}>
-                        {numPages > 0 && (
-                            <Page pageNumber={currentPage} width={520} renderTextLayer={false} />
+                    <Document file={before} onLoadSuccess={handleBeforeLoadSuccess}>
+                        {beforeNumPages > 0 && (
+                            <Page
+                                pageNumber={Math.min(currentPage, beforeNumPages)}
+                                width={520}
+                                renderTextLayer={false}
+                            />
                         )}
                     </Document>
                 </div>
-
                 <div className="w-full max-w-[820px]">
-                    <Document file={after} onLoadSuccess={handleLoadSuccess}>
-                        {numPages > 0 && (
-                            <Page pageNumber={currentPage} width={520} renderTextLayer={false} />
+                    <Document file={after} onLoadSuccess={handleAfterLoadSuccess}>
+                        {afterNumPages > 0 && (
+                            <Page
+                                pageNumber={Math.min(currentPage, afterNumPages)}
+                                width={520}
+                                renderTextLayer={false}
+                            />
                         )}
                     </Document>
                 </div>
