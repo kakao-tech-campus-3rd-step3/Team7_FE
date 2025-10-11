@@ -7,14 +7,12 @@ import type { PdfDiffResult } from "@/core/document-diff/PdfDiffStrategy";
 import type { PlainTextDiffResult } from "@/core/document-diff/PlainTextDiffStrategy";
 import { createDiffStrategy } from "@/core/document-diff/base/DiffStrategyFactory";
 
-/** 파일 타입 → 입력 소스 타입 매핑 (현재 모두 string 기반) */
 type SourceMap = {
     [FileType.PDF]: string;
     [FileType.MARKDOWN]: string;
     [FileType.TEXT]: string;
 };
 
-/** 파일 타입 → 결과 타입 매핑 */
 type ResultMap = {
     [FileType.PDF]: PdfDiffResult;
     [FileType.MARKDOWN]: MarkdownDiffResult;
@@ -25,7 +23,6 @@ export interface UseDocumentDiffParams<T extends FileTypes> {
     fileType: T;
     before: SourceMap[T];
     after: SourceMap[T];
-    /** Suspense / ErrorBoundary 통합 모드 */
     suspense?: boolean;
 }
 
@@ -36,11 +33,6 @@ export interface UseDocumentDiffReturn<T extends FileTypes> {
     diffResult: ResultMap[T] | null;
 }
 
-/**
- * 파일 타입에 따라 입력/출력 타입이 자동 매핑되는 타입 안전 훅
- * - suspense=true 시: 로딩 중 Promise throw, 에러 시 Error throw → 상위 <Suspense> / ErrorBoundary 로 처리
- * - suspense=false 시: 기존처럼 isProcessing/isError/diffResult 플래그 반환
- */
 export function useDocumentDiff<T extends FileTypes>(
     params: UseDocumentDiffParams<T>,
 ): UseDocumentDiffReturn<T> {
@@ -72,29 +64,13 @@ export function useDocumentDiff<T extends FileTypes>(
         suspensePromiseRef.current = p;
     }, [suspense, strategy, fileType, before, after]);
 
-    if (suspense) {
-        if (suspenseErrorRef.current) {
-            throw suspenseErrorRef.current;
-        }
-        if (!suspenseResultRef.current) {
-            throw suspensePromiseRef.current;
-        }
-
-        return {
-            isProcessing: false,
-            isError: false,
-            error: null,
-            diffResult: suspenseResultRef.current,
-        };
-    }
-
-    /** ===== 비-Suspense 모드 (기존 방식) ===== */
     const [isProcessing, setProcessing] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
     const [error, setError] = useState<unknown | null>(null);
     const [diffResult, setDiffResult] = useState<ResultMap[T] | null>(null);
 
     useEffect(() => {
+        if (suspense) return;
         let cancelled = false;
 
         async function run() {
@@ -123,7 +99,21 @@ export function useDocumentDiff<T extends FileTypes>(
         return () => {
             cancelled = true;
         };
-    }, [strategy, before, after]);
+    }, [suspense, strategy, before, after]);
 
+    if (suspense) {
+        if (suspenseErrorRef.current) {
+            throw suspenseErrorRef.current;
+        }
+        if (!suspenseResultRef.current) {
+            throw suspensePromiseRef.current;
+        }
+        return {
+            isProcessing: false,
+            isError: false,
+            error: null,
+            diffResult: suspenseResultRef.current,
+        };
+    }
     return { isProcessing, isError, error, diffResult };
 }
