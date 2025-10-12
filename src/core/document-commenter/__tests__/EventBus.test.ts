@@ -44,16 +44,16 @@ describe("EventBus", () => {
         });
     });
 
-    test("use() 가 호출되면 EventController 가 attach 된다", () => {
+    test("use() 가 호출되면 EventBusPlugin 이 install 된다", () => {
         const eventBus = new EventBus();
 
-        const mockEventController = {
-            attach: vitest.fn(),
-            detach: vitest.fn(),
+        const mockEventPlugin = {
+            install: vitest.fn(),
+            uninstall: vitest.fn(),
         };
 
-        eventBus.use(mockEventController);
+        eventBus.use(mockEventPlugin);
 
-        expect(mockEventController.attach).toHaveBeenCalledWith(eventBus);
+        expect(mockEventPlugin.install).toHaveBeenCalledWith(eventBus);
     });
 });

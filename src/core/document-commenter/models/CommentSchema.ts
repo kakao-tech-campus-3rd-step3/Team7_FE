@@ -1,4 +1,6 @@
-export interface Comment {
+export interface CommentSchema {
+    status: "pending" | "success" | "error";
+
     id: number;
     content: string;
 
