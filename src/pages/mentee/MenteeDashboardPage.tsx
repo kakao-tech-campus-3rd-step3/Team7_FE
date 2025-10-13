@@ -6,19 +6,23 @@ import { Folder, UserRoundPen, Clock3, UserRound } from "lucide-react";
 
 import { NewApplicationButton, NewApplicationModal } from "@/features/applications";
 import {
-    DashboardApplyContainer,
-    DndApplyCard,
-    DndApplySection,
     DashboardHeaderContainer,
     DashboardHeaderCard,
     useBoardState,
-    sectionState,
     sectionMock,
     SECTION_ORDER,
     type Section,
     type ApplyCard,
     calcDday,
+    MenteeDashboardListContainer,
+    MenteeDashboardList,
+    MenteeDashboardKanban,
+    type MenteeDashboardListItemData,
 } from "@/features/dashboard";
+import {
+    DashboardViewToggle,
+    type DashboardViewMode,
+} from "@/features/dashboard/components/ViewToggle/DashboardViewToggle";
 
 //TODO : 기업 이미지 불러오기
 const PlaceholderLogo: React.ReactNode = <div className="h-5 w-5 rounded-sm bg-zinc-200/80" />;
@@ -26,6 +30,8 @@ const PlaceholderLogo: React.ReactNode = <div className="h-5 w-5 rounded-sm bg-z
 export default function MenteeDashboardPage() {
     const { board, setBoard, moveTo } = useBoardState(sectionMock);
     const [openCreate, setOpenCreate] = useState(false);
+
+    const [view, setView] = useState<DashboardViewMode>("kanban");
 
     const totalApplications = useMemo(
         () => Object.values(board).reduce((sum, sectionCards) => sum + sectionCards.length, 0),
@@ -63,6 +69,18 @@ export default function MenteeDashboardPage() {
             });
         },
         [setBoard],
+    );
+
+    const listItems: MenteeDashboardListItemData[] = useMemo(
+        () =>
+            SECTION_ORDER.flatMap((sectionKey) => board[sectionKey]).map((card) => ({
+                id: card.id,
+                icon: card.icon ?? PlaceholderLogo,
+                company: card.company,
+                position: card.position,
+                dday: card.dday,
+            })),
+        [board],
     );
 
     return (
@@ -112,42 +130,23 @@ export default function MenteeDashboardPage() {
                 </DashboardHeaderContainer>
 
                 <header className="mt-8">
-                    <h2 className="mb-3 text-lg leading-7 font-semibold text-slate-900">
-                        지원 현황
-                    </h2>
+                    <div className="mb-3 flex items-center justify-between">
+                        <h2 className="text-lg leading-7 font-semibold text-slate-900">
+                            지원 현황
+                        </h2>
+                        <DashboardViewToggle value={view} onValueChange={setView} />
+                    </div>
                 </header>
 
-                <DashboardApplyContainer>
-                    {SECTION_ORDER.map((sectionKey, sectionIndex) => {
-                        const section = sectionState[sectionKey];
-                        const cards = board[sectionKey];
-                        return (
-                            <DndApplySection
-                                key={sectionKey}
-                                title={section.title}
-                                value={cards.length}
-                                wrapperClassName={section.wrapperClassName}
-                                sectionKey={sectionKey}
-                                sectionIndex={sectionIndex}
-                                maxStep={2}
-                                onCardDrop={(item) => moveTo(item, sectionKey)}
-                            >
-                                {cards.map((card, cardIndex) => (
-                                    <DndApplyCard
-                                        key={card.id}
-                                        id={card.id}
-                                        from={sectionKey}
-                                        origin={cardIndex}
-                                        icon={PlaceholderLogo}
-                                        company={card.company}
-                                        position={card.position}
-                                        dday={card.dday}
-                                    />
-                                ))}
-                            </DndApplySection>
-                        );
-                    })}
-                </DashboardApplyContainer>
+                {view === "kanban" && (
+                    <MenteeDashboardKanban board={board} moveTo={moveTo} icon={PlaceholderLogo} />
+                )}
+
+                {view === "list" && (
+                    <MenteeDashboardListContainer>
+                        <MenteeDashboardList items={listItems} />
+                    </MenteeDashboardListContainer>
+                )}
             </main>
 
             <NewApplicationModal
