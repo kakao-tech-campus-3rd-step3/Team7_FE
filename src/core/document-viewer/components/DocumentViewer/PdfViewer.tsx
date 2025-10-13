@@ -1,6 +1,5 @@
 import { forwardRef, type CSSProperties } from "react";
 
-import { useDebouncedResizeObserver } from "@/shared/hooks/useDebouncedResizeObserver";
 import { cn } from "@/shared/lib/utils";
 
 import { PdfPageController } from "@/core/document-viewer/components/DocumentController";
@@ -9,12 +8,14 @@ import {
     usePdfPageContext,
 } from "@/core/document-viewer/contexts/PdfPageContext";
 
-export type PdfViewerRenderProps = Omit<ReturnType<typeof useDebouncedResizeObserver>, "ref"> &
-    ReturnType<typeof usePdfPageContext>;
+export type PdfViewerRenderProps = ReturnType<typeof usePdfPageContext> & {
+    width?: number;
+    height?: number;
+};
 
 export interface PdfRendererProps {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     render: (props: PdfViewerRenderProps) => React.ReactNode;
 }
 
@@ -46,14 +47,13 @@ export const PdfRenderer = ({ width, height, render }: PdfRendererProps) => {
 
 export interface DocumentViewerProps extends React.ComponentPropsWithoutRef<"article"> {
     viewerWidth: CSSProperties["width"];
-    debouncedTimeout?: number;
+    width?: number;
+    height?: number;
     render: (props: PdfViewerRenderProps) => React.ReactNode;
 }
 
 export const PdfViewer = forwardRef<HTMLDivElement, DocumentViewerProps>(
-    ({ viewerWidth, debouncedTimeout = 400, render, ...props }: DocumentViewerProps) => {
-        const { ref, width, height } = useDebouncedResizeObserver(debouncedTimeout);
-
+    ({ viewerWidth, render, width, height, ...props }: DocumentViewerProps, ref) => {
         return (
             <PdfPageContextProvider>
                 <article

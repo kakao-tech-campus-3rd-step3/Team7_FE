@@ -3,6 +3,8 @@ import { Document, Page } from "react-pdf";
 
 import { FeedbackCommentAreas } from "@/features/document-feedback/containers/FeedbackComment/FeedbackCommentAreas";
 import { NewFeedbackComment } from "@/features/document-feedback/containers/FeedbackComment/NewFeedbackComment";
+import { FeedbackLayout } from "@/features/document-feedback/containers/FeedbackSidebar/FeedbackLayout";
+import { FeedbackSidebar } from "@/features/document-feedback/containers/FeedbackSidebar/FeedbackSidebar";
 
 import { DisableSelection } from "@/shared/components/Helper/DisableSelection";
 import { HTTPExceptionBoundary } from "@/shared/errors/HTTPExceptionBoundary";
@@ -55,53 +57,63 @@ export const PortfolioFeedbackWidget = () => {
     );
 
     return (
-        <Fragment>
-            <PortfolioFeedbackCommentToolbarWidget
-                onCommentModeToggle={() => toggleCommentMode()}
-                onZoomIn={() => setScale((prev) => Math.min(prev + PDF_SCALE_STEP, PDF_MAX_SCALE))}
-                onZoomOut={() => setScale((prev) => Math.max(prev - PDF_SCALE_STEP, PDF_MIN_SCALE))}
-            />
-            <PdfViewer
-                className="p-4"
-                viewerWidth="100%"
-                render={({ width, currentPage, initializePages }) => (
-                    <Document
-                        scale={scale}
-                        file="/mocks/v1-sample.pdf"
-                        onLoadSuccess={({ numPages }) => initializePages?.(numPages)}
-                    >
-                        <DisableSelection className="relative">
-                            <Page
-                                width={width}
-                                canvasRef={pageRef}
-                                pageNumber={currentPage}
-                                onMouseDown={onMouseDown}
-                                onMouseMove={onMouseMove}
-                                onMouseUp={onMouseUp}
-                                renderAnnotationLayer={false}
-                                renderTextLayer={false}
-                            />
-
-                            <CommentAreaPlaceholder
-                                borderColor="#F6B13B"
-                                backgroundColor="#F6B13B33"
-                            />
-
-                            <HTTPExceptionBoundary
-                                onError={(code) => {
-                                    switch (code) {
-                                        default:
-                                            return <p>Unknown Error</p>;
-                                    }
-                                }}
+        <FeedbackLayout
+            main={
+                <Fragment>
+                    <PortfolioFeedbackCommentToolbarWidget
+                        onCommentModeToggle={() => toggleCommentMode()}
+                        onZoomIn={() =>
+                            setScale((prev) => Math.min(prev + PDF_SCALE_STEP, PDF_MAX_SCALE))
+                        }
+                        onZoomOut={() =>
+                            setScale((prev) => Math.max(prev - PDF_SCALE_STEP, PDF_MIN_SCALE))
+                        }
+                    />
+                    <PdfViewer
+                        className="p-4"
+                        viewerWidth="100%"
+                        render={({ width, currentPage, initializePages }) => (
+                            <Document
+                                scale={scale}
+                                file="/mocks/v1-sample.pdf"
+                                onLoadSuccess={({ numPages }) => initializePages?.(numPages)}
                             >
-                                <FeedbackCommentAreas />
-                                <NewFeedbackComment />
-                            </HTTPExceptionBoundary>
-                        </DisableSelection>
-                    </Document>
-                )}
-            />
-        </Fragment>
+                                <DisableSelection className="relative">
+                                    <Page
+                                        className="w-fit h-fit"
+                                        width={width}
+                                        canvasRef={pageRef}
+                                        pageNumber={currentPage}
+                                        onMouseDown={onMouseDown}
+                                        onMouseMove={onMouseMove}
+                                        onMouseUp={onMouseUp}
+                                        renderAnnotationLayer={false}
+                                        renderTextLayer={false}
+                                    />
+
+                                    <CommentAreaPlaceholder
+                                        borderColor="#F6B13B"
+                                        backgroundColor="#F6B13B33"
+                                    />
+
+                                    <HTTPExceptionBoundary
+                                        onError={(code) => {
+                                            switch (code) {
+                                                default:
+                                                    return <p>Unknown Error</p>;
+                                            }
+                                        }}
+                                    >
+                                        <FeedbackCommentAreas />
+                                        <NewFeedbackComment />
+                                    </HTTPExceptionBoundary>
+                                </DisableSelection>
+                            </Document>
+                        )}
+                    />
+                </Fragment>
+            }
+            sidebar={<FeedbackSidebar />}
+        />
     );
 };
