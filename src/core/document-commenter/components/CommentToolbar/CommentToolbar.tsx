@@ -6,7 +6,7 @@ export interface CommentToolbarProps {
 export const CommentToolbar = ({ leftItems, rightItems }: CommentToolbarProps) => {
     return (
         <nav
-            className="bg-[#F9FAFB] w-full h-12 border-gray-200 border-b flex justify-between px-4"
+            className="bg-[#F9FAFB] w-full h-12 border-gray-200 border-b flex justify-between px-4 relative z-10"
             aria-label="댓글 툴바"
         >
             <div className="w-full h-full flex items-center justify-start gap-0.5">
