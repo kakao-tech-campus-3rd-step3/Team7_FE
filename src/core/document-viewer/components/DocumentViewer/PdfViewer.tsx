@@ -1,63 +1,164 @@
-import type { DiffResult } from "@/core/document-diff/domain";
+import { useCallback, useMemo, useState } from "react";
+import { Document, Page } from "react-pdf";
 
-export interface PdfDiffViewerProps {
-    result?: DiffResult;
+import type { DiffResult } from "@/core/document-diff/base/DiffResult";
+import { DiffLayout } from "@/core/document-diff/integration/components/DiffLayout";
+
+export interface PdfViewerProps {
+    result?: DiffResult<string>;
     isLoading?: boolean;
     error?: unknown;
-    leftLabel?: string; // 기본: "원본"
-    rightLabel?: string; // 기본: "수정본"
+
+    leftLabel?: string;
+    rightLabel?: string;
+
+    pageWidth?: number;
+    initialPage?: number;
+    renderTextLayer?: boolean;
 }
 
-/** PDF 전용 Diff 뷰어 (좌/우 2-pane 레이아웃) */
-export const PdfDiffViewer = ({
+export const PdfViewer = ({
     result,
     isLoading,
     error,
     leftLabel = "원본",
     rightLabel = "수정본",
-}: PdfDiffViewerProps) => {
-    if (isLoading)
+    pageWidth = 520,
+    initialPage = 1,
+    renderTextLayer = false,
+}: PdfViewerProps) => {
+    const [leftPages, setLeftPages] = useState<number>(0);
+    const [rightPages, setRightPages] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(initialPage);
+
+    const maxPages = useMemo(() => Math.max(leftPages, rightPages), [leftPages, rightPages]);
+
+    const clampToRange = useCallback(
+        (page: number) => (maxPages ? Math.min(Math.max(1, page), maxPages) : page),
+        [maxPages],
+    );
+
+    const onLeftLoadSuccess = useCallback(
+        (info: { numPages: number }) => {
+            setLeftPages(info.numPages);
+            setCurrentPage((p) => Math.min(Math.max(1, p), Math.max(info.numPages, rightPages)));
+        },
+        [rightPages],
+    );
+
+    const onRightLoadSuccess = useCallback(
+        (info: { numPages: number }) => {
+            setRightPages(info.numPages);
+            setCurrentPage((p) => Math.min(Math.max(1, p), Math.max(info.numPages, leftPages)));
+        },
+        [leftPages],
+    );
+
+    const goPrev = useCallback(() => setCurrentPage((p) => clampToRange(p - 1)), [clampToRange]);
+    const goNext = useCallback(() => setCurrentPage((p) => clampToRange(p + 1)), [clampToRange]);
+
+    if (isLoading) {
         return (
-            <p role="status" className="p-3 text-sm">
-                Loading PDF diff…
-            </p>
+            <div className="p-4 text-sm text-neutral-600" role="status" aria-live="polite">
+                PDF를 불러오는 중입니다…
+            </div>
         );
-    if (error)
+    }
+    if (error) {
         return (
-            <p role="alert" className="p-3 text-sm">
-                PDF diff error
-            </p>
+            <div className="p-4 text-sm text-red-600" role="alert">
+                문서를 불러오는 중 오류가 발생했어요.{" "}
+                {error instanceof Error ? error.message : String(error)}
+            </div>
         );
-    if (!result) return <p className="p-3 text-sm">No PDF diff</p>;
+    }
+    if (!result) return null;
+
+    const leftSrc = result.before;
+    const rightSrc = result.after;
 
     return (
-        <section className="grid grid-cols-2 gap-6">
-            {/* LEFT */}
-            <article aria-label="원본 문서" className="rounded-lg border bg-white">
-                <header className="flex items-center gap-2 px-4 py-2 border-b bg-indigo-50">
-                    <span className="inline-block h-2 w-2 rounded-full bg-indigo-500" aria-hidden />
-                    <h3 className="text-sm font-medium">{leftLabel}</h3>
-                </header>
-                <div className="p-4">
-                    {/* TODO: 원본 PDF 페이지 렌더링 */}
-                    <p className="text-xs text-muted-foreground">원본 문서 미리보기</p>
+        <div className="flex flex-col gap-3 w-full h-full">
+            <div className="flex items-center justify-between">
+                <span className="text-sm text-neutral-600">
+                    {maxPages > 0 ? `Page ${currentPage} / ${maxPages}` : "Loading PDF…"}
+                </span>
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={goPrev}
+                        disabled={currentPage <= 1 || maxPages === 0}
+                        className="px-3 py-1 rounded-md border text-sm disabled:opacity-50"
+                        aria-label="이전 페이지"
+                    >
+                        ← Prev
+                    </button>
+                    <button
+                        type="button"
+                        onClick={goNext}
+                        disabled={maxPages === 0 || currentPage >= maxPages}
+                        className="px-3 py-1 rounded-md border text-sm disabled:opacity-50"
+                        aria-label="다음 페이지"
+                    >
+                        Next →
+                    </button>
                 </div>
-            </article>
+            </div>
 
-            {/* RIGHT */}
-            <article aria-label="수정본 문서" className="rounded-lg border bg-white">
-                <header className="flex items-center gap-2 px-4 py-2 border-b bg-emerald-50">
-                    <span
-                        className="inline-block h-2 w-2 rounded-full bg-emerald-500"
-                        aria-hidden
-                    />
-                    <h3 className="text-sm font-medium">{rightLabel}</h3>
-                </header>
-                <div className="p-4">
-                    {/* TODO: 수정본 PDF 페이지 렌더링 */}
-                    <p className="text-xs text-muted-foreground">수정본 문서 미리보기</p>
-                </div>
-            </article>
-        </section>
+            <DiffLayout
+                className="w-full h-full"
+                gapXClass="gap-x-6"
+                showDivider
+                center
+                leftAccentClass="border-l-4 border-indigo-500"
+                rightAccentClass="border-l-4 border-emerald-500"
+            >
+                <article aria-label="원본 문서" className="w-full">
+                    <header className="flex items-center gap-2 px-4 py-2 border-b bg-indigo-50">
+                        <span
+                            className="inline-block h-2 w-2 rounded-full bg-indigo-500"
+                            aria-hidden
+                        />
+                        <h3 className="text-sm font-medium">{leftLabel}</h3>
+                    </header>
+                    <div className="p-4 grid place-items-center">
+                        <Document file={leftSrc} onLoadSuccess={onLeftLoadSuccess}>
+                            {leftPages > 0 ? (
+                                <Page
+                                    pageNumber={Math.min(currentPage, leftPages)}
+                                    width={pageWidth}
+                                    renderTextLayer={renderTextLayer}
+                                />
+                            ) : (
+                                <p className="text-xs text-neutral-500">문서를 불러오는 중…</p>
+                            )}
+                        </Document>
+                    </div>
+                </article>
+
+                <article aria-label="수정본 문서" className="w-full">
+                    <header className="flex items-center gap-2 px-4 py-2 border-b bg-emerald-50">
+                        <span
+                            className="inline-block h-2 w-2 rounded-full bg-emerald-500"
+                            aria-hidden
+                        />
+                        <h3 className="text-sm font-medium">{rightLabel}</h3>
+                    </header>
+                    <div className="p-4 grid place-items-center">
+                        <Document file={rightSrc} onLoadSuccess={onRightLoadSuccess}>
+                            {rightPages > 0 ? (
+                                <Page
+                                    pageNumber={Math.min(currentPage, rightPages)}
+                                    width={pageWidth}
+                                    renderTextLayer={renderTextLayer}
+                                />
+                            ) : (
+                                <p className="text-xs text-neutral-500">문서를 불러오는 중…</p>
+                            )}
+                        </Document>
+                    </div>
+                </article>
+            </DiffLayout>
+        </div>
     );
 };
