@@ -47,19 +47,16 @@ export function useDocumentDiff<T extends FileTypes>(
     useMemo(() => {
         if (!suspense) return;
 
-        const p = (async () => {
-            try {
-                const result = await strategy.process(
-                    before as SourceMap[T],
-                    after as SourceMap[T],
-                );
+        const p = strategy
+            .process(before as SourceMap[T], after as SourceMap[T])
+            .then((result) => {
                 suspenseResultRef.current = result as ResultMap[T];
                 suspenseErrorRef.current = null;
-            } catch (e) {
+            })
+            .catch((e) => {
                 suspenseErrorRef.current = e;
                 suspenseResultRef.current = null;
-            }
-        })();
+            });
 
         suspensePromiseRef.current = p;
     }, [suspense, strategy, fileType, before, after]);
