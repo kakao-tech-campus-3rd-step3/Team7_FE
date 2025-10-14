@@ -58,29 +58,33 @@ function InnerDiffRenderer({
         if (!diffResult) return <>{pendingFallback}</>;
     }
 
-    switch (fileType) {
-        case FileType.PDF:
-            return <PdfDiffViewer before={diffResult!.before} after={diffResult!.after} />;
-
-        case FileType.TEXT:
-            return (
-                <PlainTextDiffViewer
-                    before={String(diffResult!.before)}
-                    after={String(diffResult!.after)}
-                />
-            );
-
-        case FileType.MARKDOWN:
-            return (
-                <MarkdownDiffViewer
-                    before={String(diffResult!.before)}
-                    after={String(diffResult!.after)}
-                />
-            );
-
-        default:
-            throw new Error(`Unsupported file type: ${fileType}`);
+    if (fileType === FileType.PDF) {
+        return <PdfDiffViewer before={diffResult!.before} after={diffResult!.after} />;
     }
+
+    if (fileType === FileType.TEXT) {
+        return (
+            <PlainTextDiffViewer
+                before={String(diffResult!.before)}
+                after={String(diffResult!.after)}
+            />
+        );
+    }
+
+    if (fileType === FileType.MARKDOWN) {
+        return (
+            <MarkdownDiffViewer
+                before={String(diffResult!.before)}
+                after={String(diffResult!.after)}
+            />
+        );
+    }
+
+    return (
+        <div className="p-4 text-sm text-neutral-600">
+            지원하지 않는 파일 형식입니다. (fileType: {String(fileType)})
+        </div>
+    );
 }
 
 export const DiffViewer = (props: DiffViewerProps) => {
