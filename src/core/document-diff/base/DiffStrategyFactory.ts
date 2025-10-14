@@ -1,30 +1,25 @@
 import type { DiffStrategy } from "./DiffStrategy";
-import {
-    resolveDiffStrategy,
-    registerDiffStrategy,
-    unregisterDiffStrategy,
-    isDiffStrategyRegistered,
-    listRegisteredDiffStrategies,
-    type DiffStrategyFactoryFn,
-} from "./DiffStrategyRegistry";
+import { get, register, unregister, has, list, type FactoryFn } from "./DiffStrategyRegistry";
 import type { FileTypes } from "@/core/@types/FileType";
 
 export function createDiffStrategy<TResult = unknown>(fileType: FileTypes): DiffStrategy<TResult> {
-    return resolveDiffStrategy<TResult>(fileType);
+    return get<TResult>(fileType);
 }
 
+export { register, unregister, has, list };
+export type { FactoryFn };
+
 export {
-    registerDiffStrategy,
-    unregisterDiffStrategy,
-    isDiffStrategyRegistered,
-    listRegisteredDiffStrategies,
+    register as registerDiffStrategy,
+    unregister as unregisterDiffStrategy,
+    has as isDiffStrategyRegistered,
+    list as listRegisteredDiffStrategies,
 };
-export type { DiffStrategyFactoryFn } from "./DiffStrategyRegistry";
 
 export function registerBuiltinDiffStrategies(
-    creators: Partial<Record<FileTypes, DiffStrategyFactoryFn<unknown>>>,
+    creators: Partial<Record<FileTypes, FactoryFn<unknown>>>,
 ) {
     Object.entries(creators).forEach(([type, factory]) => {
-        if (factory) registerDiffStrategy(type as FileTypes, factory);
+        if (factory) register(type as FileTypes, factory);
     });
 }
