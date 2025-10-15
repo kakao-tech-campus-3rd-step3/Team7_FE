@@ -1,19 +1,24 @@
-import { FileType } from "@/core/@types/FileType";
+import { FileType, type FileTypes } from "@/core/@types/FileType";
 import { createMarkdownDiffStrategy } from "@/core/document-diff/MarkdownDiffStrategy";
 import { createPdfDiffStrategy } from "@/core/document-diff/PdfDiffStrategy";
 import { createPlainTextDiffStrategy } from "@/core/document-diff/PlainTextDiffStrategy";
-import { registerBuiltinDiffStrategies } from "@/core/document-diff/base/DiffStrategyFactory";
+import {
+    has,
+    registerBuiltinDiffStrategies,
+    type FactoryFn,
+} from "@/core/document-diff/base/DiffStrategyFactory";
 
-let installed = false;
+export function installDocumentDiffStrategies(): void {
+    const targets: Array<[FileTypes, FactoryFn<any>]> = [
+        [FileType.PDF, createPdfDiffStrategy],
+        [FileType.MARKDOWN, createMarkdownDiffStrategy],
+        [FileType.TEXT, createPlainTextDiffStrategy],
+    ];
 
-export function installDocumentDiffStrategies() {
-    if (installed) return;
+    const missing = targets.filter(([type]) => !has(type));
+    if (missing.length === 0) return;
 
-    registerBuiltinDiffStrategies({
-        [FileType.PDF]: createPdfDiffStrategy,
-        [FileType.MARKDOWN]: createMarkdownDiffStrategy,
-        [FileType.TEXT]: createPlainTextDiffStrategy,
-    });
-
-    installed = true;
+    registerBuiltinDiffStrategies(
+        Object.fromEntries(missing) as Partial<Record<FileTypes, FactoryFn<any>>>,
+    );
 }
