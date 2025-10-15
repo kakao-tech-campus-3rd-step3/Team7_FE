@@ -1,20 +1,15 @@
-import type { FileType, FileTypes } from "@/core/@types/FileType";
-import type { MarkdownDiffResult } from "@/core/document-diff/MarkdownDiffStrategy";
-import type { PdfDiffResult } from "@/core/document-diff/PdfDiffStrategy";
-import type { PlainTextDiffResult } from "@/core/document-diff/PlainTextDiffStrategy";
+import type { FileTypes } from "@/core/@types/FileType";
 
 export interface DiffResult<T> {
-    renderer: FileTypes;
-    before: T;
-    after: T;
+  before: T;
+  after: T;
+  renderer?: FileTypes;
 }
 
-export type DiffResultTypeMap = {
-    [FileType.PDF]: PdfDiffResult;
-    [FileType.TEXT]: PlainTextDiffResult;
-    [FileType.MARKDOWN]: MarkdownDiffResult;
-};
-
-export type InferDiffResultType<T extends FileTypes> = T extends keyof DiffResultTypeMap
-    ? DiffResultTypeMap[T]
-    : never;
+export function asDiffResult<T>(
+  input: DiffResult<T> | { before: T; after: T },
+  renderer?: FileTypes,
+): DiffResult<T> {
+  if ("renderer" in input) return input;
+  return renderer ? { ...input, renderer } : { ...input };
+}
