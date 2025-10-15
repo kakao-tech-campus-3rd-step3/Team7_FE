@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -7,16 +7,13 @@ import { Input } from "@/shared/ui/input";
 
 import { usePdfPageContext } from "@/core/document-viewer/contexts/PdfPageContext";
 
-export const PdfPageController = () => {
-    const {
-        currentPage,
-        totalPages,
-        isInPageRange,
-        toNextPage,
-        toPrevPage,
-        jumpToPage,
-        initializePages,
-    } = usePdfPageContext();
+export interface PdfPageControllerProps {
+    className?: string;
+}
+
+export const PdfPageController = ({ className }: PdfPageControllerProps) => {
+    const { currentPage, totalPages, isInPageRange, toNextPage, toPrevPage, jumpToPage } =
+        usePdfPageContext();
 
     const handleInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,12 +23,8 @@ export const PdfPageController = () => {
         [isInPageRange, jumpToPage],
     );
 
-    useEffect(() => {
-        if (initializePages) initializePages(totalPages);
-    }, [initializePages, totalPages]);
-
     return (
-        <div className="absolute top-2 right-2 z-10">
+        <div className={cn("absolute top-2 right-2 z-10", className)}>
             <ul className="inline-flex items-center rounded-md border p-0.5 text-sm bg-white">
                 <li>
                     <button
