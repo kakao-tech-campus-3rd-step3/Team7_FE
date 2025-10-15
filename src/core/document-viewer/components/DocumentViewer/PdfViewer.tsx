@@ -162,3 +162,5 @@ export const PdfViewer = ({
         </div>
     );
 };
+
+export default PdfViewer;
