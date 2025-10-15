@@ -1,6 +1,8 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import React from "react";
 
+import { cn } from "@/shared/lib/utils";
+
 export interface DiffLayoutProps extends PropsWithChildren {
     className?: string;
     gapXClass?: string;
@@ -36,29 +38,29 @@ export const DiffLayout = ({
     const left = items[0] ?? null;
     const right = items[1] ?? null;
 
-    const basePanel = `${panelClassName} ${center ? "grid place-items-center" : ""} p-3 h-full`;
+    const basePanel = cn(panelClassName, center && "grid place-items-center", "p-3 h-full");
 
-    const LeftWrapper = panelWrapper
-        ? panelWrapper
-        : ({ children, className }: { children: ReactNode; className: string }) => (
-              <article aria-label="원본 문서" className={className}>
-                  {children}
-              </article>
-          );
+    const DefaultPanelWrapper = ({
+        side,
+        children: _children,
+        className: _className,
+    }: {
+        side: "left" | "right";
+        children: ReactNode;
+        className: string;
+    }) => (
+        <article aria-label={side === "left" ? "원본 문서" : "수정본 문서"} className={_className}>
+            {_children}
+        </article>
+    );
 
-    const RightWrapper = panelWrapper
-        ? panelWrapper
-        : ({ children, className }: { children: ReactNode; className: string }) => (
-              <article aria-label="수정본 문서" className={className}>
-                  {children}
-              </article>
-          );
+    const PanelWrapper = panelWrapper ?? DefaultPanelWrapper;
 
     return (
         <section
-            className={`relative grid grid-cols-2 ${gapXClass} ${className}`}
             role="group"
             aria-label="문서 비교 레이아웃"
+            className={cn("relative grid grid-cols-2", gapXClass, className)}
         >
             {showDivider && (
                 <div
@@ -67,19 +69,13 @@ export const DiffLayout = ({
                 />
             )}
 
-            <LeftWrapper
-                side="left"
-                className={`${basePanel} ${leftClassName} ${leftAccentClass}`.trim()}
-            >
+            <PanelWrapper side="left" className={cn(basePanel, leftClassName, leftAccentClass)}>
                 <div className="w-full max-w-full">{left}</div>
-            </LeftWrapper>
+            </PanelWrapper>
 
-            <RightWrapper
-                side="right"
-                className={`${basePanel} ${rightClassName} ${rightAccentClass}`.trim()}
-            >
+            <PanelWrapper side="right" className={cn(basePanel, rightClassName, rightAccentClass)}>
                 <div className="w-full max-w-full">{right}</div>
-            </RightWrapper>
+            </PanelWrapper>
         </section>
     );
 };
