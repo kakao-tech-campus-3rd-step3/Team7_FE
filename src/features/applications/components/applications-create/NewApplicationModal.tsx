@@ -1,6 +1,6 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import type { Section } from "@/features/dashboard/models/types";
+import type { Section } from "@/features/mentee-dashboard/models/types";
 
 import { FormField as Field, inputClassName } from "@/shared/components/Form/FormField";
 import { cn } from "@/shared/lib/utils";
