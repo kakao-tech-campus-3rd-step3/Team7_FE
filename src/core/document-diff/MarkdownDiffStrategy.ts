@@ -1,14 +1,15 @@
-import type { FileType } from "@/core/@types/FileType";
-import type { DiffResult } from "@/core/document-diff/base/DiffResult";
-import { DiffStrategy } from "@/core/document-diff/base/DiffStrategy";
+import type { DiffStrategy } from "@/core/document-diff/base/DiffStrategy";
 
-export interface MarkdownDiffResult extends DiffResult<string> {
-    renderer: typeof FileType.MARKDOWN;
+export interface MarkdownDiffResult {
+    before: string;
+    after: string;
 }
 
-export class MarkdownDiffStrategy extends DiffStrategy<MarkdownDiffResult> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public override async process(_before: string, _after: string): Promise<MarkdownDiffResult> {
-        throw new Error("Method not implemented.");
-    }
+export function createMarkdownDiffStrategy(): DiffStrategy<MarkdownDiffResult> {
+    return {
+        async process(before: string, after: string) {
+            // TODO: 라인 기반 diff 적용
+            return { before, after };
+        },
+    };
 }

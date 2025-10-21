@@ -9,36 +9,44 @@ import { CoverletterDiffWidget } from "@/widgets/document-diff/CoverletterDiffWi
 import { PortfolioDiffWidget } from "@/widgets/document-diff/PortfolioDiffWidget";
 import { ResumeDiffWidget } from "@/widgets/document-diff/ResumeDiffWidget";
 
+import { installDocumentDiffStrategies } from "@/core/document-diff/installDocumentDiffStrategies";
+
+installDocumentDiffStrategies();
+
 export default function DocumentDiffPage() {
     return (
-        <Tab defaultActiveTab="이력서">
-            <TabNavBar>
-                <TabNavItem
-                    icon={<FileUser size={16} />}
-                    label="이력서"
-                    indicator={<TabMenuIndicator value={0} />}
-                />
-                <TabNavItem
-                    icon={<FileUser size={16} />}
-                    label="포트폴리오"
-                    indicator={<TabMenuIndicator value={0} />}
-                />
-                <TabNavItem
-                    icon={<FileUser size={16} />}
-                    label="자기소개서"
-                    indicator={<TabMenuIndicator value={0} />}
-                />
-            </TabNavBar>
+        <div className="p-6">
+            <Tab defaultActiveTab="이력서">
+                <TabNavBar>
+                    <TabNavItem
+                        icon={<FileUser size={16} />}
+                        label="이력서"
+                        indicator={<TabMenuIndicator value={0} />}
+                    />
+                    <TabNavItem
+                        icon={<FileUser size={16} />}
+                        label="포트폴리오"
+                        indicator={<TabMenuIndicator value={0} />}
+                    />
+                    <TabNavItem
+                        icon={<FileUser size={16} />}
+                        label="자기소개서"
+                        indicator={<TabMenuIndicator value={0} />}
+                    />
+                </TabNavBar>
 
-            <TabItem menu="이력서">
-                <ResumeDiffWidget />
-            </TabItem>
-            <TabItem menu="포트폴리오">
-                <PortfolioDiffWidget />
-            </TabItem>
-            <TabItem menu="자기소개서">
-                <CoverletterDiffWidget />
-            </TabItem>
-        </Tab>
+                <TabItem menu="이력서">
+                    <ResumeDiffWidget />
+                </TabItem>
+
+                <TabItem menu="포트폴리오">
+                    <PortfolioDiffWidget />
+                </TabItem>
+
+                <TabItem menu="자기소개서">
+                    <CoverletterDiffWidget />
+                </TabItem>
+            </Tab>
+        </div>
     );
 }
