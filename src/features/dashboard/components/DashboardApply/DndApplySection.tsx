@@ -19,6 +19,7 @@ export const DndApplySection = ({
     title,
     value,
     wrapperClassName,
+    sectionKey: _sectionKey,
     sectionIndex,
     maxStep = 2,
     onCardDrop,
@@ -26,6 +27,8 @@ export const DndApplySection = ({
     className,
     ...props
 }: DndApplySectionProps) => {
+    void _sectionKey;
+
     const [{ isOver, canDrop }, dropRef] = useDrop<
         DragItem,
         void,
