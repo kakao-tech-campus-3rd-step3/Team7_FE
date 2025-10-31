@@ -22,31 +22,34 @@ export const MentorReviewListItem = ({
     const submitted = format(new Date(item.submittedAt), "yyyy.MM.dd HH:mm");
     const deadline = item.deadline ? format(new Date(item.deadline), "M월 d일") : "-";
 
-    const status = (() => {
+    const statusInfo = (() => {
         switch (item.status) {
             case "waiting":
-                return { label: "대기중", cls: "bg-zinc-100 text-zinc-700" };
+                return {
+                    statusLabel: "대기중",
+                    cls: "bg-zinc-100 text-zinc-700",
+                    actionLabel: "검토시작",
+                };
             case "progress":
-                return { label: "진행중", cls: "bg-blue-50 text-blue-700" };
+                return {
+                    statusLabel: "진행중",
+                    cls: "bg-blue-50 text-blue-700",
+                    actionLabel: "계속 작성",
+                };
             case "done":
-                return { label: "완료", cls: "bg-emerald-50 text-emerald-700" };
+                return {
+                    statusLabel: "완료",
+                    cls: "bg-emerald-50 text-emerald-700",
+                    actionLabel: "리뷰 보기",
+                };
             case "expired":
-                return { label: "만료됨", cls: "bg-rose-50 text-rose-700" };
+                return {
+                    statusLabel: "만료됨",
+                    cls: "bg-rose-50 text-rose-700",
+                    actionlabel: "기한 만료",
+                };
             default:
-                return { label: "", cls: "" };
-        }
-    })();
-
-    const statusLabel = (() => {
-        switch (item.status) {
-            case "waiting":
-                return "검토 시작";
-            case "progress":
-                return "계속 작성";
-            case "done":
-                return "리뷰 보기";
-            case "expired":
-                return "기한 만료";
+                return { statusLabel: "", cls: "", actionLabel: "" };
         }
     })();
 
@@ -76,10 +79,10 @@ export const MentorReviewListItem = ({
                         <span
                             className={cn(
                                 "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-black/5",
-                                status.cls,
+                                statusInfo.cls,
                             )}
                         >
-                            {status.label}
+                            {statusInfo.statusLabel}
                         </span>
 
                         <Button
@@ -91,8 +94,9 @@ export const MentorReviewListItem = ({
                                     : "bg-[#2563EB] text-white hover:bg-[#1E4FD9]",
                             )}
                             onClick={() => onReviewClick?.(item)}
+                            disabled={item.status === "expired"}
                         >
-                            {statusLabel}
+                            {statusInfo.actionLabel}
                         </Button>
 
                         {onMoreClick && (
