@@ -8,7 +8,7 @@ import type { Review, ReviewCounts, ReviewItem } from "@/features/mentor-dashboa
 import { DashboardHeaderContainer, DashboardHeaderCard } from "@/widgets/dashboard-header";
 
 export default function MentorDashboardPage() {
-    const items = useMemo<ReviewItem[]>(() => mentorReviewMock, []);
+    const items: ReviewItem[] = mentorReviewMock;
     const [active, setActive] = useState<Review>("all");
 
     const counts: ReviewCounts = useMemo(() => {
