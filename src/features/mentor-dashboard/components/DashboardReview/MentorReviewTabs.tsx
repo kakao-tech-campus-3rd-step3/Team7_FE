@@ -28,7 +28,7 @@ export const MentorReviewTabs = ({
                         key={tab.key}
                         onClick={() => onChange(tab.key)}
                         className={cn(
-                            "h-9  px-3 text-sm transition",
+                            "h-9 rounded-md border px-3 text-sm transition",
                             isActive
                                 ? "bg-blue-50 text-blue-700 border-blue-200"
                                 : "bg-white text-slate-700 hover:bg-slate-50 border-slate-200",
