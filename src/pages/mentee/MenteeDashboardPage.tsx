@@ -6,23 +6,24 @@ import { Folder, UserRoundPen, Clock3, UserRound } from "lucide-react";
 
 import { NewApplicationButton, NewApplicationModal } from "@/features/applications";
 import {
-    DashboardHeaderContainer,
-    DashboardHeaderCard,
     useBoardState,
     sectionMock,
     SECTION_ORDER,
     type Section,
     type ApplyCard,
-    calcDday,
     MenteeDashboardListContainer,
     MenteeDashboardList,
     MenteeDashboardKanban,
     type MenteeDashboardListItemData,
-} from "@/features/dashboard";
+} from "@/features/mentee-dashboard";
 import {
     DashboardViewToggle,
     type DashboardViewMode,
-} from "@/features/dashboard/components/ViewToggle/DashboardViewToggle";
+} from "@/features/mentee-dashboard/components/ViewToggle/DashboardViewToggle";
+
+import { calcDday } from "@/shared/lib/calcDday";
+
+import { DashboardHeaderCard, DashboardHeaderContainer } from "@/widgets/dashboard-header";
 
 //TODO : 기업 이미지 불러오기
 const PlaceholderLogo: React.ReactNode = <div className="h-5 w-5 rounded-sm bg-zinc-200/80" />;

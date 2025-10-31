@@ -17,6 +17,7 @@ import DocumentDiffPage from "@/pages/mentee/applications/DocumentDiffPage";
 import NewCoverLetterPage from "@/pages/mentee/applications/NewCoverLetterPage";
 import NewPortfolioPage from "@/pages/mentee/applications/NewPortfolioPage";
 import NewResumePage from "@/pages/mentee/applications/NewResumePage";
+import MentorDashboardPage from "@/pages/mentor/MentorDashboardPage";
 
 const routes = createRoutesFromElements(
     <Fragment>
@@ -28,7 +29,7 @@ const routes = createRoutesFromElements(
             <Route path="/register" element={<RegisterLayout />}></Route>
 
             <Route path="/mentor">
-                <Route path="dashboard"></Route>
+                <Route path="dashboard" element={<MentorDashboardPage />} />
             </Route>
 
             <Route path="/mentee" element={<RootLayout navAsideMenus={navAsideMenusMentee} />}>
