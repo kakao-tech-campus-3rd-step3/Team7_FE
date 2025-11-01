@@ -1,10 +1,6 @@
 import { Fragment, useMemo, useState } from "react";
 
-import {
-    VersionNav,
-    VersionNavItem,
-    VersionNavMagnifyController,
-} from "@/features/document-diff/components/VersionNav";
+import { VersionNav, VersionNavItem } from "@/features/document-diff/components/VersionNav";
 
 import { DiffLayout } from "@/core/document-diff/integration/components/DiffLayout";
 import { HighlightedText } from "@/core/document-diff/integration/components/HighlightedText";
@@ -146,16 +142,8 @@ export const CoverletterDiffWidget = ({
     return (
         <Fragment>
             <VersionNav>
-                <VersionNavItem
-                    variant="original"
-                    label={originalLabel}
-                    controller={<VersionNavMagnifyController />}
-                />
-                <VersionNavItem
-                    variant="modified"
-                    label={modifiedLabel}
-                    controller={<VersionNavMagnifyController />}
-                />
+                <VersionNavItem variant="original" label={originalLabel} />
+                <VersionNavItem variant="modified" label={modifiedLabel} />
             </VersionNav>
 
             <div
