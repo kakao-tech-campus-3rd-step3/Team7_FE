@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Pencil, Trash2 } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 import { Card } from "@/shared/ui/card";
@@ -9,6 +9,8 @@ export interface DashboardApplyCardProps extends React.ComponentProps<"div"> {
     position: string;
     dday: string;
     ddayBg?: string;
+    onEdit?: () => void;
+    onDelete?: () => void;
 }
 
 export const DashboardApplyCard = ({
@@ -17,6 +19,8 @@ export const DashboardApplyCard = ({
     position,
     dday,
     ddayBg,
+    onEdit,
+    onDelete,
     className,
     ...props
 }: DashboardApplyCardProps) => {
@@ -47,7 +51,39 @@ export const DashboardApplyCard = ({
                 >
                     {dday}
                 </span>
-                <ArrowRight className="h-4 w-4 text-muted-foreground/70" strokeWidth={2} />
+                <div className="flex items-center gap-1">
+                    {(onEdit || onDelete) && (
+                        <div className="flex items-center gap-1">
+                            {onEdit && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onEdit();
+                                    }}
+                                    className="inline-flex items-center justify-center rounded-md p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                    title="수정"
+                                >
+                                    <Pencil size={14} />
+                                </button>
+                            )}
+                            {onDelete && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDelete();
+                                    }}
+                                    className="inline-flex items-center justify-center rounded-md p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                    title="삭제"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            )}
+                        </div>
+                    )}
+                    <ArrowRight className="h-4 w-4 text-muted-foreground/70" strokeWidth={2} />
+                </div>
             </div>
         </Card>
     );

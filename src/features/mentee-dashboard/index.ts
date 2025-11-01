@@ -20,3 +20,6 @@ export type { MenteeDashboardListItemData } from "./components/MenteeDashboardLi
 export { DashboardViewToggle } from "./components/ViewToggle/DashboardViewToggle";
 export type { DashboardViewMode } from "./components/ViewToggle/DashboardViewToggle";
 export { MenteeDashboardKanban } from "./components/MenteeDashboardKanban/MenteeDashboardKanban";
+export { useMenteeDashboard } from "./hooks/useMenteeDashboard";
+export { DashboardHeaderSection } from "./components/DashboardHeaderSection/DashboardHeaderSection";
+export { ApplicationsModals } from "./components/ApplicationsModals/ApplicationsModals";
