@@ -1,14 +1,23 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
 import type { NewApplicationFormInput } from "@/features/applications/models/application.schema";
 
-import { calcDday } from "@/shared/lib/calcDday";
+import { getCurrentMemberId } from "@/shared/lib/auth";
 
 import type { MenteeDashboardListItemData } from "../components/MenteeDashboardList/MenteeDashboardList";
 import { type DashboardViewMode } from "../components/ViewToggle/DashboardViewToggle";
-import { sectionMock } from "../models/sectionMock";
 import { SECTION_ORDER } from "../models/types";
-import type { Section, ApplyCard } from "../models/types";
+import type { Section, ApplyCard, DragItem } from "../models/types";
+import {
+    useCreateApplication,
+    useDeleteApplication,
+    useGetApplications,
+    useUpdateApplication,
+    useUpdateApplicationStatus,
+    mapApplicationItemToApplyCard,
+    mapSectionToApplicationStatus,
+    mapApplicationStatusToSection,
+} from "../services";
 import { useBoardState } from "./useBoardState";
 
 type ApplicationForm = {
@@ -22,9 +31,42 @@ type ApplicationForm = {
     targetSection?: Section;
 };
 
+const initialBoard: Record<Section, ApplyCard[]> = {
+    planned: [],
+    writing: [],
+    submitted: [],
+    interview: [],
+};
+
 export function useMenteeDashboard() {
-    const { board, setBoard, moveTo } = useBoardState(sectionMock);
+    const memberId = getCurrentMemberId();
+    const { data: applicationsData } = useGetApplications({ memberId });
+    const createMutation = useCreateApplication(memberId);
+    const updateMutation = useUpdateApplication();
+    const updateStatusMutation = useUpdateApplicationStatus(memberId);
+    const deleteMutation = useDeleteApplication(memberId);
+
+    const { board, setBoard } = useBoardState(initialBoard);
     const [view, setView] = useState<DashboardViewMode>("kanban");
+
+    useEffect(() => {
+        if (!applicationsData) return;
+
+        const newBoard: Record<Section, ApplyCard[]> = {
+            planned: [],
+            writing: [],
+            submitted: [],
+            interview: [],
+        };
+
+        applicationsData.applications.forEach((item) => {
+            const card = mapApplicationItemToApplyCard(item);
+            const section = mapApplicationStatusToSection(item.applicationStatus);
+            newBoard[section].push(card);
+        });
+
+        setBoard(newBoard);
+    }, [applicationsData, setBoard]);
 
     const [openCreate, setOpenCreate] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
@@ -74,81 +116,54 @@ export function useMenteeDashboard() {
     );
 
     const handleCreate = useCallback(
-        (form: ApplicationForm) => {
-            const target: Section = form.targetSection ?? "planned";
-            const dday = calcDday(form.deadline);
-
-            const newCard: ApplyCard = {
-                id: `c${Date.now()}`,
-                icon: undefined,
-                company: form.companyName,
-                position: form.applyPosition,
-                dday,
+        async (form: ApplicationForm) => {
+            await createMutation.mutateAsync({
+                companyName: form.companyName,
+                applyPosition: form.applyPosition,
                 deadline: form.deadline,
                 location: form.location,
                 employmentType: form.employmentType,
                 careerRequirement: form.careerRequirement,
                 url: form.url,
-            };
-
-            setBoard((previousBoard) => {
-                const nextBoard = { ...previousBoard };
-                nextBoard[target] = [...nextBoard[target], newCard];
-                return nextBoard;
             });
 
             setOpenCreate(false);
         },
-        [setBoard],
+        [createMutation],
     );
 
     const handleUpdate = useCallback(
-        (form: ApplicationForm) => {
+        async (form: ApplicationForm) => {
             if (!editingCard) return;
 
-            const { card, section } = editingCard;
-            const dday = calcDday(form.deadline);
-
-            const updatedCard: ApplyCard = {
-                ...card,
-                company: form.companyName,
-                position: form.applyPosition,
-                dday,
-                deadline: form.deadline,
-                location: form.location,
-                employmentType: form.employmentType,
-                careerRequirement: form.careerRequirement,
-                url: form.url,
-            };
-
-            setBoard((previousBoard) => {
-                const nextBoard = { ...previousBoard };
-                nextBoard[section] = nextBoard[section].map((c) =>
-                    c.id === card.id ? updatedCard : c,
-                );
-                return nextBoard;
+            const applicationId = parseInt(editingCard.card.id, 10);
+            await updateMutation.mutateAsync({
+                applicationId,
+                body: {
+                    companyName: form.companyName,
+                    applyPosition: form.applyPosition,
+                    deadline: form.deadline,
+                    location: form.location,
+                    employmentType: form.employmentType,
+                    careerRequirement: form.careerRequirement,
+                },
             });
 
             setEditingCard(null);
             setOpenEdit(false);
         },
-        [editingCard, setBoard],
+        [editingCard, updateMutation],
     );
 
-    const handleDelete = useCallback(() => {
+    const handleDelete = useCallback(async () => {
         if (!deletingCard) return;
 
-        const { cardId, section } = deletingCard;
-
-        setBoard((previousBoard) => {
-            const nextBoard = { ...previousBoard };
-            nextBoard[section] = nextBoard[section].filter((c) => c.id !== cardId);
-            return nextBoard;
-        });
+        const applicationId = parseInt(deletingCard.cardId, 10);
+        await deleteMutation.mutateAsync(applicationId);
 
         setDeletingCard(null);
         setOpenDelete(false);
-    }, [deletingCard, setBoard]);
+    }, [deletingCard, deleteMutation]);
 
     const handleEditClick = useCallback(
         (cardOrItem: ApplyCard | MenteeDashboardListItemData, section?: Section) => {
@@ -230,7 +245,15 @@ export function useMenteeDashboard() {
         editModalInitialData,
 
         setView,
-        moveTo,
+        moveTo: (dragItem: DragItem, toSection: Section) => {
+            const applicationId = parseInt(dragItem.id, 10);
+            const newStatus = mapSectionToApplicationStatus(toSection);
+
+            updateStatusMutation.mutate({
+                applicationId,
+                body: { newStatus },
+            });
+        },
         handleCreate,
         handleUpdate,
         handleDelete,
