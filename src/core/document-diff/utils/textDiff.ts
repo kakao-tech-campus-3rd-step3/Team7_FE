@@ -1,4 +1,6 @@
-import { diffWordsWithSpace, diffSentences } from "diff";
+import { diffWords, diffSentences, diffChars, type Change } from "diff";
+
+export type DiffGranularity = "sentence" | "word" | "char";
 
 export interface DiffPart {
     value: string;
@@ -6,12 +8,18 @@ export interface DiffPart {
     removed?: boolean;
 }
 
-export type DiffGranularity = "word" | "sentence";
-
 export interface GetDiffPartsArgs {
-    original: string;
-    modified: string;
+    original?: string | null;
+    modified?: string | null;
     granularity?: DiffGranularity;
+}
+
+function toDiffParts(changes: Change[]): DiffPart[] {
+    return changes.map((c) => ({
+        value: c.value ?? "",
+        added: c.added,
+        removed: c.removed,
+    }));
 }
 
 export function getDiffParts({
@@ -19,8 +27,15 @@ export function getDiffParts({
     modified,
     granularity = "word",
 }: GetDiffPartsArgs): DiffPart[] {
+    const a = original ?? "";
+    const b = modified ?? "";
+
     if (granularity === "sentence") {
-        return diffSentences(original ?? "", modified ?? "", {}) as DiffPart[];
+        return toDiffParts(diffSentences(a, b, {}));
     }
-    return diffWordsWithSpace(original ?? "", modified ?? "", {}) as DiffPart[];
+    if (granularity === "char") {
+        return toDiffParts(diffChars(a, b));
+    }
+    // default: word
+    return toDiffParts(diffWords(a, b));
 }
