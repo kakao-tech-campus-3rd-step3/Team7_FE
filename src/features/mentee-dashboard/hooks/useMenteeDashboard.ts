@@ -42,7 +42,7 @@ export function useMenteeDashboard() {
     const memberId = getCurrentMemberId();
     const { data: applicationsData } = useGetApplications({ memberId });
     const createMutation = useCreateApplication(memberId);
-    const updateMutation = useUpdateApplication();
+    const updateMutation = useUpdateApplication(memberId);
     const updateStatusMutation = useUpdateApplicationStatus(memberId);
     const deleteMutation = useDeleteApplication(memberId);
 

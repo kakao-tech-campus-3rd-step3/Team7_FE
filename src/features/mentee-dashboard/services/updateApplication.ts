@@ -38,7 +38,7 @@ export async function updateApplication(
     return response.data;
 }
 
-export const useUpdateApplication = () => {
+export const useUpdateApplication = (memberId: number) => {
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -54,6 +54,9 @@ export const useUpdateApplication = () => {
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({
                 queryKey: APPLICATION_QUERY_KEYS.BY_ID(variables.applicationId),
+            });
+            queryClient.invalidateQueries({
+                queryKey: APPLICATION_QUERY_KEYS.LIST(memberId),
             });
             queryClient.invalidateQueries({
                 queryKey: APPLICATION_QUERY_KEYS.ALL(),
