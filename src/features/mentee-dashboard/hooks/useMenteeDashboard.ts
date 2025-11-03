@@ -60,8 +60,12 @@ export function useMenteeDashboard() {
         };
 
         applicationsData.applications
-            .filter((item): item is typeof item & { applicationStatus: Exclude<typeof item.applicationStatus, "HIRED"> } => 
-                item.applicationStatus !== "HIRED"
+            .filter(
+                (
+                    item,
+                ): item is typeof item & {
+                    applicationStatus: Exclude<typeof item.applicationStatus, "HIRED">;
+                } => item.applicationStatus !== "HIRED",
             )
             .forEach((item) => {
                 const card = mapApplicationItemToApplyCard(item);
@@ -150,6 +154,7 @@ export function useMenteeDashboard() {
                     location: form.location,
                     employmentType: form.employmentType,
                     careerRequirement: form.careerRequirement,
+                    url: form.url,
                 },
             });
 
