@@ -10,7 +10,7 @@ export interface UpdateApplicationStatusRequestBody {
     newStatus: "PREPARING" | "WRITING" | "APPLIED" | "INTERVIEWING" | "HIRED";
 }
 
-export interface UpdateApplicationStatusResponse {}
+export type UpdateApplicationStatusResponse = string;
 
 export async function updateApplicationStatus(
     applicationId: number,

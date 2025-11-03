@@ -15,7 +15,7 @@ export interface CreateApplicationRequestBody {
     url: string;
 }
 
-export interface CreateApplicationResponse {}
+export type CreateApplicationResponse = string;
 
 export async function createApplication(
     body: CreateApplicationRequestBody,

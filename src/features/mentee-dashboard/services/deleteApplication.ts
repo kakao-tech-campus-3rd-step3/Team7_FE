@@ -5,7 +5,7 @@ import { toast } from "@/shared/lib/toast";
 import { APPLICATION_QUERY_KEYS } from "./_keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export interface DeleteApplicationResponse {}
+export type DeleteApplicationResponse = string;
 
 export async function deleteApplication(applicationId: number): Promise<DeleteApplicationResponse> {
     const { data: response } = await api.delete<BaseResponse<DeleteApplicationResponse>>(

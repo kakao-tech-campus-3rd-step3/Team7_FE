@@ -14,7 +14,7 @@ export interface UpdateApplicationRequestBody {
     careerRequirement: number;
 }
 
-export interface UpdateApplicationResponse {}
+export type UpdateApplicationResponse = string;
 
 export async function updateApplication(
     applicationId: number,
