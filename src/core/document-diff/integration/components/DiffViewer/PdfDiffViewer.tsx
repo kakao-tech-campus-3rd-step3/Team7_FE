@@ -19,7 +19,6 @@ function useWindowMeasuredWidth<T extends HTMLElement>(fallback = 600) {
     }, []);
 
     React.useEffect(() => {
-        // 최초 1회
         requestAnimationFrame(measure);
         const onResize = () => requestAnimationFrame(measure);
         window.addEventListener("resize", onResize);
@@ -100,7 +99,6 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
                 leftAccentClass="border-l-4 border-blue-500"
                 rightAccentClass="border-l-4 border-emerald-500"
             >
-                {/* LEFT */}
                 <div className="flex-1 min-w-0 min-h-0 w-full border rounded-lg p-3">
                     <div
                         ref={leftBox.ref}
@@ -132,7 +130,6 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
                     </div>
                 </div>
 
-                {/* RIGHT */}
                 <div className="flex-1 min-w-0 min-h-0 w-full border rounded-lg p-3">
                     <div
                         ref={rightBox.ref}
