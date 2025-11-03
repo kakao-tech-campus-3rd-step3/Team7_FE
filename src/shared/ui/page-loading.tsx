@@ -6,7 +6,11 @@ export interface PageLoadingProps {
     size?: number;
 }
 
-export function PageLoading({ message = "로딩 중...", description, size = 40 }: PageLoadingProps) {
+export const PageLoading = ({
+    message = "로딩 중...",
+    description,
+    size = 40,
+}: PageLoadingProps) => {
     return (
         <div className="flex h-screen items-center justify-center">
             <div className="flex flex-col items-center gap-4">
@@ -18,4 +22,4 @@ export function PageLoading({ message = "로딩 중...", description, size = 40 
             </div>
         </div>
     );
-}
+};
