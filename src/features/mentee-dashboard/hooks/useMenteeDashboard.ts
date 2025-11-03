@@ -59,11 +59,15 @@ export function useMenteeDashboard() {
             interview: [],
         };
 
-        applicationsData.applications.forEach((item) => {
-            const card = mapApplicationItemToApplyCard(item);
-            const section = mapApplicationStatusToSection(item.applicationStatus);
-            newBoard[section].push(card);
-        });
+        applicationsData.applications
+            .filter((item): item is typeof item & { applicationStatus: Exclude<typeof item.applicationStatus, "HIRED"> } => 
+                item.applicationStatus !== "HIRED"
+            )
+            .forEach((item) => {
+                const card = mapApplicationItemToApplyCard(item);
+                const section = mapApplicationStatusToSection(item.applicationStatus);
+                newBoard[section].push(card);
+            });
 
         setBoard(newBoard);
     }, [applicationsData, setBoard]);

@@ -6,13 +6,14 @@ import type { ApplicationItem } from "./getApplications";
 
 export type ApplicationStatus = "PREPARING" | "WRITING" | "APPLIED" | "INTERVIEWING" | "HIRED";
 
-export function mapApplicationStatusToSection(status: ApplicationStatus): Section {
-    const statusMap: Record<ApplicationStatus, Section> = {
+export function mapApplicationStatusToSection(
+    status: Exclude<ApplicationStatus, "HIRED">,
+): Section {
+    const statusMap: Record<Exclude<ApplicationStatus, "HIRED">, Section> = {
         PREPARING: "planned",
         WRITING: "writing",
         APPLIED: "submitted",
         INTERVIEWING: "interview",
-        HIRED: "submitted",
     };
     return statusMap[status];
 }
