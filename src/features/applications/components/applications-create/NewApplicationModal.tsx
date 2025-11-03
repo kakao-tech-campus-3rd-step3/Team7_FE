@@ -45,10 +45,12 @@ export const NewApplicationModal = ({
     });
 
     useEffect(() => {
-        if (open && initialData) {
-            reset(initialData);
-        } else if (open && !initialData) {
-            reset(DEFAULT_APPLICATION);
+        if (open) {
+            if (initialData) {
+                reset(initialData);
+            } else {
+                reset(DEFAULT_APPLICATION);
+            }
         }
     }, [open, initialData, reset]);
 
