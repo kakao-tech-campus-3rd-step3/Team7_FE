@@ -1,6 +1,6 @@
 import { api } from "@/app/lib/api";
 
-import { toast } from "@/shared/lib/toast.tsx";
+import { toast } from "@/shared/lib/toast";
 
 import { APPLICATION_QUERY_KEYS } from "./_keys";
 import type { GetApplicationsResponse } from "./getApplications";
