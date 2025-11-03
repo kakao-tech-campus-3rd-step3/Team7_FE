@@ -1,43 +1,29 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 
 import { VersionNav, VersionNavItem } from "@/features/document-diff/components/VersionNav";
 
+import { QnaCard } from "./components/QnaCard";
 import { DiffLayout } from "@/core/document-diff/integration/components/DiffLayout";
-import { HighlightedText } from "@/core/document-diff/integration/components/HighlightedText";
-import { getDiffParts, type DiffGranularity } from "@/core/document-diff/utils/textDiff";
+import type { DiffGranularity } from "@/core/document-diff/utils/textDiff";
 
 export interface CoverletterQnaItem {
     question: string;
     answer: string;
 }
 
+export interface CoverletterVersion {
+    id: string;
+    label: string;
+    items: CoverletterQnaItem[];
+}
+
 export interface CoverletterDiffWidgetProps {
-    originalItems?: CoverletterQnaItem[];
-    modifiedItems?: CoverletterQnaItem[];
+    versions?: CoverletterVersion[];
+    defaultLeftId?: string;
+    defaultRightId?: string;
     originalLabel?: string;
     modifiedLabel?: string;
 }
-
-const QnaCard = ({
-    index,
-    question,
-    answerParts,
-    mode,
-}: {
-    index: number;
-    question: string;
-    answerParts: ReturnType<typeof getDiffParts>;
-    mode: "original" | "modified";
-}) => (
-    <li className="rounded-md border bg-white p-3">
-        <h4 className="text-[13px] font-semibold leading-6">
-            {index}. {question}
-        </h4>
-        <p className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-slate-700">
-            <HighlightedText parts={answerParts} mode={mode} />
-        </p>
-    </li>
-);
 
 const PanelBody = ({
     originals,
@@ -57,19 +43,16 @@ const PanelBody = ({
                 {Array.from({ length: max }).map((_, i) => {
                     const o = originals[i] ?? { question: "", answer: "" };
                     const m = modifieds[i] ?? { question: "", answer: "" };
-                    const parts = getDiffParts({
-                        original: o.answer,
-                        modified: m.answer,
-                        granularity,
-                    });
                     const question = o.question || m.question || `항목 ${i + 1}`;
                     return (
                         <QnaCard
                             key={i}
                             index={i + 1}
                             question={question}
-                            answerParts={parts}
+                            originalAnswer={o.answer}
+                            modifiedAnswer={m.answer}
                             mode={mode}
+                            granularity={granularity}
                         />
                     );
                 })}
@@ -79,48 +62,57 @@ const PanelBody = ({
 };
 
 export const CoverletterDiffWidget = ({
-    originalItems = [
-        {
-            question: "지원동기 및 입사 후 포부",
-            answer:
-                "제가 Career-Fit에 지원한 이유는 사용자 문제를 데이터로 확인하고 개선하는 일이 즐겁기 때문입니다. " +
-                "최근 교내 프로젝트에서 인터뷰와 로그 분석을 통해 전환 저하 원인을 찾고, 온보딩 문구를 다듬어 전환율을 12% 개선했습니다. " +
-                "입사 후에는 실험-학습 루프를 정착시키고, 작은 배포를 자주 하는 문화를 만들고 싶습니다.",
-        },
-        {
-            question: "직무 관련 역량",
-            answer:
-                "React와 TypeScript 기반으로 대시보드와 Form을 구현했고, 상태 관리는 Zustand를 사용했습니다. " +
-                "접근성 점검을 통해 키보드 내비게이션과 명도 대비를 개선했습니다.",
-        },
-    ],
-    modifiedItems = [
-        {
-            question: "지원동기 및 입사 후 포부",
-            answer:
-                "제가 Career-Fit에 지원한 이유는 사용자 문제를 데이터로 확인하고 개선하는 일이 즐겁기 때문입니다. " +
-                "최근 교내 프로젝트에서 인터뷰와 로그 분석으로 전환 저하 원인을 규명하고, 온보딩 문구와 흐름을 다듬어 전환율을 15% 개선했습니다. " +
-                "특히 실험 결과를 팀과 공유해 재현 가능한 개선 프로세스를 만들었습니다.",
-        },
-        {
-            question: "직무 관련 역량",
-            answer:
-                "React와 TypeScript 기반으로 대시보드와 Form을 구현했고, 상태 관리는 Zustand와 React Query를 병행했습니다. " +
-                "접근성 점검을 통해 키보드 내비게이션과 명도 대비를 개선했고, Vitest 기반 단위 테스트로 회귀를 방지했습니다.",
-        },
-        {
-            question: "프로젝트 성과(신규)",
-            answer:
-                "로그 기반 퍼널을 정의하고 병목 단계에서의 이탈 원인을 표준화된 체크리스트로 관리했습니다. " +
-                "그 결과 릴리스 후 첫 2주간 활성 사용자 잔존율이 8%p 상승했습니다.",
-        },
-    ],
+    versions,
+    defaultLeftId,
+    defaultRightId,
     originalLabel = "원본",
     modifiedLabel = "수정본",
 }: CoverletterDiffWidgetProps) => {
     const [granularity, setGranularity] = useState<DiffGranularity>("word");
     const isSentence = granularity === "sentence";
     const isWord = granularity === "word";
+
+    const hasVersions = Array.isArray(versions) && versions.length > 0;
+    const [leftId, setLeftId] = useState<string | undefined>(
+        defaultLeftId ?? (hasVersions ? versions![0].id : undefined),
+    );
+    const [rightId, setRightId] = useState<string | undefined>(
+        defaultRightId ?? (hasVersions ? (versions![1]?.id ?? versions![0].id) : undefined),
+    );
+
+    useEffect(() => {
+        if (!hasVersions) return;
+        const ids = new Set(versions!.map((v) => v.id));
+        const safeLeft = leftId && ids.has(leftId) ? leftId : versions![0].id;
+        const safeRight =
+            rightId && ids.has(rightId) ? rightId : (versions![1]?.id ?? versions![0].id);
+        if (safeLeft !== leftId) setLeftId(safeLeft);
+        if (safeRight !== rightId) setRightId(safeRight);
+    }, [hasVersions, versions, leftId, rightId]);
+
+    useEffect(() => {
+        if (!hasVersions || !leftId || !rightId) return;
+        if (leftId === rightId && versions!.length > 1) {
+            const i = versions!.findIndex((v) => v.id === leftId);
+            const next = versions![(i + 1) % versions!.length].id;
+            setRightId(next);
+        }
+    }, [hasVersions, versions, leftId, rightId]);
+
+    const selectedLeftItems = useMemo<CoverletterQnaItem[] | undefined>(() => {
+        if (!hasVersions) return undefined;
+        const v = versions!.find((v) => v.id === leftId) ?? versions![0];
+        return v.items;
+    }, [hasVersions, versions, leftId]);
+
+    const selectedRightItems = useMemo<CoverletterQnaItem[] | undefined>(() => {
+        if (!hasVersions) return undefined;
+        const v = versions!.find((v) => v.id === rightId) ?? versions![0];
+        return v.items;
+    }, [hasVersions, versions, rightId]);
+
+    const leftItems = selectedLeftItems ?? [];
+    const rightItems = selectedRightItems ?? [];
 
     const btn = useMemo(
         () =>
@@ -146,35 +138,85 @@ export const CoverletterDiffWidget = ({
                 <VersionNavItem variant="modified" label={modifiedLabel} />
             </VersionNav>
 
-            <div
-                className="flex justify-center gap-2 mt-3 mb-2"
-                role="radiogroup"
-                aria-label="비교 단위 선택"
-            >
-                <button
-                    type="button"
-                    role="radio"
-                    aria-checked={isSentence}
-                    tabIndex={isSentence ? 0 : -1}
-                    onKeyDown={onKeyDownRadio}
-                    className={btn}
-                    data-active={isSentence}
-                    onClick={() => setGranularity("sentence")}
+            <div className="mt-3 mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                    className="flex justify-center gap-2"
+                    role="radiogroup"
+                    aria-label="비교 단위 선택"
                 >
-                    문장 단위
-                </button>
-                <button
-                    type="button"
-                    role="radio"
-                    aria-checked={isWord}
-                    tabIndex={isWord ? 0 : -1}
-                    onKeyDown={onKeyDownRadio}
-                    className={btn}
-                    data-active={isWord}
-                    onClick={() => setGranularity("word")}
-                >
-                    단어 단위
-                </button>
+                    <button
+                        type="button"
+                        role="radio"
+                        aria-checked={isSentence}
+                        tabIndex={isSentence ? 0 : -1}
+                        onKeyDown={onKeyDownRadio}
+                        className={btn}
+                        data-active={isSentence}
+                        onClick={() => setGranularity("sentence")}
+                    >
+                        문장 단위
+                    </button>
+                    <button
+                        type="button"
+                        role="radio"
+                        aria-checked={isWord}
+                        tabIndex={isWord ? 0 : -1}
+                        onKeyDown={onKeyDownRadio}
+                        className={btn}
+                        data-active={isWord}
+                        onClick={() => setGranularity("word")}
+                    >
+                        단어 단위
+                    </button>
+                </div>
+
+                {hasVersions && (
+                    <div className="flex items-center justify-center gap-2">
+                        <label className="inline-flex items-center gap-2">
+                            <span className="text-xs text-neutral-600">{originalLabel}</span>
+                            <select
+                                className="h-8 rounded-md border bg-white px-2 text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                                value={leftId}
+                                onChange={(e) => setLeftId(e.target.value)}
+                                aria-label="원본 버전 선택"
+                            >
+                                {versions!.map((v) => (
+                                    <option key={v.id} value={v.id}>
+                                        {v.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const l = leftId;
+                                setLeftId(rightId);
+                                setRightId(l);
+                            }}
+                            className=" px-1 text-sm"
+                            aria-label="좌우 버전 스왑"
+                            title="좌우 버전 바꾸기"
+                        >
+                            ↔︎
+                        </button>
+                        <label className="inline-flex items-center gap-2">
+                            <span className="text-xs text-neutral-600">{modifiedLabel}</span>
+                            <select
+                                className="h-8 rounded-md border bg-white px-2 text-xs outline-none focus:ring-2 focus:ring-blue-500"
+                                value={rightId}
+                                onChange={(e) => setRightId(e.target.value)}
+                                aria-label="수정본 버전 선택"
+                            >
+                                {versions!.map((v) => (
+                                    <option key={v.id} value={v.id}>
+                                        {v.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                )}
             </div>
 
             <DiffLayout
@@ -192,14 +234,14 @@ export const CoverletterDiffWidget = ({
                 )}
             >
                 <PanelBody
-                    originals={originalItems}
-                    modifieds={modifiedItems}
+                    originals={leftItems}
+                    modifieds={rightItems}
                     mode="original"
                     granularity={granularity}
                 />
                 <PanelBody
-                    originals={originalItems}
-                    modifieds={modifiedItems}
+                    originals={leftItems}
+                    modifieds={rightItems}
                     mode="modified"
                     granularity={granularity}
                 />
