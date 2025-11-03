@@ -1,3 +1,4 @@
+// 버전 비교를 위한 바 컴포넌트
 import { VersionSelect } from "./VersionSelect";
 import type { VersionOption } from "./VersionSelect";
 

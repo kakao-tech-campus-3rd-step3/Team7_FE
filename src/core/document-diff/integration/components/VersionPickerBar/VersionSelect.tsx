@@ -1,3 +1,4 @@
+//버전 선택 드롭다운 컴포넌트
 export interface VersionOption {
     id: string;
     label: string;
