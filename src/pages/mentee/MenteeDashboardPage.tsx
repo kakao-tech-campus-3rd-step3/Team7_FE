@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -12,10 +13,13 @@ import {
     DashboardViewToggle,
 } from "@/features/mentee-dashboard";
 
+import { PageLoading } from "@/shared/ui/page-loading";
+import { QueryErrorBoundary } from "@/shared/ui/query-error-boundary";
+
 //TODO : 기업 이미지 불러오기
 const PlaceholderLogo: React.ReactNode = <div className="h-5 w-5 rounded-sm bg-zinc-200/80" />;
 
-export default function MenteeDashboardPage() {
+function MenteeDashboardContent() {
     const {
         board,
         view,
@@ -102,5 +106,15 @@ export default function MenteeDashboardPage() {
                 onConfirmDelete={handleDelete}
             />
         </DndProvider>
+    );
+}
+
+export default function MenteeDashboardPage() {
+    return (
+        <QueryErrorBoundary>
+            <Suspense fallback={<PageLoading description="지원 현황을 불러오고 있습니다." />}>
+                <MenteeDashboardContent />
+            </Suspense>
+        </QueryErrorBoundary>
     );
 }
