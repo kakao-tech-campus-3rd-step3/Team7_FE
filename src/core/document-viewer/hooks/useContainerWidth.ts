@@ -1,3 +1,4 @@
+// pdf 뷰어 컨테이너 너비 측정 훅
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export interface UseContainerWidthResult {
