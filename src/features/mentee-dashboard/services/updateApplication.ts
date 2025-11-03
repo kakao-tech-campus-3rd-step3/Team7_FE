@@ -12,6 +12,7 @@ export interface UpdateApplicationRequestBody {
     location: string;
     employmentType: string;
     careerRequirement: number;
+    url: string;
 }
 
 export type UpdateApplicationResponse = string;
