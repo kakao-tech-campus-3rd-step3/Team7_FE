@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { useToast, type Toast as ToastType } from "@/shared/lib/toast";
 import { cn } from "@/shared/lib/utils";
 
-export function Toaster() {
+export const Toaster = () => {
     const { toasts, removeToast } = useToast();
 
     if (toasts.length === 0) return null;
@@ -15,14 +15,14 @@ export function Toaster() {
             ))}
         </div>
     );
-}
+};
 
 interface ToastItemProps {
     toast: ToastType;
     onClose: () => void;
 }
 
-function ToastItem({ toast, onClose }: ToastItemProps) {
+const ToastItem = ({ toast, onClose }: ToastItemProps) => {
     const variantStyles = {
         success: "bg-green-50 text-green-900 border-green-200",
         error: "bg-red-50 text-red-900 border-red-200",
@@ -55,4 +55,4 @@ function ToastItem({ toast, onClose }: ToastItemProps) {
             </button>
         </div>
     );
-}
+};
