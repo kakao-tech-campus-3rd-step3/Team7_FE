@@ -22,7 +22,7 @@ export async function updateApplication(
 ): Promise<UpdateApplicationResponse> {
     const formattedDeadline = body.deadline.includes("T")
         ? body.deadline
-        : new Date(body.deadline + "T00:00:00").toISOString();
+        : `${body.deadline}T00:00:00`;
 
     const formattedBody = {
         ...body,
