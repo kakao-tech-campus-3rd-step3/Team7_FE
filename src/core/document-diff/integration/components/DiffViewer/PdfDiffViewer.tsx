@@ -8,6 +8,8 @@ import {
     usePdfPageContext,
 } from "@/core/document-viewer/contexts/PdfPageContext";
 
+type PdfSource = NonNullable<React.ComponentProps<typeof Document>["file"]>;
+
 function useWindowMeasuredWidth<T extends HTMLElement>(fallback = 600) {
     const ref = React.useRef<T | null>(null);
     const [width, setWidth] = React.useState(fallback);
@@ -33,14 +35,29 @@ export interface PdfDiffViewerProps {
     after: unknown;
 }
 
-function normalizePdfFile(input: unknown) {
-    if (!input) return input as any;
+const hasPdfData = (value: unknown): value is { data: Uint8Array | ArrayBuffer } =>
+    typeof value === "object" &&
+    value !== null &&
+    "data" in value &&
+    ((value as { data: unknown }).data instanceof Uint8Array ||
+        (value as { data: unknown }).data instanceof ArrayBuffer);
+
+function normalizePdfFile(input: unknown): PdfSource | undefined {
+    if (input == null) return undefined;
     if (typeof input === "string") return input;
     if (input instanceof Uint8Array) return { data: input };
     if (input instanceof ArrayBuffer) return { data: new Uint8Array(input) };
-    if ((input as any)?.data instanceof Uint8Array) return input as any;
-    return input as any;
+    if (input instanceof Blob) return input;
+    if (hasPdfData(input)) {
+        const data = (input as { data: Uint8Array | ArrayBuffer }).data;
+        return data instanceof ArrayBuffer ? { data: new Uint8Array(data) } : (input as PdfSource);
+    }
+    return input as PdfSource;
 }
+
+const SCROLL_CONTAINER_STYLE = {
+    scrollbarGutter: "stable both-edges",
+} as const satisfies React.CSSProperties;
 
 const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown }) => {
     const { currentPage, initializePages } = usePdfPageContext();
@@ -103,7 +120,7 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
                     <div
                         ref={leftBox.ref}
                         className="w-full box-border overflow-y-auto overflow-x-hidden max-h-[80vh] flex justify-center"
-                        style={{ scrollbarGutter: "stable both-edges" as any }}
+                        style={SCROLL_CONTAINER_STYLE}
                     >
                         <Document
                             file={beforeFile}
@@ -134,7 +151,7 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
                     <div
                         ref={rightBox.ref}
                         className="w-full box-border overflow-y-auto overflow-x-hidden max-h-[80vh] flex justify-center"
-                        style={{ scrollbarGutter: "stable both-edges" as any }}
+                        style={SCROLL_CONTAINER_STYLE}
                     >
                         <Document
                             file={afterFile}
