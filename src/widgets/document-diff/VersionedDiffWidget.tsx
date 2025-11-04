@@ -25,6 +25,9 @@ export const VersionedPdfDiffWidget = ({
     defaultRightId,
     beforeSrc,
     afterSrc,
+    renderTextLayer,
+    heightClassName,
+    ...rest
 }: VersionedDiffWidgetProps) => {
     let effectiveVersions: PdfVersionItem[] | undefined = versions as PdfVersionItem[] | undefined;
     if ((!versions || versions.length === 0) && beforeSrc && afterSrc) {
@@ -43,6 +46,9 @@ export const VersionedPdfDiffWidget = ({
             defaultLeftId={defaultLeftId}
             defaultRightId={defaultRightId}
             title={effectiveTitle}
+            renderTextLayer={renderTextLayer}
+            heightClassName={heightClassName}
+            {...rest}
         />
     );
 };

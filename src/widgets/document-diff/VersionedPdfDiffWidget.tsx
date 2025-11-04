@@ -17,12 +17,16 @@ export interface VersionedPdfDiffWidgetProps {
     defaultLeftId?: string;
     defaultRightId?: string;
     title?: string;
+    renderTextLayer?: boolean;
+    heightClassName?: string;
 }
 
 export const VersionedPdfDiffWidget = ({
     versions,
     defaultLeftId,
     defaultRightId,
+    renderTextLayer,
+    heightClassName,
 }: VersionedPdfDiffWidgetProps) => {
     const sorted = React.useMemo(() => versions.slice(), [versions]);
 
@@ -55,7 +59,6 @@ export const VersionedPdfDiffWidget = ({
 
     return (
         <div className="w-full flex flex-col gap-3">
-            {/* ✅ 자기소개서와 동일한 상단 Nav 추가 */}
             <VersionNav>
                 <VersionNavItem variant="original" label="원본" />
                 <VersionNavItem variant="modified" label="수정본" />
@@ -72,7 +75,12 @@ export const VersionedPdfDiffWidget = ({
                 rightLabel="수정본"
             />
 
-            <PdfDiffViewer before={left.src} after={right.src} />
+            <PdfDiffViewer
+                before={left.src}
+                after={right.src}
+                renderTextLayer={renderTextLayer}
+                heightClassName={heightClassName}
+            />
         </div>
     );
 };

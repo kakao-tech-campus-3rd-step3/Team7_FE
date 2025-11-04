@@ -33,6 +33,8 @@ function useWindowMeasuredWidth<T extends HTMLElement>(fallback = 600) {
 export interface PdfDiffViewerProps {
     before: unknown;
     after: unknown;
+    renderTextLayer?: boolean;
+    heightClassName?: string;
 }
 
 const hasPdfData = (value: unknown): value is { data: Uint8Array | ArrayBuffer } =>
@@ -59,7 +61,17 @@ const SCROLL_CONTAINER_STYLE = {
     scrollbarGutter: "stable both-edges",
 } as const satisfies React.CSSProperties;
 
-const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown }) => {
+const InnerPdfDiffViewer = ({
+    before,
+    after,
+    renderTextLayer = false,
+    heightClassName,
+}: {
+    before: unknown;
+    after: unknown;
+    renderTextLayer?: boolean;
+    heightClassName?: string;
+}) => {
     const { currentPage, initializePages } = usePdfPageContext();
 
     const [beforeNumPages, setBeforeNumPages] = React.useState(0);
@@ -101,6 +113,7 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
 
     const SAFETY = 8;
     const pageWidth = Math.max(1, Math.min(leftBox.width, rightBox.width) - SAFETY);
+    const maxH = heightClassName ?? "max-h-[80vh]";
 
     return (
         <div className="flex flex-col gap-3 w-full h-full min-h-0 overflow-x-hidden">
@@ -119,7 +132,7 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
                 <div className="flex-1 min-w-0 min-h-0 w-full border rounded-lg p-3">
                     <div
                         ref={leftBox.ref}
-                        className="w-full box-border overflow-y-auto overflow-x-hidden max-h-[80vh] flex justify-center"
+                        className={`w-full box-border overflow-y-auto overflow-x-hidden ${maxH} flex justify-center`}
                         style={SCROLL_CONTAINER_STYLE}
                     >
                         <Document
@@ -140,7 +153,7 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
                                 <Page
                                     pageNumber={Math.min(currentPage, beforeNumPages)}
                                     width={pageWidth}
-                                    renderTextLayer={false}
+                                    renderTextLayer={!!renderTextLayer}
                                 />
                             )}
                         </Document>
@@ -150,7 +163,7 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
                 <div className="flex-1 min-w-0 min-h-0 w-full border rounded-lg p-3">
                     <div
                         ref={rightBox.ref}
-                        className="w-full box-border overflow-y-auto overflow-x-hidden max-h-[80vh] flex justify-center"
+                        className={`w-full box-border overflow-y-auto overflow-x-hidden ${maxH} flex justify-center`}
                         style={SCROLL_CONTAINER_STYLE}
                     >
                         <Document
@@ -171,7 +184,7 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
                                 <Page
                                     pageNumber={Math.min(currentPage, afterNumPages)}
                                     width={pageWidth}
-                                    renderTextLayer={false}
+                                    renderTextLayer={!!renderTextLayer}
                                 />
                             )}
                         </Document>
@@ -188,8 +201,18 @@ const InnerPdfDiffViewer = ({ before, after }: { before: unknown; after: unknown
     );
 };
 
-export const PdfDiffViewer = ({ before, after }: PdfDiffViewerProps) => (
+export const PdfDiffViewer = ({
+    before,
+    after,
+    renderTextLayer,
+    heightClassName,
+}: PdfDiffViewerProps) => (
     <PdfPageContextProvider>
-        <InnerPdfDiffViewer before={before} after={after} />
+        <InnerPdfDiffViewer
+            before={before}
+            after={after}
+            renderTextLayer={renderTextLayer}
+            heightClassName={heightClassName}
+        />
     </PdfPageContextProvider>
 );
