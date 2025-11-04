@@ -12,6 +12,7 @@ import {
     useCreateApplication,
     useDeleteApplication,
     useGetApplications,
+    useGetApplicationById,
     useUpdateApplication,
     useUpdateApplicationStatus,
     mapApplicationItemToApplyCard,
@@ -82,10 +83,16 @@ export function useMenteeDashboard() {
     const [editingCard, setEditingCard] = useState<{ card: ApplyCard; section: Section } | null>(
         null,
     );
+    const [editingApplicationId, setEditingApplicationId] = useState<number | null>(null);
     const [deletingCard, setDeletingCard] = useState<{
         cardId: string;
         section: Section;
     } | null>(null);
+
+    const { data: editingApplicationDetail } = useGetApplicationById(
+        editingApplicationId,
+        openEdit,
+    );
 
     const stats = useMemo(() => {
         const totalApplications = Object.values(board).reduce(
@@ -178,19 +185,23 @@ export function useMenteeDashboard() {
         (cardOrItem: ApplyCard | MenteeDashboardListItemData, section?: Section) => {
             let card: ApplyCard;
             let cardSection: Section;
+            let applicationId: number;
 
             if (section) {
                 card = cardOrItem as ApplyCard;
                 cardSection = section;
+                applicationId = parseInt(card.id, 10);
             } else {
                 const item = cardOrItem as MenteeDashboardListItemData;
                 const found = findCardInBoard(item.id);
                 if (!found) return;
                 card = found.card;
                 cardSection = found.section;
+                applicationId = parseInt(card.id, 10);
             }
 
             setEditingCard({ card, section: cardSection });
+            setEditingApplicationId(applicationId);
             setOpenEdit(true);
         },
         [findCardInBoard],
@@ -222,6 +233,7 @@ export function useMenteeDashboard() {
     const closeEditModal = useCallback(() => {
         setOpenEdit(false);
         setEditingCard(null);
+        setEditingApplicationId(null);
     }, []);
     const closeDeleteModal = useCallback(() => {
         setOpenDelete(false);
@@ -231,16 +243,36 @@ export function useMenteeDashboard() {
     const editModalInitialData = useMemo((): Partial<NewApplicationFormInput> | undefined => {
         if (!editingCard) return undefined;
 
+        if (editingApplicationDetail) {
+            const deadline = editingApplicationDetail.deadline.includes("T")
+                ? editingApplicationDetail.deadline.split("T")[0]
+                : editingApplicationDetail.deadline;
+
+            return {
+                companyName: editingApplicationDetail.companyName,
+                applyPosition: editingApplicationDetail.applyPosition,
+                deadline,
+                location: editingApplicationDetail.location,
+                employmentType: editingApplicationDetail.employmentType,
+                careerRequirement: editingApplicationDetail.careerRequirement,
+                url: editingApplicationDetail.url || "",
+            };
+        }
+
+        const deadline = editingCard.card.deadline?.includes("T")
+            ? editingCard.card.deadline.split("T")[0]
+            : editingCard.card.deadline || "";
+
         return {
             companyName: editingCard.card.company,
             applyPosition: editingCard.card.position,
-            deadline: editingCard.card.deadline || "",
+            deadline,
             location: editingCard.card.location || "",
             employmentType: editingCard.card.employmentType || "",
             careerRequirement: editingCard.card.careerRequirement || 0,
             url: editingCard.card.url || "",
         };
-    }, [editingCard]);
+    }, [editingCard, editingApplicationDetail]);
 
     return {
         board,
