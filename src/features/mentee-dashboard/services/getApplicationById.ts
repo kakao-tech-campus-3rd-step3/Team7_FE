@@ -24,9 +24,16 @@ export async function getApplicationById(applicationId: number) {
 }
 
 export const useGetApplicationById = (applicationId: number | null, enabled = true) => {
+    const isEnabled = enabled && applicationId !== null;
+
     return useQuery({
-        queryKey: APPLICATION_QUERY_KEYS.BY_ID(applicationId!),
-        queryFn: () => getApplicationById(applicationId!),
-        enabled: enabled && applicationId !== null,
+        queryKey: APPLICATION_QUERY_KEYS.BY_ID(applicationId ?? 0),
+        queryFn: () => {
+            if (applicationId === null) {
+                throw new Error("applicationId가 필요합니다.");
+            }
+            return getApplicationById(applicationId);
+        },
+        enabled: isEnabled,
     });
 };
