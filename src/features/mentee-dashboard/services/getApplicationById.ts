@@ -1,7 +1,7 @@
 import { api } from "@/app/lib/api";
 
 import { APPLICATION_QUERY_KEYS } from "./_keys";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export interface GetApplicationByIdResponse {
     applicationId: number;
@@ -11,6 +11,7 @@ export interface GetApplicationByIdResponse {
     location: string;
     employmentType: string;
     careerRequirement: number;
+    url: string;
     applicationStatus: "PREPARING" | "WRITING" | "APPLIED" | "INTERVIEWING" | "HIRED";
 }
 
@@ -22,9 +23,10 @@ export async function getApplicationById(applicationId: number) {
     return response.data;
 }
 
-export const useGetApplicationById = (applicationId: number) => {
-    return useSuspenseQuery({
-        queryKey: APPLICATION_QUERY_KEYS.BY_ID(applicationId),
-        queryFn: () => getApplicationById(applicationId),
+export const useGetApplicationById = (applicationId: number | null, enabled = true) => {
+    return useQuery({
+        queryKey: APPLICATION_QUERY_KEYS.BY_ID(applicationId!),
+        queryFn: () => getApplicationById(applicationId!),
+        enabled: enabled && applicationId !== null,
     });
 };
