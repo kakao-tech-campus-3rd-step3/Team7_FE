@@ -41,12 +41,12 @@ export default function DocumentDiffPage() {
                             {
                                 id: "v1",
                                 label: "이력서 v1",
-                                src: "/public/mocks/v1-sample.pdf",
+                                src: "/mocks/v1-sample.pdf",
                             },
                             {
                                 id: "v2",
                                 label: "이력서 v2",
-                                src: "/public/mocks/v2-sample.pdf",
+                                src: "/mocks/v2-sample.pdf",
                             },
                         ]}
                         renderTextLayer={false}
@@ -59,12 +59,12 @@ export default function DocumentDiffPage() {
                             {
                                 id: "v1",
                                 label: "포트폴리오 v1",
-                                src: "/public/mocks/v1-sample.pdf",
+                                src: "/mocks/v1-sample.pdf",
                             },
                             {
                                 id: "v2",
                                 label: "포트폴리오 v2",
-                                src: "/public/mocks/v2-sample.pdf",
+                                src: "/mocks/v2-sample.pdf",
                             },
                         ]}
                         renderTextLayer={false}
