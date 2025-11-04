@@ -1,30 +1,26 @@
 import type { DiffPart } from "@/core/document-diff/utils/textDiff";
 
-export interface DiffTokenProps {
+export interface OriginalDiffTokenProps {
     part: DiffPart;
-    index?: number;
 }
-
-export const OriginalDiffToken = ({ part, index }: DiffTokenProps) => {
+export const OriginalDiffToken = ({ part }: OriginalDiffTokenProps) => {
     if (part.removed) {
         return (
-            <del
-                key={index}
-                className="bg-rose-200/60 text-rose-800 underline decoration-rose-500/60"
-            >
+            <del className="bg-rose-200/60 text-rose-800 underline decoration-rose-500/60">
                 {part.value}
             </del>
         );
     }
     if (part.added) return null;
-    return <span key={index}>{part.value}</span>;
+    return <span>{part.value}</span>;
 };
-
-export const ModifiedDiffToken = ({ part, index }: DiffTokenProps) => {
+export interface ModifiedDiffTokenProps {
+    part: DiffPart;
+}
+export const ModifiedDiffToken = ({ part }: ModifiedDiffTokenProps) => {
     if (part.added) {
         return (
             <ins
-                key={index}
                 className="bg-emerald-200/60 text-emerald-900 no-underline"
                 style={{ textDecoration: "none" }}
             >
@@ -33,5 +29,5 @@ export const ModifiedDiffToken = ({ part, index }: DiffTokenProps) => {
         );
     }
     if (part.removed) return null;
-    return <span key={index}>{part.value}</span>;
+    return <span>{part.value}</span>;
 };
