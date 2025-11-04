@@ -5,15 +5,22 @@ import {
 
 export type MenteeDashboardListItemData = { id: string } & Omit<
     MenteeDashboardListItemProps,
-    "className" | "onItemClick"
+    "className" | "onItemClick" | "onEdit" | "onDelete"
 >;
 
 export interface MenteeDashboardListProps {
     items: Array<MenteeDashboardListItemData>;
     onItemClick?: (item: MenteeDashboardListItemData) => void;
+    onEdit?: (item: MenteeDashboardListItemData) => void;
+    onDelete?: (item: MenteeDashboardListItemData) => void;
 }
 
-export function MenteeDashboardList({ items, onItemClick }: MenteeDashboardListProps) {
+export function MenteeDashboardList({
+    items,
+    onItemClick,
+    onEdit,
+    onDelete,
+}: MenteeDashboardListProps) {
     if (!items || items.length === 0) {
         return (
             <li className="p-6 text-center text-sm text-muted-foreground">
@@ -32,6 +39,8 @@ export function MenteeDashboardList({ items, onItemClick }: MenteeDashboardListP
                     position={application.position}
                     dday={application.dday}
                     onItemClick={onItemClick ? () => onItemClick(application) : undefined}
+                    onEdit={onEdit ? () => onEdit(application) : undefined}
+                    onDelete={onDelete ? () => onDelete(application) : undefined}
                 />
             ))}
         </>
