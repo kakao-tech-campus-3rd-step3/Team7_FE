@@ -53,6 +53,7 @@ export function mapApplicationDetailToApplyCard(detail: GetApplicationByIdRespon
         location: detail.location,
         employmentType: detail.employmentType,
         careerRequirement: detail.careerRequirement,
+        url: detail.url,
         icon: undefined,
     };
 }
