@@ -19,3 +19,16 @@ export const navAsideMenusMentee: Array<NavAsideItemProps> = [
         icon: <Settings size={14} />,
     },
 ];
+
+export const navAsideMenusMentor: Array<NavAsideItemProps> = [
+    {
+        label: "대시보드",
+        to: "/mentor/dashboard",
+        icon: <LayoutDashboard size={14} />,
+    },
+    {
+        label: "프로필 설정",
+        to: "/mentor/settings",
+        icon: <Settings size={14} />,
+    },
+];
