@@ -3,12 +3,14 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface AuthState {
+    role: "ROLE_MENTOR" | "ROLE_MENTEE" | null;
     accessToken: string | null;
     refreshToken: string | null;
     isAuthenticated: boolean;
 }
 
 interface AuthActions {
+    setRole: (role: "ROLE_MENTOR" | "ROLE_MENTEE") => void;
     setTokens: (accessToken: string, refreshToken: string) => void;
     clearTokens: () => void;
     getAccessToken: () => string | null;
@@ -23,6 +25,11 @@ export const useAuthStore = create<AuthStore>()(
             accessToken: null,
             refreshToken: null,
             isAuthenticated: false,
+            role: null,
+
+            setRole: (role: "ROLE_MENTOR" | "ROLE_MENTEE") => {
+                set({ role });
+            },
 
             setTokens: (accessToken: string, refreshToken: string) => {
                 set({
@@ -55,6 +62,7 @@ export const useAuthStore = create<AuthStore>()(
                 accessToken: state.accessToken,
                 refreshToken: state.refreshToken,
                 isAuthenticated: state.isAuthenticated,
+                role: state.role,
             }),
         },
     ),
