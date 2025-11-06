@@ -28,8 +28,8 @@ export async function getCoverLetterDiffByIds(
         getCoverLetterDetailById(applicationId, rightId),
     ]);
 
-    const before = left.data;
-    const after = right.data;
+    const before = left.data.data;
+    const after = right.data.data;
 
     return {
         before,
