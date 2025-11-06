@@ -31,7 +31,7 @@ export async function updateApplication(
     };
 
     const { data: response } = await api.patch<BaseResponse<UpdateApplicationResponse>>(
-        `/api/applications/${applicationId}`,
+        `/applications/${applicationId}`,
         formattedBody,
     );
 

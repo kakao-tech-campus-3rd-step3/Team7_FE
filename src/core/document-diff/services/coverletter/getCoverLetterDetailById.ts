@@ -17,7 +17,7 @@ export interface GetCoverLetterDetailResponseBody {
 }
 
 export async function getCoverLetterDetailById(applicationId: number, documentId: number) {
-    const url = `/api/applications/${applicationId}/cover-letters/${documentId}`;
+    const url = `/applications/${applicationId}/cover-letters/${documentId}`;
     return api.get<GetCoverLetterDetailResponseBody>(url);
 }
 

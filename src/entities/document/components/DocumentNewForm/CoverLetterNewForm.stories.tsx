@@ -53,37 +53,34 @@ export const PrefilledFromAPI: Story = {
     parameters: {
         msw: {
             handlers: [
-                http.get(
-                    "/api/applications/:applicationId/coverletters/:versionId",
-                    ({ params }) => {
-                        const { versionId } = params as {
-                            applicationId: string;
-                            versionId: string;
-                        };
-                        if (versionId === "v12") {
-                            return HttpResponse.json({
-                                data: {
-                                    title: "라인 신입 백엔드 개발자 자기소개서2",
-                                    coverLetterItems: [
-                                        {
-                                            question: "지원 동기에 대해 서술하시오.",
-                                            answer: "라인의 기술력에 매료되어...",
-                                            answerLimit: 1000,
-                                        },
-                                        {
-                                            question: "협업 경험에 대해 서술하시오.",
-                                            answer: "팀 프로젝트에서 Git을 활용하여...",
-                                            answerLimit: 1000,
-                                        },
-                                    ],
-                                },
-                            });
-                        }
+                http.get("/applications/:applicationId/coverletters/:versionId", ({ params }) => {
+                    const { versionId } = params as {
+                        applicationId: string;
+                        versionId: string;
+                    };
+                    if (versionId === "v12") {
                         return HttpResponse.json({
-                            data: { title: "빈 문서", coverLetterItems: [] },
+                            data: {
+                                title: "라인 신입 백엔드 개발자 자기소개서2",
+                                coverLetterItems: [
+                                    {
+                                        question: "지원 동기에 대해 서술하시오.",
+                                        answer: "라인의 기술력에 매료되어...",
+                                        answerLimit: 1000,
+                                    },
+                                    {
+                                        question: "협업 경험에 대해 서술하시오.",
+                                        answer: "팀 프로젝트에서 Git을 활용하여...",
+                                        answerLimit: 1000,
+                                    },
+                                ],
+                            },
                         });
-                    },
-                ),
+                    }
+                    return HttpResponse.json({
+                        data: { title: "빈 문서", coverLetterItems: [] },
+                    });
+                }),
             ],
         },
     },

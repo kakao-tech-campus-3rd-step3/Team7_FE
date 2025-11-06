@@ -22,7 +22,7 @@ export async function createReview(
 ): Promise<CreateReviewResponseBody> {
     try {
         const { data: response } = await api.post<BaseResponse<CreateReviewResponseBody>>(
-            `/api/reviews/mentor/${mentorId}`,
+            `/reviews/mentor/${mentorId}`,
             body,
         );
 

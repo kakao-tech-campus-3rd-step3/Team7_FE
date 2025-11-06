@@ -62,7 +62,7 @@ export async function updateMentorProfile(
     };
 
     const { data: apiResponse } = await api.patch<BaseResponse<UpdateMentorProfileResponseBody>>(
-        `/api/mentors/${mentorId}/profile`,
+        `/mentors/${mentorId}/profile`,
         normalizedPayload,
     );
 

@@ -16,7 +16,7 @@ export const KakaoAuthButton = ({
     height = "3rem",
 }: KakaoAuthButtonProps) => {
     const onKakaoSignIn = useCallback(() => {
-        window.location.href = "https://api.kareer-fit.com/api/auth/login/kakao";
+        window.location.href = "https://api.kareer-fit.com/auth/login/kakao";
     }, []);
 
     return (
