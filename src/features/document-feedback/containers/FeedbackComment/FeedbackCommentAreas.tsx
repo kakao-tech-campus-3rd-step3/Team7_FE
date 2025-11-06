@@ -1,16 +1,20 @@
 import { useParams } from "react-router";
 
-import { useGetComments } from "@/features/document-feedback/services/getComments";
+import { useGetCommentsByPage } from "@/features/document-feedback/services/getComments";
 
 import { CommentArea } from "@/core/document-commenter/components/Comment";
 
-export const FeedbackCommentAreas = () => {
+export interface FeedbackCommentAreasProps {
+    page: number;
+}
+
+export const FeedbackCommentAreas = ({ page }: FeedbackCommentAreasProps) => {
     const { id } = useParams();
-    const { data } = useGetComments(Number(id));
+    const { data } = useGetCommentsByPage(Number(id), page);
 
     return (
         <div className="absolute z-50 top-0 left-0">
-            {data.content.map((comment) => {
+            {data.map((comment) => {
                 return (
                     <CommentArea
                         key={comment.id}

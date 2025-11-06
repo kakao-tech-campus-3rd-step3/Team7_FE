@@ -7,7 +7,11 @@ import { CommentArea } from "@/core/document-commenter/components/Comment/Commen
 import type { EventTypes } from "@/core/document-commenter/events/EventTypes";
 import { useEventBusSubscription } from "@/core/document-commenter/hooks/useEventBusSubscription";
 
-export const NewFeedbackComment = () => {
+export interface NewFeedbackCommentProps {
+    page: number;
+}
+
+export const NewFeedbackComment = ({ page }: NewFeedbackCommentProps) => {
     const { id } = useParams();
     const [newCommentPosition, setNewCommentPosition] = useState<
         EventTypes["selection:end"] | null
@@ -54,6 +58,7 @@ export const NewFeedbackComment = () => {
             />
             {isWriting && (
                 <NewFeedbackCommentForm
+                    page={page}
                     documentId={Number(id)}
                     coordinate={{
                         startX: newCommentPosition.start.x,

@@ -6,6 +6,7 @@ import { Spinner } from "@/shared/components/Spinner/Spinner";
 import { Button } from "@/shared/ui/button";
 
 export interface NewFeedbackCommentFormProps {
+    page: number;
     documentId: number;
     coordinate: {
         startX: number;
@@ -23,6 +24,7 @@ export interface NewFeedbackCommentFormProps {
 }
 
 export const NewFeedbackCommentForm = ({
+    page,
     documentId,
     coordinate,
     position,
@@ -38,7 +40,7 @@ export const NewFeedbackCommentForm = ({
         const content = textareaRef.current?.value;
         if (!content || !content.trim()) return;
 
-        mutate({ content: content.trim(), coordinate }, { onSuccess, onError });
+        mutate({ content: content.trim(), coordinate, page }, { onSuccess, onError });
     };
 
     const handleCancel = () => {

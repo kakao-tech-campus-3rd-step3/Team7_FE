@@ -22,36 +22,36 @@ export const MentorReviewListItem = ({
     const submitted = format(new Date(item.submittedAt), "yyyy.MM.dd HH:mm");
     const deadline = item.deadline ? format(new Date(item.deadline), "M월 d일") : "-";
 
-    const statusInfo = (() => {
-        switch (item.status) {
-            case "waiting":
-                return {
-                    statusLabel: "대기중",
-                    cls: "bg-zinc-100 text-zinc-700",
-                    actionLabel: "검토시작",
-                };
-            case "progress":
-                return {
-                    statusLabel: "진행중",
-                    cls: "bg-blue-50 text-blue-700",
-                    actionLabel: "계속 작성",
-                };
-            case "done":
-                return {
-                    statusLabel: "완료",
-                    cls: "bg-emerald-50 text-emerald-700",
-                    actionLabel: "리뷰 보기",
-                };
-            case "expired":
-                return {
-                    statusLabel: "만료됨",
-                    cls: "bg-rose-50 text-rose-700",
-                    actionlabel: "기한 만료",
-                };
-            default:
-                return { statusLabel: "", cls: "", actionLabel: "" };
-        }
-    })();
+    // const statusInfo = (() => {
+    //     switch (item.status) {
+    //         case "waiting":
+    //             return {
+    //                 statusLabel: "대기중",
+    //                 cls: "bg-zinc-100 text-zinc-700",
+    //                 actionLabel: "검토시작",
+    //             };
+    //         case "progress":
+    //             return {
+    //                 statusLabel: "진행중",
+    //                 cls: "bg-blue-50 text-blue-700",
+    //                 actionLabel: "계속 작성",
+    //             };
+    //         case "done":
+    //             return {
+    //                 statusLabel: "완료",
+    //                 cls: "bg-emerald-50 text-emerald-700",
+    //                 actionLabel: "리뷰 보기",
+    //             };
+    //         case "expired":
+    //             return {
+    //                 statusLabel: "만료됨",
+    //                 cls: "bg-rose-50 text-rose-700",
+    //                 actionlabel: "기한 만료",
+    //             };
+    //         default:
+    //             return { statusLabel: "", cls: "", actionLabel: "" };
+    //     }
+    // })();
 
     return (
         <div {...props}>
@@ -76,14 +76,14 @@ export const MentorReviewListItem = ({
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">
-                        <span
+                        {/* <span
                             className={cn(
                                 "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-black/5",
                                 statusInfo.cls,
                             )}
                         >
                             {statusInfo.statusLabel}
-                        </span>
+                        </span> */}
 
                         <Button
                             variant={item.status === "expired" ? "outline" : "default"}
@@ -96,7 +96,7 @@ export const MentorReviewListItem = ({
                             onClick={() => onReviewClick?.(item)}
                             disabled={item.status === "expired"}
                         >
-                            {statusInfo.actionLabel}
+                            상세 보기
                         </Button>
 
                         {onMoreClick && (

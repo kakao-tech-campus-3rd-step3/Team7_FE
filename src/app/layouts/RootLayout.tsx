@@ -15,7 +15,7 @@ export const RootLayout = ({ navAsideMenus }: RootLayoutProps) => {
 
             <main className="flex" style={{ height: "calc(100vh - 64px)" }}>
                 <NavAside navAsideMenus={navAsideMenus} />
-                <section className="overflow-auto w-full bg-[#F9FAFB]">
+                <section className="w-full bg-[#F9FAFB]">
                     <Outlet />
                 </section>
             </main>

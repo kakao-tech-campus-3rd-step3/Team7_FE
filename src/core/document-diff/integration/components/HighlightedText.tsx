@@ -12,7 +12,7 @@ export const HighlightedText = ({ parts, mode, className }: HighlightedTextProps
     return (
         <span className={className}>
             {parts.map((p, idx) => (
-                <Token key={idx} part={p} index={idx} />
+                <Token key={idx} part={p} />
             ))}
         </span>
     );
