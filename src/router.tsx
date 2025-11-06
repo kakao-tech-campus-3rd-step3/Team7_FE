@@ -1,7 +1,7 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from "react-router";
 import { Fragment } from "react/jsx-runtime";
 
-import { navAsideMenusMentee } from "@/app/config/nav";
+import { navAsideMenusMentee, navAsideMenusMentor } from "@/app/config/nav";
 import { GlobalLayout } from "@/app/layouts/GlobalLayout";
 import { NavTopLayout } from "@/app/layouts/NavTopLayout";
 import { RegisterLayout } from "@/app/layouts/RegisterLayout";
@@ -18,6 +18,7 @@ import NewCoverLetterPage from "@/pages/mentee/applications/NewCoverLetterPage";
 import NewPortfolioPage from "@/pages/mentee/applications/NewPortfolioPage";
 import NewResumePage from "@/pages/mentee/applications/NewResumePage";
 import MentorDashboardPage from "@/pages/mentor/MentorDashboardPage";
+import MentorSettingsPage from "@/pages/mentor/MentorSettingsPage";
 
 const routes = createRoutesFromElements(
     <Fragment>
@@ -28,8 +29,9 @@ const routes = createRoutesFromElements(
 
             <Route path="/register" element={<RegisterLayout />}></Route>
 
-            <Route path="/mentor">
+            <Route path="/mentor" element={<RootLayout navAsideMenus={navAsideMenusMentor} />}>
                 <Route path="dashboard" element={<MentorDashboardPage />} />
+                <Route path="settings" element={<MentorSettingsPage />} />
             </Route>
 
             <Route path="/mentee" element={<RootLayout navAsideMenus={navAsideMenusMentee} />}>
