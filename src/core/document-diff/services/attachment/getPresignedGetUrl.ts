@@ -1,4 +1,4 @@
-import { get } from "@/app/lib/api";
+import { api } from "@/app/lib/api";
 
 import { DocumentQueryKeys } from "@/core/document-diff/services/_keys";
 import { useQuery } from "@tanstack/react-query";
@@ -14,7 +14,7 @@ export interface GetPresignedGetUrlResponseBody {
 
 export async function getPresignedGetUrl(applicationId: number, attachmentFileId: number) {
     const url = `/api/applications/${applicationId}/attachment-files/${attachmentFileId}`;
-    return get<GetPresignedGetUrlResponseBody>(url);
+    return api.get<GetPresignedGetUrlResponseBody>(url);
 }
 
 export const usePresignedGetUrl = (

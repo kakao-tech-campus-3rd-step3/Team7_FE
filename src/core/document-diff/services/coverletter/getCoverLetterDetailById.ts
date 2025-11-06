@@ -1,4 +1,4 @@
-import { get } from "@/app/lib/api";
+import { api } from "@/app/lib/api";
 
 import { DocumentQueryKeys } from "@/core/document-diff/services/_keys";
 import { useQuery } from "@tanstack/react-query";
@@ -18,7 +18,7 @@ export interface GetCoverLetterDetailResponseBody {
 
 export async function getCoverLetterDetailById(applicationId: number, documentId: number) {
     const url = `/api/applications/${applicationId}/cover-letters/${documentId}`;
-    return get<GetCoverLetterDetailResponseBody>(url);
+    return api.get<GetCoverLetterDetailResponseBody>(url);
 }
 
 export const useCoverLetterDetailById = (

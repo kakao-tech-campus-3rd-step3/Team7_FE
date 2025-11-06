@@ -1,4 +1,4 @@
-import { post } from "@/app/lib/api";
+import { api } from "@/app/lib/api";
 
 import { useMutation } from "@tanstack/react-query";
 
@@ -24,7 +24,10 @@ export async function generatePutPresignedUrl(
     body: GeneratePutPresignedUrlRequestBody,
 ) {
     const url = `/api/applications/${applicationId}/attachment-files/file-upload?attachment-file-type=${attachmentFileType}`;
-    return post<GeneratePutPresignedUrlResponseBody, GeneratePutPresignedUrlRequestBody>(url, body);
+    return api.post<GeneratePutPresignedUrlResponseBody, GeneratePutPresignedUrlRequestBody>(
+        url,
+        body,
+    );
 }
 
 export const useGeneratePutPresignedUrl = () =>
