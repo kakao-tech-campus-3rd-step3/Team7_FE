@@ -1,3 +1,4 @@
+//새 이력서 등록 페이지
 import { useNavigate } from "react-router";
 
 import { DocumentNewForm } from "@/entities/document/components/DocumentNewForm";
