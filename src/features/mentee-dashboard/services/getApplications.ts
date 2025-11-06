@@ -25,7 +25,7 @@ export interface GetApplicationsResponse {
 
 export async function getApplications(params: GetApplicationsQueryParams) {
     const { data: response } = await api.get<BaseResponse<GetApplicationsResponse>>(
-        `/api/applications`,
+        `/applications`,
         {
             params: {
                 memberId: params.memberId,

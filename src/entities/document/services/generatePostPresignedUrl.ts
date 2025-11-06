@@ -28,7 +28,7 @@ export async function generatePostPresignedUrl(
     console.log("[presigned:request]", { applicationId, attachmentFileType, body });
 
     const { data } = await api.post<GeneratePostPresignedUrlResponseBody>(
-        `/api/applications/${applicationId}/attachment-files/file-upload`,
+        `/applications/${applicationId}/attachment-files/file-upload`,
         body,
         { params: { "attachment-file-type": attachmentFileType } },
     );

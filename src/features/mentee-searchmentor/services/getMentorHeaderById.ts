@@ -20,7 +20,7 @@ export async function getMentorHeaderById(
     mentorId: number,
 ): Promise<GetMentorHeaderByIdResponseBody> {
     const { data: response } = await api.get<BaseResponse<GetMentorHeaderByIdResponseBody>>(
-        `/api/mentors/${mentorId}/header`,
+        `/mentors/${mentorId}/header`,
     );
 
     return response.data;

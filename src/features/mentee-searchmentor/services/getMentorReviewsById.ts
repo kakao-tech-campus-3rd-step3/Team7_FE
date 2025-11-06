@@ -20,7 +20,7 @@ export async function getMentorReviewsById(
     mentorId: number,
 ): Promise<GetMentorReviewsByIdResponseBody> {
     const { data: response } = await api.get<BaseResponse<GetMentorReviewsByIdResponseBody>>(
-        `/api/mentors/${mentorId}/reviews`,
+        `/mentors/${mentorId}/reviews`,
     );
 
     return response.data;

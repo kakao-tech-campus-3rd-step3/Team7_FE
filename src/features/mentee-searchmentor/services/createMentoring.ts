@@ -18,7 +18,7 @@ export interface CreateMentoringResponseBody {
 export async function createMentoring(
     body: CreateMentoringRequestBody,
 ): Promise<CreateMentoringResponseBody> {
-    const { data: response } = await api.post<BaseResponse<number>>(`/api/mentoring`, body);
+    const { data: response } = await api.post<BaseResponse<number>>(`/mentoring`, body);
 
     return {
         mentoringId: response.data,

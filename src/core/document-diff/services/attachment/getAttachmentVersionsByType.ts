@@ -35,7 +35,7 @@ export async function getAttachmentFileMetaListByType(
         code: string;
         message: string;
         data: GetFileMetaListResponseBody;
-    }>(`/api/applications/${applicationId}/attachment-files/metadata/list`, {
+    }>(`/applications/${applicationId}/attachment-files/metadata/list`, {
         params: {
             "attachment-file-type": type,
             page,
@@ -50,7 +50,7 @@ export async function getPresignedGetUrl(applicationId: number, attachmentFileId
         code: string;
         message: string;
         data: GetPresignedGetUrlResponseBody;
-    }>(`/api/applications/${applicationId}/attachment-files/${attachmentFileId}`);
+    }>(`/applications/${applicationId}/attachment-files/${attachmentFileId}`);
     return response.data;
 }
 

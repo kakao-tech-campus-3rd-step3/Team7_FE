@@ -17,7 +17,7 @@ export interface GetApplicationByIdResponse {
 
 export async function getApplicationById(applicationId: number) {
     const { data: response } = await api.get<BaseResponse<GetApplicationByIdResponse>>(
-        `/api/applications/${applicationId}`,
+        `/applications/${applicationId}`,
     );
 
     return response.data;
