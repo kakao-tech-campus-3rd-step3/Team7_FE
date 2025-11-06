@@ -1,3 +1,4 @@
+//Pdf diff viewer compoenent
 import React from "react";
 import { Document, Page } from "react-pdf";
 
