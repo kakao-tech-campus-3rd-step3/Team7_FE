@@ -37,16 +37,14 @@ const routes = createRoutesFromElements(
                 <Route path="search" element={<MenteeSearchMentorPage />} />
                 <Route path="settings" element={<MenteeSettingsPage />} />
 
-                <Route path="applications"></Route>
-                <Route path="resumes/new" element={<NewResumePage />} />
-                <Route path="coverletters/new" element={<NewCoverLetterPage />} />
-                <Route path="portfolios/new" element={<NewPortfolioPage />} />
-
                 <Route path="applications/:applicationId">
                     <Route index></Route>
                     <Route path="resumes" element={<ApplicationDetailPage />} />
                     <Route path="coverletters" element={<ApplicationDetailPage />} />
                     <Route path="portfolios" element={<ApplicationDetailPage />} />
+                    <Route path="resumes/new" element={<NewResumePage />} />
+                    <Route path="coverletters/new" element={<NewCoverLetterPage />} />
+                    <Route path="portfolios/new" element={<NewPortfolioPage />} />
 
                     <Route path="diff" element={<DocumentDiffPage />} />
                 </Route>
