@@ -1,12 +1,15 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
+import { jwtDecode } from "jwt-decode";
+
+import type { JwtSchema } from "@/features/authentication/schema/JwtSchema";
 import { useAuthStore } from "@/features/authentication/store/authStore";
 
 export default function RedirectPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const { setTokens } = useAuthStore();
+    const { setTokens, setRole } = useAuthStore();
 
     useEffect(() => {
         const isNewUser = searchParams.get("isNewUser");
@@ -18,13 +21,22 @@ export default function RedirectPage() {
             navigate("/auth/role?oauthId=" + oauthId);
         } else {
             if (accessToken && refreshToken) {
+                const decoded: JwtSchema = jwtDecode(accessToken);
+                const role = decoded.roles[0];
+
+                setRole(role);
                 setTokens(accessToken, refreshToken);
-                navigate("/");
+
+                if (role === "ROLE_MENTOR") {
+                    navigate("/mentor/dashboard");
+                } else {
+                    navigate("/mentee/dashboard");
+                }
             } else {
                 navigate("/auth/login");
             }
         }
-    }, [navigate, searchParams, setTokens]);
+    }, [navigate, searchParams, setRole, setTokens]);
 
     return (
         <main>
