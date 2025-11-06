@@ -8,6 +8,10 @@ import { RegisterLayout } from "@/app/layouts/RegisterLayout";
 import { RootLayout } from "@/app/layouts/RootLayout";
 
 import HomePage from "@/pages/HomePage";
+import RedirectPage from "@/pages/auth/RedirectPage";
+import RegisterMentee from "@/pages/auth/RegisterMentee";
+import RegisterMentor from "@/pages/auth/RegisterMentor";
+import RolePage from "@/pages/auth/RolePage";
 import SignInPage from "@/pages/auth/SignInPage";
 import MenteeDashboardPage from "@/pages/mentee/MenteeDashboardPage";
 import MenteeFeedbackPage from "@/pages/mentee/MenteeFeedbackPage";
@@ -25,8 +29,13 @@ const routes = createRoutesFromElements(
 
             <Route path="/auth">
                 <Route path="signin" element={<SignInPage />} />
-                <Route path="role" />
-                <Route path="register" element={<RegisterLayout />}></Route>
+                <Route path="redirect" element={<RedirectPage />} />
+                <Route path="role" element={<RolePage />}></Route>
+
+                <Route path="register" element={<RegisterLayout />}>
+                    <Route path="mentor" element={<RegisterMentor />} />
+                    <Route path="mentee" element={<RegisterMentee />} />
+                </Route>
             </Route>
 
             <Route path="/mentor">
