@@ -1,4 +1,4 @@
-import { get } from "@/app/lib/api";
+import { api } from "@/app/lib/api";
 
 import { DocumentQueryKeys } from "@/core/document-diff/services/_keys";
 import { useQuery } from "@tanstack/react-query";
@@ -37,7 +37,7 @@ export async function getAttachmentFileMetaList(
     size = 10,
 ) {
     const url = `/api/applications/${applicationId}/attachment-files/metadata/list?attachment-file-type=${type}&page=${page}&size=${size}`;
-    return get<GetAttachmentFileMetaListResponseBody>(url);
+    return api.get<GetAttachmentFileMetaListResponseBody>(url);
 }
 
 export const useAttachmentFileMetaList = (
