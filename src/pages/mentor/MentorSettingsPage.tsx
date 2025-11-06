@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/shared/ui/card";
 import { PageLoading } from "@/shared/ui/page-loading";
 import { QueryErrorBoundary } from "@/shared/ui/query-error-boundary";
 
-function MentorSettingsContent() {
+const MentorSettingsContent = () => {
     const mentorId = getCurrentMentorId();
     const { profile, save, isSaving } = useMentorProfile(mentorId);
 
@@ -26,15 +26,19 @@ function MentorSettingsContent() {
                         profile={profile}
                         isSaving={isSaving}
                         onSave={async (partial) => {
-                            await save(partial);
-                            toast.success("저장되었습니다.");
+                            try {
+                                await save(partial);
+                                toast.success("저장되었습니다.");
+                            } catch {
+                                toast.error("프로필 저장에 실패했습니다.");
+                            }
                         }}
                     />
                 </CardContent>
             </Card>
         </div>
     );
-}
+};
 
 export default function MentorSettingsPage() {
     return (

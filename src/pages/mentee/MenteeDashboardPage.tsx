@@ -19,7 +19,7 @@ import { QueryErrorBoundary } from "@/shared/ui/query-error-boundary";
 //TODO : 기업 이미지 불러오기
 const PlaceholderLogo: React.ReactNode = <div className="h-5 w-5 rounded-sm bg-zinc-200/80" />;
 
-function MenteeDashboardContent() {
+const MenteeDashboardContent = () => {
     const {
         board,
         view,
@@ -107,7 +107,7 @@ function MenteeDashboardContent() {
             />
         </DndProvider>
     );
-}
+};
 
 export default function MenteeDashboardPage() {
     return (
