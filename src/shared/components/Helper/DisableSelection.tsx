@@ -1,22 +1,37 @@
-export interface DisableSelectionProps extends React.ComponentPropsWithoutRef<"div"> {
+import React, { forwardRef } from "react";
+
+import { useEventBusSubscription } from "@/core/document-commenter/hooks/useEventBusSubscription";
+
+export interface ViewportSurfaceProps extends React.ComponentProps<"div"> {
     children?: React.ReactNode;
 }
 
-export const DisableSelection = ({ children, ...props }: DisableSelectionProps) => {
-    const { style, ...rest } = props;
+export const BaseCoordinateLayer = forwardRef<HTMLDivElement, ViewportSurfaceProps>(
+    ({ children, ...props }: ViewportSurfaceProps, ref) => {
+        const { style, ...rest } = props;
 
-    return (
-        <div
-            {...rest}
-            style={{
-                userSelect: "none",
-                WebkitUserSelect: "none",
-                MozUserSelect: "none",
-                msUserSelect: "none",
-                ...style,
-            }}
-        >
-            {children}
-        </div>
-    );
-};
+        useEventBusSubscription("pan:move", (event) => {
+            if (ref && "current" in ref && ref.current) {
+                ref.current.style.transform = `translate(${event.dx}px, ${event.dy}px)`;
+            }
+        });
+
+        return (
+            <div
+                ref={ref}
+                {...rest}
+                style={{
+                    userSelect: "none",
+                    WebkitUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    willChange: "transform",
+
+                    ...style,
+                }}
+            >
+                {children}
+            </div>
+        );
+    },
+);
