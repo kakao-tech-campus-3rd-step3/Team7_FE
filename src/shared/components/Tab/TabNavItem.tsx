@@ -2,9 +2,9 @@ import { useTabContext } from "@/shared/components/Tab/TabContext";
 import { cn } from "@/shared/lib/utils";
 
 export interface TabNavItemProps {
-    icon: React.ReactNode;
+    icon?: React.ReactNode;
     label: string;
-    indicator: React.ReactNode;
+    indicator?: React.ReactNode;
 }
 
 export const TabNavItem = ({ icon, label, indicator }: TabNavItemProps) => {
