@@ -1,4 +1,4 @@
 export * from "./components/DiffLayout";
 export * from "./components/DiffViewer";
 
-export * from "./hooks/useDocumentDiff";
+export * from "../hooks/useDocumentDiff";

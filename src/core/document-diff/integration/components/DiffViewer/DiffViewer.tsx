@@ -1,6 +1,30 @@
+import React, { Suspense, type ReactNode } from "react";
+
 import { FileType, type FileTypes } from "@/core/@types/FileType";
+import { useDocumentDiff } from "@/core/document-diff/hooks/useDocumentDiff";
+import { MarkdownDiffViewer } from "@/core/document-diff/integration/components/DiffViewer/MarkdownDiffViewer";
 import { PdfDiffViewer } from "@/core/document-diff/integration/components/DiffViewer/PdfDiffViewer";
-import { useDocumentDiff } from "@/core/document-diff/integration/hooks/useDocumentDiff";
+import { PlainTextDiffViewer } from "@/core/document-diff/integration/components/DiffViewer/PlainTextDiffViewer";
+
+class DiffErrorBoundary extends React.Component<
+    { fallback: ReactNode; children: ReactNode },
+    { hasError: boolean; error: unknown }
+> {
+    constructor(props: { fallback: ReactNode; children: ReactNode }) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error: unknown) {
+        return { hasError: true, error };
+    }
+    componentDidCatch() {}
+    render() {
+        if (this.state.hasError) {
+            return this.props.fallback ?? null;
+        }
+        return this.props.children;
+    }
+}
 
 export interface DiffViewerProps {
     pendingFallback: React.ReactNode;
@@ -9,33 +33,72 @@ export interface DiffViewerProps {
     fileType: FileTypes;
     beforeSrc: string;
     afterSrc: string;
+    suspense?: boolean;
 }
 
-export const DiffViewer = ({
-    pendingFallback,
-    errorFallback,
+function InnerDiffRenderer({
     fileType,
     beforeSrc,
     afterSrc,
-}: DiffViewerProps) => {
+    suspense,
+    pendingFallback,
+    errorFallback,
+}: DiffViewerProps) {
     const { isProcessing, diffResult, isError, error } = useDocumentDiff({
-        fileType: fileType,
+        fileType,
         before: beforeSrc,
         after: afterSrc,
+        suspense,
     });
 
-    if (isProcessing) return pendingFallback;
-    if (isError) return errorFallback ?? error;
-    if (!diffResult) return pendingFallback;
-
-    switch (fileType) {
-        case FileType.PDF:
-            return <PdfDiffViewer before={diffResult.before} after={diffResult.after} />;
-
-        // TODO : PlainTextDiffViewer, MarkdownDiffViewer 구현 후 추가
-        case FileType.TEXT:
-        case FileType.MARKDOWN:
-        default:
-            throw new Error(`Unsupported file type: ${fileType}`);
+    if (!suspense) {
+        if (isProcessing) return <>{pendingFallback}</>;
+        if (isError)
+            return <>{errorFallback ?? (error instanceof Error ? error.message : String(error))}</>;
+        if (!diffResult) return <>{pendingFallback}</>;
     }
+
+    if (fileType === FileType.PDF) {
+        return <PdfDiffViewer before={diffResult!.before} after={diffResult!.after} />;
+    }
+
+    if (fileType === FileType.TEXT) {
+        return (
+            <PlainTextDiffViewer
+                before={String(diffResult!.before)}
+                after={String(diffResult!.after)}
+            />
+        );
+    }
+
+    if (fileType === FileType.MARKDOWN) {
+        return (
+            <MarkdownDiffViewer
+                before={String(diffResult!.before)}
+                after={String(diffResult!.after)}
+            />
+        );
+    }
+
+    return (
+        <div className="p-4 text-sm text-neutral-600">
+            지원하지 않는 파일 형식입니다. (fileType: {String(fileType)})
+        </div>
+    );
+}
+
+export const DiffViewer = (props: DiffViewerProps) => {
+    const { suspense = false, pendingFallback, errorFallback } = props;
+
+    if (!suspense) {
+        return <InnerDiffRenderer {...props} />;
+    }
+
+    return (
+        <DiffErrorBoundary fallback={errorFallback}>
+            <Suspense fallback={pendingFallback}>
+                <InnerDiffRenderer {...props} />
+            </Suspense>
+        </DiffErrorBoundary>
+    );
 };

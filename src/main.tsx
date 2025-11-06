@@ -6,6 +6,8 @@ import "@/app/styles/main.css";
 
 import App from "@/App";
 import { isMSWEnabled, mswWorker } from "@/__mocks__/msw";
+import "@/core/document-diff/pdfBoot";
+import "@/core/document-diff/pdfBoot";
 
 const REACT_ROOT_ELEMENT = document.getElementById("root") as HTMLElement;
 

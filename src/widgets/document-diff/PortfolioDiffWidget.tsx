@@ -1,30 +1,9 @@
-import { Fragment } from "react/jsx-runtime";
+//포트폴리오
+import { VersionedPdfDiffWidget, type VersionedDiffWidgetProps } from "./VersionedDiffWidget";
 
-import {
-    VersionNav,
-    VersionNavItem,
-    VersionNavMagnifyController,
-} from "@/features/document-diff/components/VersionNav";
+export interface PortfolioDiffWidgetProps
+    extends Omit<VersionedDiffWidgetProps, "titleLeft" | "titleRight"> {}
 
-import { PdfDiffViewer } from "@/core/document-diff/integration/components/DiffViewer/PdfDiffViewer";
-
-export const PortfolioDiffWidget = () => {
-    return (
-        <Fragment>
-            <VersionNav>
-                <VersionNavItem
-                    variant="original"
-                    label="원본"
-                    controller={<VersionNavMagnifyController />}
-                />
-                <VersionNavItem
-                    variant="modified"
-                    label="수정본"
-                    controller={<VersionNavMagnifyController />}
-                />
-            </VersionNav>
-
-            <PdfDiffViewer before="/mocks/v1-sample.pdf" after="/mocks/v2-sample.pdf" />
-        </Fragment>
-    );
+export const PortfolioDiffWidget = (props: PortfolioDiffWidgetProps) => {
+    return <VersionedPdfDiffWidget titleLeft="원본" titleRight="수정본" {...props} />;
 };

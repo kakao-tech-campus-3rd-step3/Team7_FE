@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import type { Section } from "@/features/dashboard/models/types";
+import type { Section } from "@/features/mentee-dashboard/models/types";
 
 import { FormField as Field, inputClassName } from "@/shared/components/Form/FormField";
 import { cn } from "@/shared/lib/utils";
@@ -18,6 +19,8 @@ export interface NewApplicationModalProps {
     open: boolean;
     onClose: () => void;
     onCreate: (payload: NewApplicationFormOutput & { targetSection?: Section }) => void;
+    initialData?: Partial<NewApplicationFormInput>;
+    isEditMode?: boolean;
     className?: string;
 }
 
@@ -25,6 +28,8 @@ export const NewApplicationModal = ({
     open,
     onClose,
     onCreate,
+    initialData,
+    isEditMode = false,
     className,
 }: NewApplicationModalProps) => {
     const {
@@ -36,8 +41,18 @@ export const NewApplicationModal = ({
         resolver: zodResolver(NewApplicationSchema),
         mode: "onChange",
         reValidateMode: "onChange",
-        defaultValues: DEFAULT_APPLICATION,
+        defaultValues: initialData || DEFAULT_APPLICATION,
     });
+
+    useEffect(() => {
+        if (open) {
+            if (initialData) {
+                reset(initialData);
+            } else {
+                reset(DEFAULT_APPLICATION);
+            }
+        }
+    }, [open, initialData, reset]);
 
     const onSubmit: SubmitHandler<NewApplicationFormInput> = (formValues) => {
         const data: NewApplicationFormOutput = NewApplicationSchema.parse(formValues);
@@ -61,7 +76,9 @@ export const NewApplicationModal = ({
                 <div className="px-6 py-5 border-b">
                     <h3 className="text-base font-semibold text-slate-900">정보 확인</h3>
                     <p className="mt-1 text-sm text-slate-500">
-                        지원하실 기업의 정보를 입력해 주세요.
+                        {isEditMode
+                            ? "지원 패키지 정보를 수정해 주세요."
+                            : "지원하실 기업의 정보를 입력해 주세요."}
                     </p>
                 </div>
 
@@ -140,7 +157,13 @@ export const NewApplicationModal = ({
                             disabled={isSubmitting || !isValid}
                             className="bg-[#2563EB] text-white hover:bg-[#1E4FD9] disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            {isSubmitting ? "생성 중..." : "지원 패키지 생성"}
+                            {isSubmitting
+                                ? isEditMode
+                                    ? "수정 중..."
+                                    : "생성 중..."
+                                : isEditMode
+                                  ? "지원 패키지 수정"
+                                  : "지원 패키지 생성"}
                         </Button>
                     </div>
                 </form>

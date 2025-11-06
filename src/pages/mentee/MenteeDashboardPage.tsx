@@ -1,87 +1,46 @@
-import { useState, useMemo, useCallback } from "react";
+import { Suspense } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import { Folder, UserRoundPen, Clock3, UserRound } from "lucide-react";
-
-import { NewApplicationButton, NewApplicationModal } from "@/features/applications";
+import { NewApplicationButton } from "@/features/applications";
 import {
-    DashboardHeaderContainer,
-    DashboardHeaderCard,
-    useBoardState,
-    sectionMock,
-    SECTION_ORDER,
-    type Section,
-    type ApplyCard,
-    calcDday,
+    useMenteeDashboard,
     MenteeDashboardListContainer,
     MenteeDashboardList,
     MenteeDashboardKanban,
-    type MenteeDashboardListItemData,
-} from "@/features/dashboard";
-import {
+    DashboardHeaderSection,
+    ApplicationsModals,
     DashboardViewToggle,
-    type DashboardViewMode,
-} from "@/features/dashboard/components/ViewToggle/DashboardViewToggle";
+} from "@/features/mentee-dashboard";
+
+import { PageLoading } from "@/shared/ui/page-loading";
+import { QueryErrorBoundary } from "@/shared/ui/query-error-boundary";
 
 //TODO : 기업 이미지 불러오기
 const PlaceholderLogo: React.ReactNode = <div className="h-5 w-5 rounded-sm bg-zinc-200/80" />;
 
-export default function MenteeDashboardPage() {
-    const { board, setBoard, moveTo } = useBoardState(sectionMock);
-    const [openCreate, setOpenCreate] = useState(false);
-
-    const [view, setView] = useState<DashboardViewMode>("kanban");
-
-    const totalApplications = useMemo(
-        () => Object.values(board).reduce((sum, sectionCards) => sum + sectionCards.length, 0),
-        [board],
-    );
-    const writing = board.writing.length;
-    const interview = board.interview.length;
-
-    const handleCreate = useCallback(
-        (form: {
-            companyName: string;
-            applyPosition: string;
-            deadline: string;
-            location: string;
-            employmentType: string;
-            careerRequirement: number;
-            url: string;
-            targetSection?: Section;
-        }) => {
-            const target: Section = form.targetSection ?? "planned";
-            const dday = calcDday(form.deadline);
-
-            const newCard: ApplyCard = {
-                id: `c${Date.now()}`,
-                icon: undefined,
-                company: form.companyName,
-                position: form.applyPosition,
-                dday,
-            };
-
-            setBoard((previousBoard) => {
-                const nextBoard = { ...previousBoard };
-                nextBoard[target] = [...nextBoard[target], newCard];
-                return nextBoard;
-            });
-        },
-        [setBoard],
-    );
-
-    const listItems: MenteeDashboardListItemData[] = useMemo(
-        () =>
-            SECTION_ORDER.flatMap((sectionKey) => board[sectionKey]).map((card) => ({
-                id: card.id,
-                icon: card.icon ?? PlaceholderLogo,
-                company: card.company,
-                position: card.position,
-                dday: card.dday,
-            })),
-        [board],
-    );
+const MenteeDashboardContent = () => {
+    const {
+        board,
+        view,
+        stats,
+        listItems,
+        openCreate,
+        openEdit,
+        openDelete,
+        editModalInitialData,
+        setView,
+        moveTo,
+        handleCreate,
+        handleUpdate,
+        handleDelete,
+        handleEditClick,
+        handleDeleteClick,
+        openCreateModal,
+        closeCreateModal,
+        closeEditModal,
+        closeDeleteModal,
+    } = useMenteeDashboard();
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -95,39 +54,14 @@ export default function MenteeDashboardPage() {
                             모든 취업 활동을 한눈에 관리하세요
                         </p>
                     </div>
-                    <NewApplicationButton onClick={() => setOpenCreate(true)} />
+                    <NewApplicationButton onClick={openCreateModal} />
                 </header>
 
-                <DashboardHeaderContainer className="mt-4">
-                    <DashboardHeaderCard
-                        title="전체 지원 패키지"
-                        value={totalApplications}
-                        description="+2 이번 주"
-                        icon={<Folder className="h-5 w-5 text-blue-600" strokeWidth={2} />}
-                        iconBg="bg-blue-50"
-                    />
-                    <DashboardHeaderCard
-                        title="진행 중인 멘토링"
-                        value={writing}
-                        description="+1 이번 주"
-                        icon={<UserRoundPen className="h-5 w-5 text-emerald-600" strokeWidth={2} />}
-                        iconBg="bg-emerald-50"
-                    />
-                    <DashboardHeaderCard
-                        title="이번 주 마감"
-                        value={2}
-                        description=" - "
-                        icon={<Clock3 className="h-5 w-5 text-orange-600" strokeWidth={2} />}
-                        iconBg="bg-orange-50"
-                    />
-                    <DashboardHeaderCard
-                        title="면접 대기"
-                        value={interview}
-                        description="+1 이번 주"
-                        icon={<UserRound className="h-5 w-5 text-violet-600" strokeWidth={2} />}
-                        iconBg="bg-violet-50"
-                    />
-                </DashboardHeaderContainer>
+                <DashboardHeaderSection
+                    totalApplications={stats.totalApplications}
+                    writing={stats.writing}
+                    interview={stats.interview}
+                />
 
                 <header className="mt-8">
                     <div className="mb-3 flex items-center justify-between">
@@ -139,21 +73,48 @@ export default function MenteeDashboardPage() {
                 </header>
 
                 {view === "kanban" && (
-                    <MenteeDashboardKanban board={board} moveTo={moveTo} icon={PlaceholderLogo} />
+                    <MenteeDashboardKanban
+                        board={board}
+                        moveTo={moveTo}
+                        icon={PlaceholderLogo}
+                        onEdit={handleEditClick}
+                        onDelete={handleDeleteClick}
+                    />
                 )}
 
                 {view === "list" && (
                     <MenteeDashboardListContainer>
-                        <MenteeDashboardList items={listItems} />
+                        <MenteeDashboardList
+                            items={listItems}
+                            onEdit={handleEditClick}
+                            onDelete={handleDeleteClick}
+                        />
                     </MenteeDashboardListContainer>
                 )}
             </main>
 
-            <NewApplicationModal
-                open={openCreate}
-                onClose={() => setOpenCreate(false)}
+            <ApplicationsModals
+                openCreate={openCreate}
+                onCloseCreate={closeCreateModal}
                 onCreate={handleCreate}
+                openEdit={openEdit}
+                onCloseEdit={closeEditModal}
+                onUpdate={handleUpdate}
+                editInitialData={editModalInitialData}
+                openDelete={openDelete}
+                onCloseDelete={closeDeleteModal}
+                onConfirmDelete={handleDelete}
             />
         </DndProvider>
+    );
+};
+
+export default function MenteeDashboardPage() {
+    return (
+        <QueryErrorBoundary>
+            <Suspense fallback={<PageLoading description="지원 현황을 불러오고 있습니다." />}>
+                <MenteeDashboardContent />
+            </Suspense>
+        </QueryErrorBoundary>
     );
 }
