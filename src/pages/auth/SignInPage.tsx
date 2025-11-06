@@ -1,16 +1,9 @@
-import { useCallback } from "react";
 import { Link } from "react-router";
 
 import authBackground from "@/features/authentication/assets/auth-bg.png";
-import kakaoSymbol from "@/features/authentication/assets/kakao-symbol.png";
-
-import { cn } from "@/shared/lib/utils";
+import { KakaoAuthButton } from "@/features/authentication/components/KakaoAuthButton";
 
 export default function SignInPage() {
-    const onKakaoSignIn = useCallback(() => {
-        window.location.href = "https://api.kareer-fit.com/api/auth/login/kakao";
-    }, []);
-
     return (
         <main className="w-full h-screen flex items-center justify-center relative">
             <img
@@ -30,22 +23,7 @@ export default function SignInPage() {
                     <p className="my-2 text-sm">현직자 멘토의 진짜 피드백을 받아보세요</p>
                 </header>
 
-                <button
-                    onClick={onKakaoSignIn}
-                    className={cn(
-                        "bg-[#FEE500] w-full h-12 rounded-md my-4 flex justify-center p-3 hover:cursor-pointer",
-                        "disabled:opacity-80",
-                    )}
-                >
-                    <img
-                        src={kakaoSymbol}
-                        alt="카카오 로그인"
-                        width={20}
-                        height={20}
-                        className="block object-contain"
-                    />
-                    <span className="mx-2 font-semibold">카카오로 3초 만에 시작하기</span>
-                </button>
+                <KakaoAuthButton />
 
                 <footer className="w-full text-center text-sm text-gray-400">
                     <Link to="/">메인 페이지로 돌아가기</Link>
