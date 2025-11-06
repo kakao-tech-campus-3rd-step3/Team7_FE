@@ -57,6 +57,30 @@ export function MentorProfileIntroTab({
         setFormData((prev) => ({ ...prev, profileImageUrl: trimmedUrl || undefined }));
     };
 
+    const handleEducationChange = (
+        updates: Partial<{
+            schoolName: string;
+            major: string;
+            startYear: number;
+            endYear: number;
+        }>,
+    ) => {
+        setFormData((prev) => {
+            const currentEducation = prev.educations[0];
+            return {
+                ...prev,
+                educations: [
+                    {
+                        schoolName: updates.schoolName ?? currentEducation?.schoolName ?? "",
+                        major: updates.major ?? currentEducation?.major ?? "",
+                        startYear: updates.startYear ?? currentEducation?.startYear ?? 0,
+                        endYear: updates.endYear ?? currentEducation?.endYear ?? 0,
+                    },
+                ],
+            };
+        });
+    };
+
     return (
         <div className={cn(className)}>
             <div className="flex items-center gap-4 py-4 border-b">
@@ -115,48 +139,68 @@ export function MentorProfileIntroTab({
 
                 <div>
                     <div className="mb-2 text-sm font-medium">학력</div>
-                    <Input
-                        value={
-                            formData.educations[0]
-                                ? `${formData.educations[0].schoolName} ${formData.educations[0].major} (${formData.educations[0].startYear}-${formData.educations[0].endYear ?? ""})`
-                                : ""
-                        }
-                        onChange={(e) => {
-                            const inputValue = e.target.value;
-
-                            if (!inputValue.trim()) {
-                                setFormData((prev) => ({
-                                    ...prev,
-                                    educations: [],
-                                }));
-                                return;
-                            }
-
-                            const currentEducation = formData.educations[0];
-                            const parts = inputValue.trim().split(" ");
-
-                            if (!parts[0] || parts[0].length === 0) {
-                                setFormData((prev) => ({
-                                    ...prev,
-                                    educations: [],
-                                }));
-                                return;
-                            }
-
-                            setFormData((prev) => ({
-                                ...prev,
-                                educations: [
-                                    {
-                                        schoolName: parts[0] ?? "",
-                                        major: parts[1] ?? "",
-                                        startYear: currentEducation?.startYear ?? 2012,
-                                        endYear: currentEducation?.endYear ?? 2016,
-                                    },
-                                ],
-                            }));
-                        }}
-                        placeholder="예: OO대학교 OO학과 학사 (20XX-20YY)"
-                    />
+                    <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <div className="mb-1.5 text-xs text-muted-foreground">학교명</div>
+                                <Input
+                                    value={formData.educations[0]?.schoolName ?? ""}
+                                    onChange={(e) => {
+                                        handleEducationChange({ schoolName: e.target.value });
+                                    }}
+                                    placeholder="예: OO대학교"
+                                />
+                            </div>
+                            <div>
+                                <div className="mb-1.5 text-xs text-muted-foreground">전공</div>
+                                <Input
+                                    value={formData.educations[0]?.major ?? ""}
+                                    onChange={(e) => {
+                                        handleEducationChange({ major: e.target.value });
+                                    }}
+                                    placeholder="예: OO학과"
+                                />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <div className="mb-1.5 text-xs text-muted-foreground">입학년도</div>
+                                <Input
+                                    type="number"
+                                    value={formData.educations[0]?.startYear || ""}
+                                    onChange={(e) => {
+                                        const startYear = e.target.value
+                                            ? parseInt(e.target.value, 10)
+                                            : 0;
+                                        handleEducationChange({
+                                            startYear: isNaN(startYear) ? 0 : startYear,
+                                        });
+                                    }}
+                                    placeholder="예: 20XX"
+                                    min="1900"
+                                    max="2100"
+                                />
+                            </div>
+                            <div>
+                                <div className="mb-1.5 text-xs text-muted-foreground">졸업년도</div>
+                                <Input
+                                    type="number"
+                                    value={formData.educations[0]?.endYear || ""}
+                                    onChange={(e) => {
+                                        const endYear = e.target.value
+                                            ? parseInt(e.target.value, 10)
+                                            : 0;
+                                        handleEducationChange({
+                                            endYear: isNaN(endYear) ? 0 : endYear,
+                                        });
+                                    }}
+                                    placeholder="예: 20YY"
+                                    min="1900"
+                                    max="2100"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
