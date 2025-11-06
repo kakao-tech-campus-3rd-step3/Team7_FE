@@ -1,3 +1,4 @@
+//문서 비교 페이지
 import { FileUser } from "lucide-react";
 
 import { Tab, TabNavItem } from "@/shared/components/Tab";
