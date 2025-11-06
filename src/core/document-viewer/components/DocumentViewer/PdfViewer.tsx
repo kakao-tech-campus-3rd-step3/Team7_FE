@@ -1,4 +1,4 @@
-import { forwardRef, type CSSProperties } from "react";
+import { forwardRef } from "react";
 
 import { cn } from "@/shared/lib/utils";
 
@@ -46,22 +46,16 @@ export const PdfRenderer = ({ width, height, render }: PdfRendererProps) => {
 };
 
 export interface DocumentViewerProps extends React.ComponentPropsWithoutRef<"article"> {
-    viewerWidth: CSSProperties["width"];
     width?: number;
     height?: number;
     render: (props: PdfViewerRenderProps) => React.ReactNode;
 }
 
 export const PdfViewer = forwardRef<HTMLDivElement, DocumentViewerProps>(
-    ({ viewerWidth, render, width, height, ...props }: DocumentViewerProps, ref) => {
+    ({ render, width, height, className, ...props }: DocumentViewerProps, ref) => {
         return (
             <PdfPageContextProvider>
-                <article
-                    ref={ref}
-                    style={{ width: viewerWidth }}
-                    className={cn("relative", props.className)}
-                    {...props}
-                >
+                <article ref={ref} className={cn("relative", className)} {...props}>
                     <PdfPageController />
                     <PdfRenderer render={render} width={width} height={height} />
                 </article>
