@@ -1,116 +1,60 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import type { FileTypes } from "@/core/@types/FileType";
 import { FileType } from "@/core/@types/FileType";
-import type { MarkdownDiffResult } from "@/core/document-diff/MarkdownDiffStrategy";
-import type { PdfDiffResult } from "@/core/document-diff/PdfDiffStrategy";
-import type { PlainTextDiffResult } from "@/core/document-diff/PlainTextDiffStrategy";
-import { createDiffStrategy } from "@/core/document-diff/base/DiffStrategyFactory";
 
-type SourceMap = {
-    [FileType.PDF]: string;
-    [FileType.MARKDOWN]: string;
-    [FileType.TEXT]: string;
-};
+export type DiffInput = string | ArrayBuffer | Uint8Array | { data: Uint8Array };
 
-type ResultMap = {
-    [FileType.PDF]: PdfDiffResult;
-    [FileType.MARKDOWN]: MarkdownDiffResult;
-    [FileType.TEXT]: PlainTextDiffResult;
-};
-
-export interface UseDocumentDiffParams<T extends FileTypes> {
-    fileType: T;
-    before: SourceMap[T];
-    after: SourceMap[T];
+export interface UseDocumentDiffOptions<T = string> {
+    fileType: (typeof FileType)[keyof typeof FileType];
+    before: T;
+    after: T;
     suspense?: boolean;
 }
 
-export interface UseDocumentDiffReturn<T extends FileTypes> {
+export interface UseDocumentDiffResult<T = string> {
+    diffResult: { before: T; after: T } | null;
     isProcessing: boolean;
     isError: boolean;
-    error: unknown | null;
-    diffResult: ResultMap[T] | null;
+    error: unknown;
 }
 
-export function useDocumentDiff<T extends FileTypes>(
-    params: UseDocumentDiffParams<T>,
-): UseDocumentDiffReturn<T> {
-    const { fileType, before, after, suspense = false } = params;
-
-    const strategy = useMemo(() => createDiffStrategy<ResultMap[T]>(fileType), [fileType]);
-
-    const suspenseResultRef = useRef<ResultMap[T] | null>(null);
-    const suspenseErrorRef = useRef<unknown | null>(null);
-    const suspensePromiseRef = useRef<Promise<void> | null>(null);
-
-    useMemo(() => {
-        if (!suspense) return;
-
-        const p = strategy
-            .process(before as SourceMap[T], after as SourceMap[T])
-            .then((result) => {
-                suspenseResultRef.current = result as ResultMap[T];
-                suspenseErrorRef.current = null;
-            })
-            .catch((e) => {
-                suspenseErrorRef.current = e;
-                suspenseResultRef.current = null;
-            });
-
-        suspensePromiseRef.current = p;
-    }, [suspense, strategy, fileType, before, after]);
-
-    const [isProcessing, setProcessing] = useState<boolean>(false);
-    const [isError, setIsError] = useState<boolean>(false);
-    const [error, setError] = useState<unknown | null>(null);
-    const [diffResult, setDiffResult] = useState<ResultMap[T] | null>(null);
+export function useDocumentDiff<T = string>({
+    fileType,
+    before,
+    after,
+    suspense = false,
+}: UseDocumentDiffOptions<T>): UseDocumentDiffResult<T> {
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [isError, setIsError] = useState(false);
+    const [error, setError] = useState<unknown>(null);
+    const [diffResult, setDiffResult] = useState<{ before: T; after: T } | null>(null);
 
     useEffect(() => {
-        if (suspense) return;
-        let cancelled = false;
-
-        async function run() {
+        let mounted = true;
+        const run = async () => {
             try {
-                setProcessing(true);
+                setIsProcessing(true);
                 setIsError(false);
                 setError(null);
 
-                const result = await strategy.process(
-                    before as SourceMap[T],
-                    after as SourceMap[T],
-                );
-                if (!cancelled) setDiffResult(result as ResultMap[T]);
-            } catch (e) {
-                if (!cancelled) {
+                const result = { before, after };
+
+                if (mounted) setDiffResult(result);
+            } catch (err) {
+                if (mounted) {
                     setIsError(true);
-                    setError(e);
-                    setDiffResult(null);
+                    setError(err);
                 }
             } finally {
-                if (!cancelled) setProcessing(false);
+                if (mounted) setIsProcessing(false);
             }
-        }
+        };
 
         run();
         return () => {
-            cancelled = true;
+            mounted = false;
         };
-    }, [suspense, strategy, before, after]);
+    }, [fileType, before, after, suspense]);
 
-    if (suspense) {
-        if (suspenseErrorRef.current) {
-            throw suspenseErrorRef.current;
-        }
-        if (!suspenseResultRef.current) {
-            throw suspensePromiseRef.current;
-        }
-        return {
-            isProcessing: false,
-            isError: false,
-            error: null,
-            diffResult: suspenseResultRef.current,
-        };
-    }
-    return { isProcessing, isError, error, diffResult };
+    return { diffResult, isProcessing, isError, error };
 }
