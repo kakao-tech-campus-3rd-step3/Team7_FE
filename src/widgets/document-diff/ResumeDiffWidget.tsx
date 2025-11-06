@@ -1,3 +1,4 @@
+//이력서
 import { VersionedPdfDiffWidget, type VersionedDiffWidgetProps } from "./VersionedDiffWidget";
 
 export interface ResumeDiffWidgetProps
