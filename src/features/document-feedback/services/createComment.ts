@@ -13,6 +13,7 @@ export interface CreateCommentRequest {
         endX: number;
         endY: number;
     };
+    page: number;
 }
 
 export interface CreateCommentResponse {}
@@ -59,41 +60,17 @@ export const useCreateComment = (documentId: number) => {
                     id: documentId,
                     title: "임시 문서",
                 },
+                page: newCommentData.page,
             };
 
             queryClient.setQueryData(
                 COMMENT_QUERY_KEYS.COMMENTS_BY_DOCUMENT_ID(documentId),
-                (previousData: BasePaginatedResponse<GetCommentsResponse[]>["data"]) => {
+                (previousData: GetCommentsResponse[]) => {
                     if (!previousData) {
-                        return {
-                            totalElements: 1,
-                            totalPages: 1,
-                            pageable: {
-                                paged: true,
-                                pageNumber: 0,
-                                pageSize: 20,
-                                offset: 0,
-                                sort: { sorted: false, empty: true, unsorted: true },
-                                unpaged: false,
-                            },
-                            size: 20,
-                            content: [optimisticComment],
-                            number: 0,
-                            sort: { sorted: false, empty: true, unsorted: true },
-                            numberOfElements: 1,
-                            first: true,
-                            last: true,
-                            empty: false,
-                        };
+                        return [optimisticComment];
                     }
 
-                    return {
-                        ...previousData,
-                        content: [...(previousData.content || []), optimisticComment],
-                        totalElements: (previousData.totalElements || 0) + 1,
-                        numberOfElements: (previousData.numberOfElements || 0) + 1,
-                        empty: false,
-                    };
+                    return [...previousData, optimisticComment];
                 },
             );
 

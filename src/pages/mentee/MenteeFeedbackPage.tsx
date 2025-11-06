@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Fragment } from "react/jsx-runtime";
 
 import { FileUser } from "lucide-react";
 
@@ -11,11 +10,12 @@ import { TabNavBar } from "@/shared/components/Tab/TabNavBar";
 import { PortfolioFeedbackWidget } from "@/widgets/document-feedback/PortfolioFeedbackWidget";
 
 import { EventBusProvider } from "@/core/document-commenter/contexts/EventBusContext";
+import { PanEventPlugin } from "@/core/document-commenter/plugins/PanEventPlugin";
 import { SelectionEventPlugin } from "@/core/document-commenter/plugins/SelectionEventPlugin";
 
 export default function MenteeFeedbackPage() {
     return (
-        <Fragment>
+        <>
             <Tab defaultActiveTab="이력서">
                 <TabNavBar>
                     <TabNavItem
@@ -40,7 +40,10 @@ export default function MenteeFeedbackPage() {
                 </TabItem>
                 <TabItem menu="포트폴리오">
                     <EventBusProvider
-                        eventBusPlugins={useMemo(() => [new SelectionEventPlugin()], [])}
+                        eventBusPlugins={useMemo(
+                            () => [new SelectionEventPlugin(), new PanEventPlugin()],
+                            [],
+                        )}
                     >
                         <PortfolioFeedbackWidget />
                     </EventBusProvider>
@@ -49,6 +52,6 @@ export default function MenteeFeedbackPage() {
                     <div>자기소개서 피드백 위젯</div>
                 </TabItem>
             </Tab>
-        </Fragment>
+        </>
     );
 }

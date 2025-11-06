@@ -22,10 +22,11 @@ export interface GetCommentsResponse {
         id: number;
         title: string;
     };
+    page: number;
 }
 
 export async function getComments(documentId: number) {
-    const { data: response } = await api.get<BasePaginatedResponse<Array<GetCommentsResponse>>>(
+    const { data: response } = await api.get<BaseResponse<Array<GetCommentsResponse>>>(
         `/documents/${documentId}/comments/list`,
     );
 
@@ -36,5 +37,13 @@ export const useGetComments = (documentId: number) => {
     return useSuspenseQuery({
         queryKey: COMMENT_QUERY_KEYS.COMMENTS_BY_DOCUMENT_ID(documentId),
         queryFn: () => getComments(documentId),
+    });
+};
+
+export const useGetCommentsByPage = (documentId: number, page: number) => {
+    return useSuspenseQuery({
+        queryKey: COMMENT_QUERY_KEYS.COMMENTS_BY_DOCUMENT_ID(documentId),
+        queryFn: () => getComments(documentId),
+        select: (comments) => comments.filter((comment) => comment.page === page),
     });
 };
