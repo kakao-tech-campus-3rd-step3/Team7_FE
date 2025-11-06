@@ -75,7 +75,7 @@ export async function getMentors(query: SearchQuery): Promise<GetMentorsResponse
     const pageSize = query.size ?? DEFAULT_PAGE_SIZE;
     params.size = pageSize;
 
-    const { data: response } = await api.get<BaseResponse<GetMentorsResponseBody>>(`/api/mentors`, {
+    const { data: response } = await api.get<BaseResponse<GetMentorsResponseBody>>(`/mentors`, {
         params,
     });
 

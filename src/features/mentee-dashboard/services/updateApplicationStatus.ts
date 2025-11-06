@@ -17,7 +17,7 @@ export async function updateApplicationStatus(
     body: UpdateApplicationStatusRequestBody,
 ): Promise<UpdateApplicationStatusResponse> {
     const { data: response } = await api.patch<BaseResponse<UpdateApplicationStatusResponse>>(
-        `/api/applications/${applicationId}/status`,
+        `/applications/${applicationId}/status`,
         body,
         {
             headers: {

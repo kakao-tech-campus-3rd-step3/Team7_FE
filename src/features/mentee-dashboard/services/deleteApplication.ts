@@ -9,7 +9,7 @@ export type DeleteApplicationResponse = string;
 
 export async function deleteApplication(applicationId: number): Promise<DeleteApplicationResponse> {
     const { data: response } = await api.delete<BaseResponse<DeleteApplicationResponse>>(
-        `/api/applications/${applicationId}`,
+        `/applications/${applicationId}`,
     );
 
     return response.data;

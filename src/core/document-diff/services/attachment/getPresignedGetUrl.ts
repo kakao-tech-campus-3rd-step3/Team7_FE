@@ -13,7 +13,7 @@ export interface GetPresignedGetUrlResponseBody {
 }
 
 export async function getPresignedGetUrl(applicationId: number, attachmentFileId: number) {
-    const url = `/api/applications/${applicationId}/attachment-files/${attachmentFileId}`;
+    const url = `/applications/${applicationId}/attachment-files/${attachmentFileId}`;
     return api.get<GetPresignedGetUrlResponseBody>(url);
 }
 

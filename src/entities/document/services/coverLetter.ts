@@ -39,7 +39,7 @@ export async function getCoverLetterList(applicationId: number, page = 0, size =
             totalPages: number;
             last: boolean;
         };
-    }>(`/api/applications/${applicationId}/cover-letters`, {
+    }>(`/applications/${applicationId}/cover-letters`, {
         params: { pageable: { page, size } },
     });
     return res.data;
@@ -53,7 +53,7 @@ export const useCoverLetterList = (applicationId: number, page = 0, size = 30) =
 // 상세
 export async function getCoverLetterDetail(applicationId: number, documentId: number) {
     const { data: res } = await api.get<{ data: CoverLetterDetailResponseBody }>(
-        `/api/applications/${applicationId}/cover-letters/${documentId}`,
+        `/applications/${applicationId}/cover-letters/${documentId}`,
     );
     return res.data;
 }
@@ -64,7 +64,7 @@ export async function registerCoverLetterByApplicationId(
     body: CoverLetterRegisterRequestBody,
 ) {
     const { data: res } = await api.post<{ data: unknown }>(
-        `/api/applications/${applicationId}/cover-letters`,
+        `/applications/${applicationId}/cover-letters`,
         body,
     );
     return res.data;

@@ -36,7 +36,7 @@ export async function getAttachmentFileMetaList(
     page = 0,
     size = 10,
 ) {
-    const url = `/api/applications/${applicationId}/attachment-files/metadata/list?attachment-file-type=${type}&page=${page}&size=${size}`;
+    const url = `/applications/${applicationId}/attachment-files/metadata/list?attachment-file-type=${type}&page=${page}&size=${size}`;
     return api.get<GetAttachmentFileMetaListResponseBody>(url);
 }
 

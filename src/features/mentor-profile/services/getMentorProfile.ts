@@ -28,7 +28,7 @@ export interface GetMentorProfileResponseBody {
 
 export async function getMentorProfile(mentorId: number): Promise<MentorProfile> {
     const { data: apiResponse } = await api.get<BaseResponse<GetMentorProfileResponseBody>>(
-        `/api/mentors/${mentorId}/profile`,
+        `/mentors/${mentorId}/profile`,
     );
 
     const mentorProfile: MentorProfile = {

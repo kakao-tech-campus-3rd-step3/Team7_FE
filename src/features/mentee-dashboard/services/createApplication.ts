@@ -30,7 +30,7 @@ export async function createApplication(
     };
 
     const { data: response } = await api.post<BaseResponse<CreateApplicationResponse>>(
-        `/api/applications/register`,
+        `/applications/register`,
         formattedBody,
     );
 

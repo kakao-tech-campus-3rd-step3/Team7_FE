@@ -21,7 +21,7 @@ export interface GetCoverLettersByApplicationIdResponseBody {
 }
 
 export async function getCoverLettersByApplicationId(applicationId: number, page = 0, size = 10) {
-    const url = `/api/applications/${applicationId}/cover-letters?page=${page}&size=${size}`;
+    const url = `/applications/${applicationId}/cover-letters?page=${page}&size=${size}`;
     return api.get<GetCoverLettersByApplicationIdResponseBody>(url);
 }
 

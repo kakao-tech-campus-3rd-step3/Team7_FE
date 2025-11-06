@@ -23,7 +23,7 @@ export async function generatePutPresignedUrl(
     attachmentFileType: "RESUME" | "PORTFOLIO",
     body: GeneratePutPresignedUrlRequestBody,
 ) {
-    const url = `/api/applications/${applicationId}/attachment-files/file-upload?attachment-file-type=${attachmentFileType}`;
+    const url = `/applications/${applicationId}/attachment-files/file-upload?attachment-file-type=${attachmentFileType}`;
     return api.post<GeneratePutPresignedUrlResponseBody, GeneratePutPresignedUrlRequestBody>(
         url,
         body,

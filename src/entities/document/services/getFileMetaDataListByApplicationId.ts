@@ -29,7 +29,7 @@ export async function getFileMetaDataListByApplicationId(
     size = 30,
 ) {
     const { data: res } = await api.get<{ data: PageFileInfoResponseBody }>(
-        `/api/applications/${applicationId}/attachment-files/metadata/list`,
+        `/applications/${applicationId}/attachment-files/metadata/list`,
         {
             params: { "attachment-file-type": attachmentFileType, pageable: { page, size } },
         },
