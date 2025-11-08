@@ -14,7 +14,7 @@ export const NavTop = () => {
 
     return (
         <nav className="w-full shadow-xs" style={{ height: NAV_TOP_HEIGHT }}>
-            <ul className="w-full max-w-[1200px] mx-auto h-full px-4 flex items-center justify-between">
+            <ul className="w-full max-w-[1200px] mx-auto h-full px-4 flex items-center justify-between border-b">
                 <li>
                     <img src={logo} alt="CareerFit 커리어핏" />
                 </li>
