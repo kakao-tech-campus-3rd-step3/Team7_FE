@@ -9,5 +9,6 @@
     "explorer.fileNesting.patterns": {
         "index.ts": "*",
         "index.tsx": "*"
-    }
+    },
+    "cSpell.words": ["expertises"]
 }
