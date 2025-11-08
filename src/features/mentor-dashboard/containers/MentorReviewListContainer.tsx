@@ -1,4 +1,4 @@
-import { MentorReviewItem } from "@/features/mentor-dashboard/components/DashboardReview/MentorReviewItem";
+import { MentorReviewItem } from "@/features/mentor-dashboard/components/MentorReviewItem";
 import { useGetMentorDashboard } from "@/features/mentor-dashboard/services/getMentorDashboard";
 
 export const MentorReviewListContainer = () => {
@@ -7,7 +7,7 @@ export const MentorReviewListContainer = () => {
     if (data.length === 0) {
         return (
             <article className="w-80 h-80 mx-auto text-center">
-                <div>아직 들어온 리뷰 요청이 없어요</div>
+                <div>아직 들어온 리뷰 요청이 없어요</div>햣
             </article>
         );
     }
