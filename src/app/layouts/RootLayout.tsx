@@ -1,12 +1,13 @@
 import { Outlet } from "react-router";
 import { Fragment } from "react/jsx-runtime";
 
-import { NavAside, type NavAsideProps } from "@/app/ui/NavAside";
 import { NavTop } from "@/app/ui/NavTop";
 
-export interface RootLayoutProps extends NavAsideProps {}
+export interface RootLayoutProps {
+    navAside: React.ReactNode;
+}
 
-export const RootLayout = ({ navAsideMenus }: RootLayoutProps) => {
+export const RootLayout = ({ navAside }: RootLayoutProps) => {
     return (
         <Fragment>
             <header>
@@ -14,7 +15,7 @@ export const RootLayout = ({ navAsideMenus }: RootLayoutProps) => {
             </header>
 
             <main className="flex" style={{ height: "calc(100vh - 64px)" }}>
-                <NavAside navAsideMenus={navAsideMenus} />
+                {navAside}
                 <section className="w-full bg-[#F9FAFB]">
                     <Outlet />
                 </section>

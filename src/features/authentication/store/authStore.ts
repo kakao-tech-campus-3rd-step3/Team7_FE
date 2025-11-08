@@ -2,15 +2,22 @@ import { create } from "zustand";
 
 import { persist, createJSONStorage } from "zustand/middleware";
 
+export const Role = {
+    MENTOR: "ROLE_MENTOR",
+    MENTEE: "ROLE_MENTEE",
+} as const;
+
+export type RoleType = (typeof Role)[keyof typeof Role];
+
 interface AuthState {
-    role: "ROLE_MENTOR" | "ROLE_MENTEE" | null;
+    role: RoleType | null;
     accessToken: string | null;
     refreshToken: string | null;
     isAuthenticated: boolean;
 }
 
 interface AuthActions {
-    setRole: (role: "ROLE_MENTOR" | "ROLE_MENTEE") => void;
+    setRole: (role: RoleType) => void;
     setTokens: (accessToken: string, refreshToken: string) => void;
     clearTokens: () => void;
     getAccessToken: () => string | null;
@@ -27,7 +34,7 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: false,
             role: null,
 
-            setRole: (role: "ROLE_MENTOR" | "ROLE_MENTEE") => {
+            setRole: (role: RoleType) => {
                 set({ role });
             },
 
