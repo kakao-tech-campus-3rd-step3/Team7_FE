@@ -10,6 +10,7 @@ export const Role = {
 export type RoleType = (typeof Role)[keyof typeof Role];
 
 interface AuthState {
+    id: number | null;
     role: RoleType | null;
     accessToken: string | null;
     refreshToken: string | null;
@@ -17,6 +18,7 @@ interface AuthState {
 }
 
 interface AuthActions {
+    setId: (id: number) => void;
     setRole: (role: RoleType) => void;
     setTokens: (accessToken: string, refreshToken: string) => void;
     clearTokens: () => void;
@@ -29,10 +31,15 @@ type AuthStore = AuthState & AuthActions;
 export const useAuthStore = create<AuthStore>()(
     persist(
         (set, get) => ({
+            id: null,
             accessToken: null,
             refreshToken: null,
             isAuthenticated: false,
             role: null,
+
+            setId: (id: number) => {
+                set({ id });
+            },
 
             setRole: (role: RoleType) => {
                 set({ role });
@@ -70,6 +77,7 @@ export const useAuthStore = create<AuthStore>()(
                 refreshToken: state.refreshToken,
                 isAuthenticated: state.isAuthenticated,
                 role: state.role,
+                id: state.id,
             }),
         },
     ),
