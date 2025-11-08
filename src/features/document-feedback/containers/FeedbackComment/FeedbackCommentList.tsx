@@ -15,7 +15,6 @@ export const FeedbackCommentList = () => {
                         id={comment.id}
                         author={comment.writerInfo.name}
                         content={comment.content}
-                        createdAt={"2023-10-01T12:00:00Z"}
                     />
                 );
             })}
