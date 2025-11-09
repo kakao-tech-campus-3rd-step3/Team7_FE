@@ -14,7 +14,7 @@ export const RootLayout = ({ navAside }: RootLayoutProps) => {
                 <NavTop />
             </header>
 
-            <main className="flex" style={{ height: "calc(100vh - 64px)" }}>
+            <main className="flex" style={{ height: "100vh" }}>
                 {navAside}
                 <section className="w-full bg-white">
                     <Outlet />
