@@ -52,6 +52,7 @@ export const MenteeDashboardListItem = ({
                         </p>
                     </div>
                 </button>
+
                 {(onEdit || onDelete) && (
                     <div className="flex items-center gap-1">
                         {onEdit && (

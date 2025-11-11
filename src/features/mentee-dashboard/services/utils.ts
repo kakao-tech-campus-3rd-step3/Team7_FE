@@ -37,7 +37,6 @@ export function mapApplicationItemToApplyCard(item: ApplicationItem): ApplyCard 
         position: item.applyPosition,
         dday,
         deadline: item.deadline,
-        icon: undefined,
     };
 }
 
@@ -54,6 +53,5 @@ export function mapApplicationDetailToApplyCard(detail: GetApplicationByIdRespon
         employmentType: detail.employmentType,
         careerRequirement: detail.careerRequirement,
         url: detail.url,
-        icon: undefined,
     };
 }

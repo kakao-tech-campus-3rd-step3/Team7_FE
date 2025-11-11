@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { ChevronRight, Pencil, Trash2 } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 import { Badge } from "@/shared/ui/badge";
@@ -12,6 +12,7 @@ export interface DashboardApplyCardProps extends React.ComponentProps<"div"> {
 
     onEdit?: () => void;
     onDelete?: () => void;
+    onItemClick?: () => void;
 }
 
 export const DashboardApplyCard = ({
@@ -21,6 +22,7 @@ export const DashboardApplyCard = ({
 
     onEdit,
     onDelete,
+    onItemClick,
     className,
     ...props
 }: DashboardApplyCardProps) => {
@@ -69,6 +71,20 @@ export const DashboardApplyCard = ({
                                     title="삭제"
                                 >
                                     <Trash2 size={14} />
+                                </Button>
+                            )}
+                            {onItemClick && (
+                                <Button
+                                    className="aspect-square"
+                                    variant="ghost"
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onItemClick();
+                                    }}
+                                    title="상세 보기"
+                                >
+                                    <ChevronRight size={14} />
                                 </Button>
                             )}
                         </div>
