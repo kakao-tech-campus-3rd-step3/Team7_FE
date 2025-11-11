@@ -42,7 +42,6 @@ export function MenteeDashboardKanban({
                                 id={card.id}
                                 from={sectionKey}
                                 origin={cardIndex}
-                                icon={card.icon ?? icon}
                                 company={card.company}
                                 position={card.position}
                                 dday={card.dday}

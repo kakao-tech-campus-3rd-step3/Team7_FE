@@ -1,4 +1,4 @@
-import { useCallback, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 
 import kakaoSymbol from "@/features/authentication/assets/kakao-symbol.png";
 
@@ -15,9 +15,9 @@ export const KakaoAuthButton = ({
     width = "100%",
     height = "3rem",
 }: KakaoAuthButtonProps) => {
-    const onKakaoSignIn = useCallback(() => {
+    const onKakaoSignIn = () => {
         window.location.href = "https://api.kareer-fit.com/api/auth/login/kakao";
-    }, []);
+    };
 
     return (
         <button

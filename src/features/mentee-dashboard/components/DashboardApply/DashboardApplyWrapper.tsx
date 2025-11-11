@@ -22,8 +22,7 @@ export const DashboardApplyWrapper = ({
     isOver,
     canDrop,
 }: DashboardApplyWrapperProps) => {
-    const baseState =
-        "rounded-xl px-5 py-6 min-h-[420px] sm:min-h-[480px] lg:min-h-[560px] transition outline-offset-0";
+    const baseState = "rounded-xl px-5 py-6 min-h-[460px]";
 
     const dropState = {
         isAccepted: isOver && canDrop,
@@ -46,7 +45,7 @@ export const DashboardApplyWrapper = ({
                     "opacity-70": dropState.isBlocked,
                 })}
             >
-                <div className="flex flex-col gap-4">{children}</div>
+                {children}
             </div>
         </section>
     );

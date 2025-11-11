@@ -1,3 +1,3 @@
 export const MENTOR_DASHBOARD_QUERY_KEYS = {
-    ALL: () => ["MENTOR_DASHBOARD"] as const,
+    BY_ID: (mentorId: number) => ["MENTOR_DASHBOARD", mentorId] as const,
 };
