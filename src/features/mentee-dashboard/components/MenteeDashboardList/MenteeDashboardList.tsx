@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router";
+
 import {
     MenteeDashboardListItem,
     type MenteeDashboardListItemProps,
@@ -17,10 +19,12 @@ export interface MenteeDashboardListProps {
 
 export function MenteeDashboardList({
     items,
-    onItemClick,
+
     onEdit,
     onDelete,
 }: MenteeDashboardListProps) {
+    const navigate = useNavigate();
+
     if (!items || items.length === 0) {
         return (
             <li className="p-6 text-center text-sm text-muted-foreground">
@@ -38,7 +42,9 @@ export function MenteeDashboardList({
                     company={application.company}
                     position={application.position}
                     dday={application.dday}
-                    onItemClick={onItemClick ? () => onItemClick(application) : undefined}
+                    onItemClick={() => {
+                        navigate(`/mentee/applications/${application.id}`);
+                    }}
                     onEdit={onEdit ? () => onEdit(application) : undefined}
                     onDelete={onDelete ? () => onDelete(application) : undefined}
                 />
