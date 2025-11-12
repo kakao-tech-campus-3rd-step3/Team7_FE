@@ -7,9 +7,9 @@ import type { JwtSchema } from "@/features/authentication/schema/JwtSchema";
 import { useAuthStore } from "@/features/authentication/store/authStore";
 
 export default function RedirectPage() {
-    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const { setTokens, setRole } = useAuthStore();
+    const navigate = useNavigate();
+    const { setTokens, setRole, setId } = useAuthStore();
 
     useEffect(() => {
         const isNewUser = searchParams.get("isNewUser");
@@ -24,6 +24,7 @@ export default function RedirectPage() {
                 const decoded: JwtSchema = jwtDecode(accessToken);
                 const role = decoded.roles[0];
 
+                setId(Number(decoded.sub));
                 setRole(role);
                 setTokens(accessToken, refreshToken);
 
@@ -36,7 +37,7 @@ export default function RedirectPage() {
                 navigate("/auth/login");
             }
         }
-    }, [navigate, searchParams, setRole, setTokens]);
+    }, [navigate, searchParams, setId, setRole, setTokens]);
 
     return (
         <main>

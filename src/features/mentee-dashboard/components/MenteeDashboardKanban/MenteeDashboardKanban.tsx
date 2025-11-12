@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router";
+
 import { sectionState } from "../../models/constants";
 import { SECTION_ORDER, type Section, type ApplyCard, type DragItem } from "../../models/types";
 import { DashboardApplyContainer, DndApplyCard, DndApplySection } from "../DashboardApply";
@@ -14,11 +16,13 @@ export interface MenteeDashboardKanbanProps {
 export function MenteeDashboardKanban({
     board,
     moveTo,
-    icon,
+
     onEdit,
     onDelete,
     className,
 }: MenteeDashboardKanbanProps) {
+    const navigate = useNavigate();
+
     return (
         <DashboardApplyContainer className={className}>
             {SECTION_ORDER.map((sectionKey, sectionIndex) => {
@@ -42,7 +46,6 @@ export function MenteeDashboardKanban({
                                 id={card.id}
                                 from={sectionKey}
                                 origin={cardIndex}
-                                icon={card.icon ?? icon}
                                 company={card.company}
                                 position={card.position}
                                 dday={card.dday}
@@ -50,6 +53,9 @@ export function MenteeDashboardKanban({
                                 onDelete={
                                     onDelete ? () => onDelete(card.id, sectionKey) : undefined
                                 }
+                                onItemClick={() => {
+                                    navigate(`/mentee/applications/${card.id}`);
+                                }}
                             />
                         ))}
                     </DndApplySection>

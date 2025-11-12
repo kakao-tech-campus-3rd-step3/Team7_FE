@@ -1,11 +1,12 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from "react-router";
 import { Fragment } from "react/jsx-runtime";
 
-import { navAsideMenusMentee, navAsideMenusMentor } from "@/app/config/nav";
 import { GlobalLayout } from "@/app/layouts/GlobalLayout";
 import { NavTopLayout } from "@/app/layouts/NavTopLayout";
 import { RegisterLayout } from "@/app/layouts/RegisterLayout";
 import { RootLayout } from "@/app/layouts/RootLayout";
+
+import { NavAsideMenusByRole } from "@/features/authentication/components/NavAsideMenusByRole";
 
 import HomePage from "@/pages/HomePage";
 import RedirectPage from "@/pages/auth/RedirectPage";
@@ -24,7 +25,7 @@ import NewCoverLetterPage from "@/pages/mentee/applications/NewCoverLetterPage";
 import NewPortfolioPage from "@/pages/mentee/applications/NewPortfolioPage";
 import NewResumePage from "@/pages/mentee/applications/NewResumePage";
 import MentorDashboardPage from "@/pages/mentor/MentorDashboardPage";
-import MentorSettingsPage from "@/pages/mentor/MentorSettingsPage";
+import MentorProfileSettingsPage from "@/pages/mentor/MentorSettingsPage";
 
 const routes = createRoutesFromElements(
     <Fragment>
@@ -44,12 +45,12 @@ const routes = createRoutesFromElements(
                 </Route>
             </Route>
 
-            <Route path="/mentor" element={<RootLayout navAsideMenus={navAsideMenusMentor} />}>
+            <Route path="/mentor" element={<RootLayout navAside={<NavAsideMenusByRole />} />}>
                 <Route path="dashboard" element={<MentorDashboardPage />} />
-                <Route path="settings" element={<MentorSettingsPage />} />
+                <Route path="settings" element={<MentorProfileSettingsPage />} />
             </Route>
 
-            <Route path="/mentee" element={<RootLayout navAsideMenus={navAsideMenusMentee} />}>
+            <Route path="/mentee" element={<RootLayout navAside={<NavAsideMenusByRole />} />}>
                 <Route path="dashboard" element={<MenteeDashboardPage />} />
                 <Route path="search" element={<MenteeSearchMentorPage />} />
                 <Route path="mentors/:id" element={<MenteeDetailMentorPage />} />
@@ -60,10 +61,11 @@ const routes = createRoutesFromElements(
                 <Route path="portfolios/new" element={<NewPortfolioPage />} />
 
                 <Route path="applications/:applicationId">
-                    <Route index></Route>
+                    <Route index element={<ApplicationDetailPage />} />
                     <Route path="resumes" element={<ApplicationDetailPage />} />
                     <Route path="coverletters" element={<ApplicationDetailPage />} />
                     <Route path="portfolios" element={<ApplicationDetailPage />} />
+
                     <Route path="resumes/new" element={<NewResumePage />} />
                     <Route path="coverletters/new" element={<NewCoverLetterPage />} />
                     <Route path="portfolios/new" element={<NewPortfolioPage />} />

@@ -13,7 +13,7 @@ export const NavTop = () => {
     const { isAuthenticated, clearTokens } = useAuthStore();
 
     return (
-        <nav className="w-full shadow-xs" style={{ height: NAV_TOP_HEIGHT }}>
+        <nav className="w-full shadow-xs border-b" style={{ height: NAV_TOP_HEIGHT }}>
             <ul className="w-full max-w-[1200px] mx-auto h-full px-4 flex items-center justify-between">
                 <li>
                     <img src={logo} alt="CareerFit 커리어핏" />

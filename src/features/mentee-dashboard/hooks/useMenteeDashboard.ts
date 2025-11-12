@@ -109,7 +109,7 @@ export function useMenteeDashboard() {
         () =>
             SECTION_ORDER.flatMap((sectionKey) => board[sectionKey]).map((card) => ({
                 id: card.id,
-                icon: card.icon,
+
                 company: card.company,
                 position: card.position,
                 dday: card.dday,

@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import { NewApplicationButton } from "@/features/applications";
 import {
     useMenteeDashboard,
     MenteeDashboardListContainer,
@@ -13,6 +12,8 @@ import {
     DashboardViewToggle,
 } from "@/features/mentee-dashboard";
 
+import { HeaderWithTitle } from "@/shared/components/Layout/Header";
+import { Button } from "@/shared/ui/button";
 import { PageLoading } from "@/shared/ui/page-loading";
 import { QueryErrorBoundary } from "@/shared/ui/query-error-boundary";
 
@@ -45,17 +46,11 @@ const MenteeDashboardContent = () => {
     return (
         <DndProvider backend={HTML5Backend}>
             <main className="px-6 py-6">
-                <header className="flex items-start justify-between">
-                    <div>
-                        <h1 className="text-xl font-semibold text-foreground">
-                            취업 트래커 대시보드
-                        </h1>
-                        <p className="mt-1 text-sm leading-[22px] text-[#485563] font-normal">
-                            모든 취업 활동을 한눈에 관리하세요
-                        </p>
-                    </div>
-                    <NewApplicationButton onClick={openCreateModal} />
-                </header>
+                <HeaderWithTitle
+                    title="취업 트래커 대시보드"
+                    subtitle="모든 취업 활동을 한눈에 관리하세요"
+                />
+                <Button onClick={openCreateModal}>신규 지원 추가</Button>
 
                 <DashboardHeaderSection
                     totalApplications={stats.totalApplications}

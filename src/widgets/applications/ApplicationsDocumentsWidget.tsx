@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { NavLink, useLocation, useParams, generatePath } from "react-router-dom";
+import { NavLink, useLocation, useParams, generatePath, useNavigate } from "react-router-dom";
 
 import { FileText, BookText, FolderClosed } from "lucide-react";
 
@@ -28,6 +28,8 @@ export const ApplicationsDocumentsWidget = () => {
     const { applicationId } = useParams();
     const { pathname } = useLocation();
     const activeMenu = getActiveMenuByPath(pathname);
+
+    const navigate = useNavigate();
 
     const [resumeVersions, setResumeVersions] = useState<Version[]>([
         { id: "1", title: "v1.2", description: "최종본", date: "2024.01.20" },
@@ -77,7 +79,9 @@ export const ApplicationsDocumentsWidget = () => {
                         <DocumentList
                             title="이력서"
                             versions={resumeVersions}
-                            onCreateVersion={() => alert("이력서 새 버전")}
+                            onCreateVersion={() =>
+                                navigate(`/mentee/applications/${applicationId}/resumes/new`)
+                            }
                             onViewVersion={() => alert("이력서 보기")}
                             onDeleteVersion={makeDeleteHandler(setResumeVersions)}
                         />
@@ -87,7 +91,9 @@ export const ApplicationsDocumentsWidget = () => {
                         <DocumentList
                             title="자기소개서"
                             versions={coverVersions}
-                            onCreateVersion={() => alert("자기소개서 새 버전")}
+                            onCreateVersion={() =>
+                                navigate(`/mentee/applications/${applicationId}/coverletters/new`)
+                            }
                             onViewVersion={() => alert(`자기소개서 보기`)}
                             onDeleteVersion={makeDeleteHandler(setCoverVersions)}
                         />
@@ -97,7 +103,9 @@ export const ApplicationsDocumentsWidget = () => {
                         <DocumentList
                             title="포트폴리오"
                             versions={portfolioVersions}
-                            onCreateVersion={() => alert("포트폴리오 새 버전")}
+                            onCreateVersion={() =>
+                                navigate(`/mentee/applications/${applicationId}/portfolios/new`)
+                            }
                             onViewVersion={() => alert(`포트폴리오 보기`)}
                             onDeleteVersion={makeDeleteHandler(setPortfolioVersions)}
                         />
