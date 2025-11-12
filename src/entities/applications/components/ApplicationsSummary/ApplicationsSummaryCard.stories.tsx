@@ -21,10 +21,9 @@ const meta: Meta<typeof ApplicationsSummaryCard> = {
         ),
     ],
     argTypes: {
-        companyLogo: { control: "text" },
         companyName: { control: "text" },
         applyPosition: { control: "text" },
-        appliedDate: { control: "text" },
+
         location: { control: "text" },
         jobType: { control: "text" },
         field: { control: "text" },
