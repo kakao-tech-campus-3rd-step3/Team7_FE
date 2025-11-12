@@ -31,7 +31,11 @@ export async function getFileMetaDataListByApplicationId(
     const { data: res } = await api.get<{ data: PageFileInfoResponseBody }>(
         `/applications/${applicationId}/attachment-files/metadata/list`,
         {
-            params: { "attachment-file-type": attachmentFileType, pageable: { page, size } },
+            params: {
+                "attachment-file-type": attachmentFileType,
+                page,
+                size,
+            },
         },
     );
     return res.data;
@@ -47,9 +51,11 @@ export const useFileMetaDataListByApplicationId = (
     attachmentFileType: "RESUME" | "PORTFOLIO",
     page = 0,
     size = 30,
+    enabled = true,
 ) =>
     useQuery({
         queryKey: DocumentQueryKeys.FILES_BY_APP(applicationId, attachmentFileType, page, size),
         queryFn: () =>
             getFileMetaDataListByApplicationId(applicationId, attachmentFileType, page, size),
+        enabled: enabled && applicationId > 0,
     });
