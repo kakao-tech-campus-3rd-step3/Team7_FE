@@ -1,14 +1,19 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { NavLink, useLocation, useParams, generatePath, useNavigate } from "react-router-dom";
 
 import { FileText, BookText, FolderClosed } from "lucide-react";
 
 import { DocumentList } from "@/entities/document/components/DocumentList";
+import { useCoverLetterList } from "@/entities/document/services/coverLetter";
+import { useDeleteAttachmentFile } from "@/entities/document/services/deleteAttachmentFile";
+import { useDeleteCoverLetter } from "@/entities/document/services/deleteCoverLetter";
+import { useFileMetaDataListByApplicationId } from "@/entities/document/services/getFileMetaDataListByApplicationId";
 
 import { Tab } from "@/shared/components/Tab/Tab";
 import { TabItem } from "@/shared/components/Tab/TabItem";
 import { TabNavBar } from "@/shared/components/Tab/TabNavBar";
 import { TabNavItem } from "@/shared/components/Tab/TabNavItem";
+import { toast } from "@/shared/lib/toast";
 
 type Version = { id: string; title: string; description: string; date: string };
 
@@ -30,22 +35,58 @@ export const ApplicationsDocumentsWidget = () => {
     const activeMenu = getActiveMenuByPath(pathname);
 
     const navigate = useNavigate();
+    const appId = applicationId ? Number(applicationId) : 0;
 
-    const [resumeVersions, setResumeVersions] = useState<Version[]>([
-        { id: "1", title: "v1.2", description: "최종본", date: "2024.01.20" },
-        { id: "2", title: "v1.1", description: "1차 피드백 반영", date: "2024.01.18" },
-        { id: "3", title: "v1.0", description: "초안", date: "2024.01.15" },
-    ]);
-    const [coverVersions, setCoverVersions] = useState<Version[]>([
-        { id: "1", title: "최종본", description: "3일 전", date: "2025.09.01" },
-        { id: "2", title: "1차 피드백 반영", description: "7일 전", date: "2025.08.28" },
-        { id: "3", title: "초안", description: "10일 전", date: "2025.08.23" },
-    ]);
-    const [portfolioVersions, setPortfolioVersions] = useState<Version[]>([
-        { id: "1", title: "최종본", description: "어제 수정", date: "2025.09.06" },
-        { id: "2", title: "프로젝트 보강", description: "5일 전", date: "2025.09.02" },
-        { id: "3", title: "초안", description: "2주 전", date: "2025.08.23" },
-    ]);
+    const { data: resumeData, isLoading: isLoadingResumes } = useFileMetaDataListByApplicationId(
+        appId,
+        "RESUME",
+        0,
+        100,
+        !!appId,
+    );
+
+    const { data: portfolioData, isLoading: isLoadingPortfolios } =
+        useFileMetaDataListByApplicationId(appId, "PORTFOLIO", 0, 100, !!appId);
+
+    const { data: coverLetterData, isLoading: isLoadingCoverLetters } = useCoverLetterList(
+        appId,
+        0,
+        100,
+        !!appId,
+    );
+
+    const deleteAttachmentMutation = useDeleteAttachmentFile();
+    const deleteCoverLetterMutation = useDeleteCoverLetter();
+
+    const resumeVersions: Version[] = useMemo(() => {
+        if (!resumeData?.content) return [];
+        return resumeData.content.map((file) => ({
+            id: String(file.id),
+            title: file.documentTitle,
+            description: file.originalFileName,
+            date: new Date().toLocaleDateString("ko-KR"),
+        }));
+    }, [resumeData]);
+
+    const portfolioVersions: Version[] = useMemo(() => {
+        if (!portfolioData?.content) return [];
+        return portfolioData.content.map((file) => ({
+            id: String(file.id),
+            title: file.documentTitle,
+            description: file.originalFileName,
+            date: new Date().toLocaleDateString("ko-KR"),
+        }));
+    }, [portfolioData]);
+
+    const coverVersions: Version[] = useMemo(() => {
+        if (!coverLetterData?.content) return [];
+        return coverLetterData.content.map((item) => ({
+            id: String(item.versionId),
+            title: item.title,
+            description: "",
+            date: new Date(item.createdDate).toLocaleDateString("ko-KR"),
+        }));
+    }, [coverLetterData]);
 
     const paths = useMemo(() => {
         return TABS.reduce<Record<string, string>>((acc, t) => {
@@ -57,11 +98,45 @@ export const ApplicationsDocumentsWidget = () => {
         }, {});
     }, [applicationId]);
 
-    const makeDeleteHandler =
-        (setList: React.Dispatch<React.SetStateAction<Version[]>>) => (id: string) => {
-            if (!confirm("정말 삭제하시겠습니까?")) return;
-            setList((prev) => prev.filter((v) => v.id !== id));
-        };
+    const handleDeleteAttachment = (id: string) => {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+        if (!appId) return;
+
+        deleteAttachmentMutation.mutate(
+            {
+                applicationId: appId,
+                attachmentFileId: Number(id),
+            },
+            {
+                onSuccess: () => {
+                    toast.success("삭제되었습니다.");
+                },
+                onError: () => {
+                    toast.error("삭제에 실패했습니다.");
+                },
+            },
+        );
+    };
+
+    const handleDeleteCoverLetter = (id: string) => {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+        if (!appId) return;
+
+        deleteCoverLetterMutation.mutate(
+            {
+                applicationId: appId,
+                documentId: Number(id),
+            },
+            {
+                onSuccess: () => {
+                    toast.success("삭제되었습니다.");
+                },
+                onError: () => {
+                    toast.error("삭제에 실패했습니다.");
+                },
+            },
+        );
+    };
 
     return (
         <section className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -78,36 +153,42 @@ export const ApplicationsDocumentsWidget = () => {
                     <TabItem menu="이력서">
                         <DocumentList
                             title="이력서"
-                            versions={resumeVersions}
+                            versions={isLoadingResumes ? [] : resumeVersions}
                             onCreateVersion={() =>
                                 navigate(`/mentee/applications/${applicationId}/resumes/new`)
                             }
-                            onViewVersion={() => alert("이력서 보기")}
-                            onDeleteVersion={makeDeleteHandler(setResumeVersions)}
+                            onViewVersion={(id) => {
+                                navigate(`/mentee/feedback/${id}`);
+                            }}
+                            onDeleteVersion={handleDeleteAttachment}
                         />
                     </TabItem>
 
                     <TabItem menu="자기소개서">
                         <DocumentList
                             title="자기소개서"
-                            versions={coverVersions}
+                            versions={isLoadingCoverLetters ? [] : coverVersions}
                             onCreateVersion={() =>
                                 navigate(`/mentee/applications/${applicationId}/coverletters/new`)
                             }
-                            onViewVersion={() => alert(`자기소개서 보기`)}
-                            onDeleteVersion={makeDeleteHandler(setCoverVersions)}
+                            onViewVersion={(id) => {
+                                navigate(`/mentee/feedback/${id}`);
+                            }}
+                            onDeleteVersion={handleDeleteCoverLetter}
                         />
                     </TabItem>
 
                     <TabItem menu="포트폴리오">
                         <DocumentList
                             title="포트폴리오"
-                            versions={portfolioVersions}
+                            versions={isLoadingPortfolios ? [] : portfolioVersions}
                             onCreateVersion={() =>
                                 navigate(`/mentee/applications/${applicationId}/portfolios/new`)
                             }
-                            onViewVersion={() => alert(`포트폴리오 보기`)}
-                            onDeleteVersion={makeDeleteHandler(setPortfolioVersions)}
+                            onViewVersion={(id) => {
+                                navigate(`/mentee/feedback/${id}`);
+                            }}
+                            onDeleteVersion={handleDeleteAttachment}
                         />
                     </TabItem>
                 </div>

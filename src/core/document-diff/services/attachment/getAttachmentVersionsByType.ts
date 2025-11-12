@@ -3,6 +3,7 @@ import { api } from "@/app/lib/api";
 import type { PdfVersionItem } from "@/widgets/document-diff/VersionedPdfDiffWidget";
 
 import { AttachmentQueryKeys } from "../_keys";
+import { getPresignedGetUrl as getPresignedGetUrlFromService } from "./getPresignedGetUrl";
 import { useQuery } from "@tanstack/react-query";
 
 export interface GetFileMetaListResponseBody {
@@ -18,11 +19,6 @@ export interface GetFileMetaListResponseBody {
         applicationId: number;
         attachmentFileType: "RESUME" | "PORTFOLIO";
     }>;
-}
-
-export interface GetPresignedGetUrlResponseBody {
-    presignedUrl: string;
-    expiredAt: string;
 }
 
 export async function getAttachmentFileMetaListByType(
@@ -45,15 +41,6 @@ export async function getAttachmentFileMetaListByType(
     return response.data;
 }
 
-export async function getPresignedGetUrl(applicationId: number, attachmentFileId: number) {
-    const { data: response } = await api.get<{
-        code: string;
-        message: string;
-        data: GetPresignedGetUrlResponseBody;
-    }>(`/applications/${applicationId}/attachment-files/${attachmentFileId}`);
-    return response.data;
-}
-
 export async function getAttachmentVersionsByType(
     applicationId: number,
     type: "RESUME" | "PORTFOLIO",
@@ -62,7 +49,9 @@ export async function getAttachmentVersionsByType(
     const rows = meta.content ?? [];
     if (rows.length === 0) return [];
 
-    const urls = await Promise.all(rows.map((r) => getPresignedGetUrl(applicationId, r.id)));
+    const urls = await Promise.all(
+        rows.map((r) => getPresignedGetUrlFromService(applicationId, r.id)),
+    );
 
     return rows.map((r, i) => ({
         id: String(r.id),

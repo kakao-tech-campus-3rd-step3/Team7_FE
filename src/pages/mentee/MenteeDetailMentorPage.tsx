@@ -187,7 +187,9 @@ export default function MenteeDetailMentorPage() {
                     <MentoringRequestModal
                         open={isMentoringRequestModalOpen}
                         onClose={() => setIsMentoringRequestModalOpen(false)}
+                        mentorId={mentorId}
                         mentorName={header.name}
+                        onSuccess={() => {}}
                     />
                 </>
             )}

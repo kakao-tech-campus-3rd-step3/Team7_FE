@@ -40,14 +40,15 @@ export async function getCoverLetterList(applicationId: number, page = 0, size =
             last: boolean;
         };
     }>(`/applications/${applicationId}/cover-letters`, {
-        params: { pageable: { page, size } },
+        params: { page, size },
     });
     return res.data;
 }
-export const useCoverLetterList = (applicationId: number, page = 0, size = 30) =>
+export const useCoverLetterList = (applicationId: number, page = 0, size = 30, enabled = true) =>
     useQuery({
         queryKey: CoverLetterQueryKeys.LIST(applicationId, page, size),
         queryFn: () => getCoverLetterList(applicationId, page, size),
+        enabled: enabled && applicationId > 0,
     });
 
 // 상세
@@ -57,6 +58,12 @@ export async function getCoverLetterDetail(applicationId: number, documentId: nu
     );
     return res.data;
 }
+export const useCoverLetterDetail = (applicationId: number, documentId: number, enabled = true) =>
+    useQuery({
+        queryKey: CoverLetterQueryKeys.DETAIL(applicationId, documentId),
+        queryFn: () => getCoverLetterDetail(applicationId, documentId),
+        enabled: enabled && applicationId > 0 && documentId > 0,
+    });
 
 // 등록
 export async function registerCoverLetterByApplicationId(

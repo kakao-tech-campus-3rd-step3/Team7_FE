@@ -17,8 +17,8 @@ export async function getResumePdfDiffByIds(
         getPresignedGetUrl(applicationId, rightAttachmentId),
     ]);
     return {
-        before: left.data.data.presignedUrl,
-        after: right.data.data.presignedUrl,
+        before: left.presignedUrl,
+        after: right.presignedUrl,
     } satisfies GetPdfDiffByIdsResponseBody;
 }
 
